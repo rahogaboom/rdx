@@ -3,7 +3,7 @@ Using Multi Key Radix PATRICIA Fast Search
 
 Richard Hogaboom
 
-JUNE 06, 2007
+June 6, 2007
 
 Here's a follow-up to an article about enhancing a fundamental storage algorithm for faster search.
 
@@ -17,35 +17,46 @@ the data-node access structures are separate for each key.
 
 In a March 1997 article ("Highly Dynamic Radix Fast Search Algorithm with Easy Sort/Deletion"), I
 described how to implement a single-key fast search using PATRICIA (Practical Algorithm to Retrieve
-Information Coded in Alphanumeric), which featured easy sort and deletion.1 PATRICIA, invented by
-Donald Morrison in 1968, is a radix trie with one child data node per parent branch node, each data
-node containing a single key string.2 
+Information Coded in Alphanumeric), which featured easy sort and deletion(Ref 1).  PATRICIA(Ref 2),
+invented by Donald Morrison in 1968, is a radix trie with one child data node per parent branch
+node, each data node containing a single key string.
 
 This article builds on that previous one, available online. The fundamental storage algorithm is the
 same, but I've enhanced the specific implementation in several ways. Starting with the same code
 base, the enhancements accomplish the following: 
 
+1. Do a complete multikey implementation, allowing a data node to be accessed, using PATRICIA, by
+   any of N keys of arbitrary length.
 
-Do a complete multikey implementation, allowing a data node to be accessed, using PATRICIA, by any
-of N keys of arbitrary length.  Enhance the print routine to display the branch-node path that each
-key traverses to reach the common data node.  Write an entirely new routine to verify the integrity
-of the data structure at any point in its lifetime.  Set up a new encapsulating data structure type
-that holds all the state for a single multikey PATRICIA data structure and could be repeatedly used
-in one program to declare multiple different PATRICIA search tries.  Improve both in-code and
-external documentation.  Improve the test suite provided with the code (I discuss this test suite in
-detail later). First, make most of the tests independent of the number of keys, their length, and
-the maximum total number of trie nodes. Second, use the enhanced print and verify routines to
-display trie state and verify its correctness. And lastly, give some idea of expected results and
-success or failure at getting those results.  Provide implementations in both C and C++. Provide
-both static and dynamic libraries. Make sure the code runs on both little and big endian machines.
-Standardize on the GNU compiler suite, because it's the most common and not vendor specific.
+2. Enhance the print routine to display the branch-node path that each key traverses to reach the
+   common data node.
+
+3. Write an entirely new routine to verify the integrity of the data structure at any point in its
+   lifetime.
+
+4. Set up a new encapsulating data structure type that holds all the state for a single multikey
+   PATRICIA data structure and could be repeatedly used in one program to declare multiple different
+   PATRICIA search tries.
+
+5. Improve both in-code and external documentation.
+
+6. Improve the test suite provided with the code (I discuss this test suite in detail later). First,
+   make most of the tests independent of the number of keys, their length, and the maximum total
+   number of trie nodes.  Second, use the enhanced print and verify routines to display trie state
+   and verify its correctness. And lastly, give some idea of expected results and success or failure
+   at getting those results.
+
+7. Provide implementations in both C and C++. Provide both static and dynamic libraries. Make sure
+   the code runs on both little and big endian machines.
+
+8. Standardize on the GNU compiler suite, because it's the most common and not vendor specific.
 
 The most important enhancement over my previous implementation of the routines is the algorithmic
 changes needed to support an arbitrary multiple number (N) of keys to find a given data node, all
 using PATRICIA radix fast search. I believe this is a truly unique feature. To quote Robert
 Sedgewick, "PATRICIA manages to identify the bits which distinguish the search keys and build them
 into a data structure (with no surplus nodes) that quickly leads from any search key to the only one
-key in the data structure that could be equal."3 
+key in the data structure that could be equal."(Ref 3)
 
 As explained later, the characteristic of PATRICIA that enables this multikey implementation is the
 allocation of a new branch node for every new data node inserted. Thus, with multikey, there are now
@@ -105,7 +116,9 @@ PNODE-defined variables are then used as arguments to the library routines. The 
 how to use the library is to examine the test code in rdx_pat_test.c (available online). All eight
 routines are used in several different circumstances. 
 
-Data structures The PNODE type is the basic repository of the multikey PATRICIA structures and the
+Data structures
+
+The PNODE type is the basic repository of the multikey PATRICIA structures and the
 user data. Its structure is worth understanding in some detail. In rdx_pat_search.h, the unsigned
 int tot_nodes holds the count of allocated nodes, not including the always-allocated root node.
 BNODE *head[NUM_KEYS]; is the array of pointers to the heads of the PATRICIA tries with one trie for
@@ -158,93 +171,154 @@ the NUM_KEYS keys of NUM_KEY_BYTES. The extra byte is for comparison with the ro
 are all 0xff of one extra byte, the impossible key. Lastly, APP_DATA data; holds the application
 data defined in rdx_pat_data.h. 
 
-General API issues All routines parameter lists begin with PNODE *pnodep, a pointer to the basic
-data structure. Each declaration of PNODE type will result in a different trie of MAX_NUM_RDX_NODES
-user-data nodes of NUM_KEYS keys with NUM_KEY_BYTES bytes per key. Begin all calls with the form:
-PNODE data; rdx_pat_xxx(&data, ...  For search, insert, delete, and print, the second argument will
-be unsigned char key[NUM_KEYS][NUM_KEY_BYTES], which holds the NUM_KEYS keys of NUM_KEY_BYTES bytes
-length. Internally, the keys are stored with one extra high-order byte of 0 for comparison with the
-root node 0xff key extra high-order byte. If each key is unique within its key index(0 -
-NUM_KEYS-1), then an insertion will succeed. All keys must be of the same length. For actual shorter
-keys, use only the low-order bytes of the key space with high-order bytes set to 0. 
+General API issues
+
+All routines parameter lists begin with PNODE *pnodep, a pointer to the basic data structure. Each
+declaration of PNODE type will result in a different trie of MAX_NUM_RDX_NODES user-data nodes of
+NUM_KEYS keys with NUM_KEY_BYTES bytes per key. Begin all calls with the form:
+
+PNODE data;
+rdx_pat_xxx(&data, ...
+
+For search, insert, delete, and print, the second argument will be unsigned char
+key[NUM_KEYS][NUM_KEY_BYTES], which holds the NUM_KEYS keys of NUM_KEY_BYTES bytes length.
+Internally, the keys are stored with one extra high-order byte of 0 for comparison with the root
+node 0xff key extra high-order byte. If each key is unique within its key index(0 - NUM_KEYS-1),
+then an insertion will succeed. All keys must be of the same length. For actual shorter keys,
+use only the low-order bytes of the key space with high-order bytes set to 0. 
 
 The rdx_pat_verify() routine takes an enum argument of VERIFY_MODE vm. The ERR_CODE value will cause
 upon error the return of an integer error code only. The ERR_CODE_PRINT value will cause upon error
 the return of the same integer error code, print an error message, and print the free
 branch-/data-node addresses, the allocated branch/data nodes addresses, and the key values.  The
 print and verify routines take an argument of type FILE *fp to print to. This can just as easily be
-a file as a print queue.  Routines 1.	rdx_pat_initialize()--After any PNODE definition, you'll
+a file as a print queue.
+
+Routines
+
+1. rdx_pat_initialize()--After any PNODE definition, you'll
 want to do initialization. Failure to do this will result in unpredictable results. Every library
 routine depends on node variables being in a consistent state. Start by setting the entire data
 structure to 0xf0. This improves the chances of finding problems if something goes wrong. When the
 print or verify routines are used, this lets the user see or the verify routine to run into 0xf0
 where it shouldn't be. Also note that the full user-data structure of each node is set to 0xf0. This
-might alert the user to any uninitialized portions of data. Typical use: PNODE data;
-rdx_pat_initialize(&data); 2.	rdx_pat_search()--The search routine uses (in sequence) each of the
+might alert the user to any uninitialized portions of data. Typical use:
+
+PNODE data;
+rdx_pat_initialize(&data);
+
+2. rdx_pat_search()--The search routine uses (in sequence) each of the
 NUM_KEYS PATRICIA tries constructed by the insert routine. Each trie is traversed until either a
 data node is found with that key or not. If all NUM_KEYS keys are found and in the same data node,
 then the search was successful. Success returns a pointer to the found DNODE. Failure returns NULL.
-Typical usage is: PNODE data; unsigned char keys[NUM_KEYS][NUM_KEY_BYTES]; DNODE *dnp;
+Typical usage is:
 
-dnp = rdx_pat_search(&data, keys); 3.	rdx_pat_insert()--Insertion is the most complex of the
+PNODE data;
+unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+DNODE *dnp;
+
+dnp = rdx_pat_search(&data, keys);
+
+3. rdx_pat_insert()--Insertion is the most complex of the
 operations. Each key must be unique within its own key index(0-NUM_KEYS). This means that all of the
 keys that will define the new data node must be searched for, and if found, will stop the insertion
 attempt with a return code of 1 and a pointer to the existing key node passed back as the third
 argument. If no key is found in the trie, a node is allocated from the free queue. If no free nodes
 are available, the return code is set to 2 and a NULL pointer is assigned to the return third
-argument.  PNODE data; unsigned char keys[NUM_KEYS][NUM_KEY_BYTES]; DNODE *dnp; int return_code;
+argument.
 
-return_code = rdx_pat_insert (&data, keys, &dnp); 4.	rdx_pat_delete()--Deletion proceeds by
-searching for each of the NUM_KEYS keys passed in. If any of the keys aren't found, the deletion
-fails and NULL is returned. If all NUM_KEYS keys are found, deletion continues by removing from the
-trie structure the data node found and the NUM_KEYS branch nodes that are the data node's p[k]
-parents.  PNODE data; unsigned char keys[NUM_KEYS][NUM_KEY_BYTES]; DNODE *dnp;
-
-dnp = rdx_pat_delete(&data, keys); 5.	rdx_pat_sort()--Sorting this structure comes simply by
-recursively traversing the trie and storing pointers to the nodes in order. The third-argument
-integer specifies the key index(0-NUM_KEYS) that will be sorted over. If it's outside 0-NUM_KEYS-1,
-return -1. If the trie is empty, return 0. Typical usage: PNODE data; DNODE **nodes; unsigned int k;
+PNODE data;
+unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+DNODE *dnp;
 int return_code;
 
-return_code = dx_pat_sort(&data, &nodes, k); 6.	rdx_pat_nodes()--rdx_pat_nodes() simply returns the
-number of user allocated nodes in the passed in PNODE. Typical usage: PNODE data; int n;
+return_code = rdx_pat_insert(&data, keys, &dnp); 
 
-n = rdx_pat_nodes(&data); 7.	rdx_pat_print()--The rdx_pat_print() routine has two modes,
-distinguished by the value of the passed data in second argument. If the argument is NULL, the
-NUM_KEYS branch nodes and the data nodes for each of the total allocated nodes is printed. No
-attempt is made to associate branch nodes that lead via PATRICIA trie hierarchy to a given data
-node. All nodes are printed. The NUM_KEYS branch nodes that are printed with a given data node may
-be connected in an unspecified way with any data node in the trie. This mode is useful for cases
-where only a few data nodes are allocated and printing the entire trie will show vis inspection all
-the trie connections.  The second mode is specified when the argument is not NULL and holds a key
-argument with the full NUM_KEYS keys specified. In this case, for each NUM_KEYS key, the full path
-from the root node to the data node through all the intervening branch nodes is printed. This gives
-a means to see how each branch node is connected to the next, leading to the data node for all of
-the keys. Typical usage: PNODE data; unsigned char keys[NUM_KEYS][NUM_KEY_BYTES]; FILE *fp; int
-return_code;
+4. rdx_pat_delete()--Deletion proceeds by searching for each of the NUM_KEYS keys passed in. If
+any of the keys aren't found, the deletion fails and NULL is returned. If all NUM_KEYS keys are
+found, deletion continues by removing from the trie structure the data node found and the NUM_KEYS
+branch nodes that are the data node's p[k] parents.
 
-return_code = rdx_pat_print(&data, NULL, fp); return_code = rdx_pat_print(&data, keys, fp); 8.
-rdx_pat_verify()--rdx_pat_verify() is by far the largest routine of the library. It provides a way
-to verify the integrity of the multikey PATRICIA trie structure. For example, an embedded systems
-developer might suspect that his trie has been corrupted by some hardware fault or maybe a neutrino
-or an erroneous memory access, and wants to know if the trie is in a consistent state, available for
-access, and that at least the manipulation of the trie via any key is available. The application
-data's integrity isn't guaranteed however, because rdx_pat_verify() has nothing to do with APP_DATA.
+PNODE data;
+unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+DNODE *dnp;
+
+dnp = rdx_pat_delete(&data, keys);
+
+5. rdx_pat_sort()--Sorting this structure comes simply by recursively traversing the trie and
+storing pointers to the nodes in order. The third-argument integer specifies the key
+index(0-NUM_KEYS) that will be sorted over. If it's outside 0-NUM_KEYS-1, return -1. If the trie is
+empty, return 0. Typical usage:
+
+PNODE data;
+DNODE **nodes;
+unsigned int k;
+int return_code;
+
+return_code = dx_pat_sort(&data, &nodes, k);
+
+6. rdx_pat_nodes()--rdx_pat_nodes() simply returns the number of user allocated nodes in the
+passed in PNODE. Typical usage:
+
+PNODE data;
+int n;
+
+n = rdx_pat_nodes(&data);
+
+7. rdx_pat_print()--The rdx_pat_print() routine has two modes, distinguished by the value of
+the passed data in second argument. If the argument is NULL, the NUM_KEYS branch nodes and the data
+nodes for each of the total allocated nodes is printed. No attempt is made to associate branch nodes
+that lead via PATRICIA trie hierarchy to a given data node. All nodes are printed. The NUM_KEYS
+branch nodes that are printed with a given data node may be connected in an unspecified way with any
+data node in the trie. This mode is useful for cases where only a few data nodes are allocated and
+printing the entire trie will show vis inspection all the trie connections.
+
+The second mode is specified when the argument is not NULL and holds a key argument with the full
+NUM_KEYS keys specified. In this case, for each NUM_KEYS key, the full path from the root node to
+the data node through all the intervening branch nodes is printed. This gives a means to see how
+each branch node is connected to the next, leading to the data node for all of the keys. Typical
+usage:
+
+PNODE data;
+unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+FILE *fp;
+int return_code;
+
+return_code = rdx_pat_print(&data, NULL, fp);
+return_code = rdx_pat_print(&data, keys, fp);
+
+8. rdx_pat_verify()--rdx_pat_verify() is by far the largest routine of the library. It provides a
+way to verify the integrity of the multikey PATRICIA trie structure. For example, an embedded
+systems developer might suspect that his trie has been corrupted by some hardware fault or maybe a
+neutrino or an erroneous memory access, and wants to know if the trie is in a consistent state,
+available for access, and that at least the manipulation of the trie via any key is available. The
+application data's integrity isn't guaranteed however, because rdx_pat_verify() has nothing to do
+with APP_DATA.
+
 rdx_pat_verify() makes 25 types of error checking. Any error will result in a non-zero integer
 return code and termination of the routine. There are two modes of operation based on the value of
 the enum second argument: if ERR_CODE, only an integer code is returned; if ERR_CODE_PRINT, a
 message is printed to the third argument file pointer and also a listing of all of the free and
-allocated branch-/data-node addresses, node indexes, and data-node keys. Typical usage: PNODE data;
-FILE *fp; int return_code;
+allocated branch-/data-node addresses, node indexes, and data-node keys. Typical usage:
 
-return_code = rdx_pat_verify(&data, ERR_CODE, fp); return_code = rdx_pat_verify(&data,
-ERR_CODE_PRINT, fp); Testing I provide rdx_pat_test.c (available online) to test the library
-routines and provide use examples. All the tests involve two PNODE PATRICIA tries and an associated
-array for each to hold keys. These are: PNODE rdx_data1; unsigned char
-rdx_data1_keys[MAX_NUM_RDX_NODES] [NUM_KEYS][NUM_KEY_BYTES];
+PNODE data;
+FILE *fp;
+int return_code;
 
-PNODE rdx_data2; unsigned char rdx_data2_keys[MAX_NUM_RDX_NODES+1] [NUM_KEYS][NUM_KEY_BYTES];
+return_code = rdx_pat_verify(&data, ERR_CODE, fp);
+return_code = rdx_pat_verify(&data, ERR_CODE_PRINT, fp);
 
+Testing
+
+I provide rdx_pat_test.c (available online) to test the library routines and provide use examples.
+All the tests involve two PNODE PATRICIA tries and an associated array for each to hold keys.
+These are:
+
+PNODE rdx_data1;
+unsigned char rdx_data1_keys[MAX_NUM_RDX_NODES][NUM_KEYS][NUM_KEY_BYTES];
+
+PNODE rdx_data2;
+unsigned char rdx_data2_keys[MAX_NUM_RDX_NODES+1][NUM_KEYS][NUM_KEY_BYTES];
 
 The constants are MAX_NUM_RDX_NODES=8, NUM_KEYS=3 and NUM_KEY_BYTES=20 defined in rdx_pat_search.h.
 These can be adjusted to any non-zero integers. Actually, (1,1,1) works! However, a trie of one node
@@ -264,24 +338,26 @@ gbit() routine. A valgrind memcheck also passes.
 I also provide a test routine for the gbit() static internal routine. This routine is critical to
 the correct operation of the library. 
 
-Memory consumption I've run tests on my Linux box with NUM_KEYS=16, MAX_NUM_RDX_NODES=100000, and
-NUM_KEY_BYTES=64 successfully. This resulted, with the suite of tests provided, in a
-rdx_pat_test.results file size of 1.4 Gbytes! (File available online). The same test with
-MAX_NUM_RDX_NODES=1000000 fails with a segmentation fault. Remember that this was done on a Linux
-machine. Other RTOSes may differ. 
+Memory consumption
+
+I've run tests on my Linux box with NUM_KEYS=16, MAX_NUM_RDX_NODES=100000, and NUM_KEY_BYTES=64
+successfully. This resulted, with the suite of tests provided, in a rdx_pat_test.results file size
+of 1.4 Gbytes! (File available online). The same test with MAX_NUM_RDX_NODES=1000000 fails with a
+segmentation fault. Remember that this was done on a Linux machine. Other RTOSes may differ. 
 
 Richard Hogaboom has an MS in physics and has published in The C Users Journal, The Perl Journal,
 and Embedded Systems Programming.
 
-Endnotes: 1.	Hogaboom, Dick."Highly Dynamic Radix Fast Search Algorithm with Easy Sort/Deletion,"
+Endnotes:
+1. Hogaboom, Dick."Highly Dynamic Radix Fast Search Algorithm with Easy Sort/Deletion,"
 Embedded Systems Programming, March 1997, p72. Available at
-www.embedded.com/showArticle.jhtml?articleID=199500801.  Back 
+www.embedded.com/showArticle.jhtml?articleID=199500801.
 
-2.	Morrison, Donald R. "PATRICIA--Practical Algorithm To Retrieve Information Coded in
+2. Morrison, Donald R. "PATRICIA--Practical Algorithm To Retrieve Information Coded in
 Alphanumeric," Journal of the Association for Computing Machinery, Vol. 15, No. 4, Oct. 1968, pp.
-514-534.  Back 
+514-534.
 
-3.	Sedgewick, Robert. Algorithms in C. Addison-Wesley, 1998, Patricia Tries, pp. 623-631.  Back 
+3. Sedgewick, Robert. Algorithms in C. Addison-Wesley, 1998, Patricia Tries, pp. 623-631.
 
 Further reading: Knuth, Donald. The Art of Computer Programming: Sorting and Searching.
 Addison-Wesley, 1973, pp 490-499.

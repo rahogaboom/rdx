@@ -1,0 +1,29 @@
+
+Multi Key Radix PATRICIA Fast Search(rdx_pat_search)
+
+Files:
+
+. directory:
+   rdx.article.ESP.2007   - extended documentation
+   rdx.README             - this file
+
+c directory:
+   c.README               - how to run default test build and build with your own parameters
+   rdx_pat.mk             - build script for everything
+   rdx_pat_data.h         - header file for application data structure
+   rdx_pat_search.h       - header file with prototypes and typedefs
+   rdx_pat_search.c       - code for Multi Key Radix PATRICIA Fast Search
+   rdx_pat_test.c         - test code
+   test_gbit.c            - program to test gbit() routine
+   rdx_pat.man            - man page in perldoc format, do "perldoc rdx_pat.man"
+
+cpp directory:
+   cpp.README             - how to run default test build and build with your own parameters
+   rdx_pat.mk             - build script for everything
+   rdx_pat_data.h         - header file for application data structure
+   rdx_pat_search.h       - header file with prototypes and typedefs
+   rdx_pat_search.cpp     - code for Multi Key Radix PATRICIA Fast Search
+   rdx_pat_test.cpp       - test code
+   test_gbit.cpp          - program to test gbit() routine
+   rdx_pat.man            - man page in perldoc format, do "perldoc rdx_pat.man"
+

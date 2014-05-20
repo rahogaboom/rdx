@@ -2,7 +2,7 @@ rdx
 ===
 
 Multi Key Radix PATRICIA Fast Search C/C++
-   - 
+   - see article in Embedded Systems Design, Jun. 2007, "Using multikey radix PATRICIA fast search"(included)
 
 
 API:

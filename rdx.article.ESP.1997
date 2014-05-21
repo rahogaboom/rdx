@@ -1,0 +1,322 @@
+
+Highly dynamic Radix fast search algorithm with easy sort/deletion
+
+Richard Hogaboom
+
+March 1997
+
+
+Good search algorithms are hard to find. Embedded systems in particular have some peculiar
+requirements. This article presents a search algorithm suitable for embedded applications.
+
+Every program, even the simplest, needs to store and retrieve data according to some key. Simple
+arrays are the favorite and most common choice. Storage and access are simple and predictable. Every
+high-level language has built in facilities for this kind of search. As keys get lengthier and the
+key space gets sparsely occupied, this solution becomes impractical. Large, mostly empty, arrays
+result. Search algorithms that have more desirable properties are sought. Always desirable are the
+predictable allocation of storage, linearly related to the number of keys, and a fast average search
+with tolerable worst-case search times. Sometimes, other algorithm characteristics are important.
+For dynamic environments, key deletion is necessary. Some applications require the return of a
+sorted list of key values. Over decades, numerous algorithms have been developed, each with more or
+less desirable characteristics. Their usage depends on matching their most desirable properties with
+the needs of the application. An often recurring theme in search algorithm evaluation is the
+difficulties encountered in deletion. Very often comparatively complex storage structure repairs are
+required to restore the links and structure consistency. As I will show later, ease of deletion was
+very important in the selection and modification of the algorithm that I ultimately used.
+
+Embedded applications, in particular, have some peculiar requirements. Usually, their real-time
+nature limits both space and time resources that can be spent on searching. Regular periodic
+deadlines and highly dynamic search/insertion/deletion environments make undesirable those
+algorithms that have periodic complex restructuring requirements, such as rebalancing of trees or
+elimination of lazy deletion nodes. Algorithms that produce unpredictable characteristics in the
+storage structure, based on key length, key insertion order, or key value, introduce too much
+uncertainty into the dynamic allocation requirements and can unpredictably break deadlines. For
+example, in binary search trees, one of the most fundamental search algorithms in computer science,
+if the keys inserted are not in random order, the tree can be very unbalanced and result in
+worst-case searches requiring N key comparisons for N nodes.
+
+I do not intend here to survey the vast field of search algorithms. Nor do I intend to
+justify/quantify even the most typical parameters characteristic of the algorithm that I selected,
+such as average search/worst-case search/insertion/deletion times or sort complexity. Many fine
+texts cover, in great depth, the mathematically precise calculations of these characteristic
+parameters. The text I relied on most heavily was Robert Sedgewick's classic Algorithms in C.(Ref 1)
+I intend merely to present an implementation of an existing algorithm, modified for deletion, that I
+have found to be extremely useful in highly dynamic situations.
+
+Application environment
+
+I started out with a specific application in mind, and the particular requirements of that
+application drove my investigation of search algorithms. I work in the Air Traffic Surveillance
+group at MIT Lincoln Laboratory on the GPS-Squitter project. We do aircraft surveillance research
+for the FAA with a combination of the GPS satellite system, Mode S transponders on the aircraft, and
+Mode S receivers on the ground, all linked together in a Sun SPARCstation central control computer.
+The basic surveillance concept is as follows: GPS signals, available globally, are received by the
+target aircraft, decoded into latitude, longitude, and altitude, and encoded (with additional
+information such as Mode S address, time, squitter type, and turn indicator) into a 112-bit long
+squitter that is broadcast by the Mode S transponder every half-second. The ground Mode S
+receivers—there are usually several of these at an airport or in the general surveillance area—pick
+up these broadcasts and link them to the central control computer. The key here, literally, is the
+Mode S address. These addresses are 24 bits long and uniquely identify each aircraft. They translate
+into the tail identification numbers seen on aircraft. The central control computer picks up
+receptions from all the Mode S receivers and decodes the information for storage, based on the
+target Mode S address. Currently, there are relatively few long squitter broadcasting aircraft. Most
+aircraft broadcast short squitters that have only the Mode S address for identification purposes. My
+initial central control computer implementation used a simple linked list to store long squitter
+targets only. This arrangement is fine with only several test aircraft targets. Later versions of
+the software required monitoring short squitter activity also, and because most commercial aircraft
+broadcast these, the world of aircraft to be monitored in a high-traffic terminal control area went
+immediately from several to several hundred. Thus my search for a new storage algorithm.
+
+This environment implies several requirements on the storage algorithm. First, because we are
+dealing with high-speed moving targets that must be monitored continuously, fast searches without
+any bad worst-case searches due to key value are necessary. Also, because the environment is highly
+dynamic with targets moving into and out of the surveillance area continuously, the algorithm had to
+have key deletion that was very efficient. Over long periods of time, the storage structure could
+not accumulate characteristics that required periodic restructuring of the entire structure. Lazy
+deletion was intolerable. Hash tables were rejected because of deletion problems and the need to
+maintain a relatively sparse structure to avoid multiple hash hits from the same hash value. I
+wanted the algorithm to behave just as nicely on allocation of the last available storage node as on
+the first. Additionally, when a target moved out of contact, the central control computer would stop
+receiving squitters from all of the Mode S receivers. Eventually, the target would have to be
+dropped or aged out. To do this, the entire storage structure would have to be searched for targets
+that had been lost from contact for greater than the age out seconds time, and all of these targets
+would have to be deleted. In some cases, I also wanted to be able to sort the targets by some other
+field than target node key. For example, displaying the targets in order of strength of squitter
+contact was desirable in some circumstances. Traversing each target node, calculating the number of
+squitters received by all the Mode S receivers in the last n seconds, and sorting by this number was
+very useful—on occasion.
+
+After considering various trees, tries, and hash tables, the algorithm I selected as my starting
+point was among the class of algorithms referred to as radix search methods, characterized by
+examining the keys one bit at a time rather than full key comparisons at each stage in node
+traversal. This algorithm, Practical Algorithm To Retrieve Information Coded In Alphanumeric
+(PATRICIA) (due to Donald R. Morrison), was outlined in some detail by Sedgewick with some
+rudimentary example code for searching and insertion.(Ref 2) I was attracted to this algorithm
+because it solved some of the characteristic problems of the more elementary radix search methods.
+
+Radix searching 
+
+Digital search trees, for example, have some desirable properties. The longest node path is the
+length of the longest leading bit key string match. They use about lg N (the number of bits needed
+to represent N) key comparisons, on average, and have a worst case of b comparisons for b-bit keys.
+Digital search trees are usually well balanced. However, they require a full key comparison at each
+node traversal and they have a structure dependent on the order of insertion.
+
+An alternative radix search algorithm that presents some additional advantages is the radix search
+trie. This method branches according to each successive key bit, but without storing keys in each
+node. Keys are only stored in leaf nodes. This introduces some additional complexity. The two types
+of nodes are branch and leaf nodes. One traverses this structure by examining only successive key
+bits and doing a final key comparison when a leaf node is reached. The trie structure is also
+independent of insertion order. Whereas the digital search tree required about lg N key comparisons,
+the digital search trie requires about lg Nbit comparisons. For longer keys, this difference can be
+significant. The same holds for the worst case. Two disadvantages come with tries: a multinode
+implementation and creation of trees with long paths of branch nodes for keys with leading bits in
+common. The resulting tree has unequal numbers of branch and leaf nodes. Both of these disadvantages
+complicate the code. Sedgewick mentions multiway radix algorithms, but these algorithms did not
+really solve the problems, except for situations in which the algorithm was tailored to the key
+length or value and the size of N.
+
+
+PATRICIA
+
+PATRICIA examines key bits also, with two way branches based on the bit value. However, PATRICIA
+eliminates the long path branch nodes problem by storing, in each node, the bit number within the
+key that is to be compared. When a link that would connect to a leaf node in digital search tries is
+encountered, an upward link to an exiting node is established and the key is stored there. This
+upward link is to the only node in the tree that could possibly store that key. Recognition of an
+upward link is easy, because the node it points to will have a bit comparison number larger than the
+node from which the link originates. That is, as the search proceeds down the tree, the bit indices
+get smaller as from left to right in the key. This process also has the effect of equalizing the
+number of nodes and keys allocated. Every node will thus have a key, but they will only be used for
+full key comparison at the end of the search on the upward link. Frequently, the terminating link in
+a node points to itself, in which case the key would be stored in that node, but not always.
+Sometimes upward terminating links point to nodes much further up the tree. For arbitrarily long
+keys, PATRICIA requires at most n bit comparisons, where n is the number of bits in the key, and one
+full key comparison at the upward link. An example using five bit keys can be seen in Figure 17.8 on
+page 254 of Sedgewick.
+
+Insertion has two cases—internal and external. These cases are shown in Figures 17.9 and 17.10 on
+page 255 of Sedgewick. External insertion is the most simple. These cases end at self-pointing
+nodes. When a search ends, it is, by the defining property of the tree, the only node at which a
+search for the new key could end. The new key is inserted in a node connected to the terminating
+node, with a search bit index of the leftmost bit in the two keys which differ. The upward links
+must now be adjusted—one pointing to the old terminating node and the other pointing to the new
+terminating node. In the example, X=11000 is the terminating node and Z=11010 is to be inserted. The
+three leading bits (four, three, and two) are the same. The first differing bit is bit one. The new
+node is thus inserted with bit search index one. Internal insertion starts out similarly, but ends
+when the current key bit is at a bit index that is between the search bit indexes already in the
+tree, and no branch is already in the tree for that bit index. This situation is shown in Figure
+17.10 for the value T=10100. Let's step down the tree. At the head of the tree the bit search index
+is four. Bit four of T is one, so go right. The next node in the tree has bit search index three.
+Bit three of T is zero, so go left. The next node in the tree has search bit index one, but this is
+to the right of bit two of T, which is one. At this point in the tree there is no place to go right
+at bit index two. Thus a more leftward bit index, which was skipped previously, must be inserted
+between Xand P. This insertion requires a more complex repair than external insertion. The X-P link
+must be broken and a new node inserted, and the other link must be set to point to the just-inserted
+node. If this verbiage seems complicated, just examine Figures 17.9 and 17.10. These figures are
+labeled with the bit search indexes and all the links.
+
+To quote Sedgewick, "PATRICIA is the quintessential radix search method: it manages to identify the
+bits which distinguish the search keys and build them into a data structure (with no surplus nodes)
+that quickly leads from any search key to the only key in the data structure that could be equal."
+But this method has one serious flaw from the point of view of my application: deletion. Horowitz
+suggests the construction of the delete function as an exercise, but does not give an example, and
+indicates that the deletion complexity is a function of the free depth.(Ref 3) Although the
+structure of the nodes is independent of the order of insertion, the location of the keys is not.
+All is not lost however. If one changes the algorithm by eliminating the upward links and inserting
+links pointing to leaf nodes instead, the structure repairs become doable. Once the key node is
+found, the deletion cost is predictable. The double node implementation resurfaces however.
+Examining the structure reveals that every insertion/deletion results in the addition/deletion of
+two nodes, one branch node, and one data node. The branch nodes will be small, with only pointers
+and indexes. The data nodes will not have upward links and will contain the key and the application
+data. I was willing to tolerate additional code complexity for ease of deletion. Knuth has a
+detailed calculation of successful and unsuccessful searching times, which should be unchanged even
+in this modification.(Ref 4)
+
+Implementation and usage 
+
+The code for my implementation is shown in rdx_sch.c, which contains all of the access routines.
+Header files rdx_sch.h and rdx_dta.h contain the typedefs of the data nodes and the application data
+structure. An extensive comment at the beginning of rdx_sch.c has prototypes, explanatory/cautionary
+notes and examples of usage. The first thing you will want to do is open rdx_sch.h and set
+MAX_NUM_RDX_NODES and NUM_KEY_BYTES to the number of key nodes and number of key bytes you desire.
+For my application, 1,024 seemed more than enough for the number of aircraft targets in a terminal
+surveillance area, and three bytes was the Mode S address size. The data node typedef follows and
+includes the APP_DATA data structure in rdx_dta.h for the node data. I won't show my actual data, as
+this is extensive and not relevant to a discussion of the algorithm. The first three members of both
+data and branch nodes are identical: a boolean indicating branch(0) or data(1) node id, a
+left(0)/right(1) parent branch indicator, and a pointer to the parent node. The data nodes have the
+full key plus the data structure. The branch nodes have the bit index used for search comparison
+against the search key and the left and right node pointers. These pointers may point to other
+branch or data nodes.
+
+Open rdx_sch.c and examine the code. Note that MAX_KEY_BITS is set to MAX_KEY_BYTES*8, but that the
+definition of key [MAX_KEY_BYTES+1] contained one extra byte. The algorithm starts with a data
+structure with one branch and one data node always allocated with an "impossible" key of at least
+one more bit length than the normal search keys. I set this key to all 0xff. Next, follow the branch
+node typedef and the static storage of the branch and data nodes. Static storage was chosen for its
+obvious efficiency in a highly dynamic environment. Everything should be static, as only the access
+routines should provide access to the data structure. The selection of 1,024 nodes, although a power
+of two, is not important—any number will do. Note also that the allocated storage for both node
+types has the extra node allocated for the initial root impossible key. Thus, a full 1,024 data
+nodes are available. The head pointers to the search tree and the free lists of both types of nodes
+are declared as pointers to a specific node type. However, on occasion, these pointers are cast to
+point to the other type of node. This implementation problem is encountered with any type of
+multi-node type tree. It is important to note that the first three members of each type of node may
+not be moved or altered, because casts to the opposite type refer to these members.
+
+Initialization is with rdx_ini(). The initial branch and data node with the impossible key are
+allocated and initialized. The remaining branch and data nodes are linked on free lists. Searching
+is with DNODE *rdx_sch(key). The key passed is without any extra byte added at the beginning. For my
+application, this key is just a pointer to the 3-byte Mode S addresses. The return points to a data
+node with the found key or is NULL if the key was not found. All routines that take a key argument
+copy the key to storage with an extra zero byte for subsequent comparison. Searching always starts
+at the left branch of the always-allocated initial branch node. The simple while() loop does the
+job. The macro GBIT() gets the key index bit needed for that branch node (in b) and branches. The
+search ends when a data node is encountered. A single key comparison determines search success or
+failure.
+
+Insertion is by far the most complex operation. There are three cases:
+
+The key is not already in the tree: insert it, pass back a pointer to the data node in the argument,
+and return one The key already exists: pass back a pointer to the data node and return zero The
+nodes are exhausted: pass back NULL argument and return -1 Start by searching for the key. If the
+key is found, this amounts to doing rdx_sch()—set the node pointer, return value, and return. If the
+key is not found, we begin actual insertion. The availability of free nodes is checked next, and the
+error case returned if none are free. Insertion proceeds by finding the leftmost bit that the search
+key is different from the terminating key actually found in the tree. A while() loop with GBIT()
+decrementing key_bit performs this. When this bit index is determined, the new branch and data nodes
+are allocated, with t1 pointing to the new branch node and t2 pointing to the new data node. We now
+begin traversing down the tree, looking for the internal or external location to insert, all the
+while saving the parent (p pointer) and child (c pointer) pointers to the nodes to insert between.
+If the search terminates with c->d= 1, then the insertion is external. If the search terminates with
+c->b<= key_bit, the insertion is internal. The variable lr saves the link type—node is a right link
+of its parent (lr=1) or node is a left link (lr=0) of its parent, that is then used to set the
+brvariable in all nodes and is needed for deletion. With the new nodes allocated (pointers t1 and
+t2) and the parent and child nodes to be inserted between (pointers p and c), the only remaining
+task is to change all the pointers among four nodes correctly. There are two cases (surprise!). The
+new branch node is between a parent that points right to its child or left to its child. The new
+data node will then be pointed to by the new branch nodes' other opposite direction pointer. There
+are six forward and backward pointers to set, the br variables in the two new nodes, the b-bit index
+in the new branch node, and the key in the new data node. I will not even begin to describe setting
+each of these. Just examine the code and draw a four node tree with arrows for links. This solution
+will probably be much clearer than a verbal description. If all this does not read exactly like a
+novel, please don't be discouraged. It took me some time to get all the pointers for both cases
+straight as well.
+
+Deletion proceeds similarly, but in opposite fashion to insertion. There are two cases:
+
+If the key is found, delete it and return one If the key is not found, return zero Start by
+searching. When the terminal data node is reached, its parent is the paired branch node to delete
+also. Thus, the other child of this branch node will have to point to the parent of the
+to-be-deleted branch node. Repairing the pointers of this other child and the parent of the
+to-be-deleted branch completes the deletion. The free branch and data nodes are now returned to the
+free lists. Sorting in this kind of structure comes simply by recursively traversing the tree and
+storing pointers to the nodes in order as they are reached by the recursions. A static array of node
+pointers, DNODE *node_ptrs [MAX_NUM_RDX_NODES+1], is allocated. This array will contain pointers to
+the key-sorted nodes. One extra node pointer allocated in this array will point to the impossible
+key node. Examining the key in the node pointed to by node_ptrs [MAX_NUM_RDX_NODES+1] should yield
+all 0xff bytes. As the recursive invocations reach data nodes the node_ptrs_cnt is incremented. When
+rdx_srt() returns, it sets its argument to a pointer to the head of the sorted pointers array and
+the function returns the number of elements. This scheme allows the use of qsort() to resort the
+nodes by resorting the array of pointers according to node data other than the key. An example of
+this is given in the test program.
+
+Two additional simple functions finish our tour. An access function, rdx_kys(), is provided to find
+out how many nodes are allocated, and a debugging function, rdx_prt(), is provided to print out the
+contents of all the allocated tree nodes in two columns, with the associated branch and data nodes
+side by side.
+
+Testing and examples
+
+Nothing in software is as useful as an example. I provide rdx_test.c to both test and illustrate the
+usage of these routines. I generate 128 random three byte keys. The data node information is
+random() numbers also. The code is self-explanatory. Note the qsort() resort by node data. Timing
+this on a SPARCstation 10 results in a run time of about 100ms. This time is reduced by more than
+half by eliminating all the print out stuff. A more accurate test would do only algorithm
+manipulations of a random nature for more lengthy periods. This testing, however, was more than
+adequate for my application. For applications of less than 50 to 100 nodes, linked lists would
+probably be faster, but as the number of nodes increases, radix search has the advantage, especially
+for long keys.
+
+One caveat: if you are retrieving keys from a data node and want to subsequently delete this key,
+then you must be careful to skip the first key byte— rdx_del( &(((DNODE *)dn[i])->key[1]) ), because
+the data node keys are all one byte longer than keys passed to the routines. This byte will always
+be zero except for the impossible key head node.
+
+Enhancements
+
+Imagining several useful variations on this theme is entirely possible. My implementation assumes
+uniform and identical data nodes. It would be relatively easy to modify this implementation to
+malloc() data storage at key insertion. Rather than containing data, the terminal nodes would
+contain a pointer returned by malloc() and the size of the allocation. Deletion would free() this
+storage. Both branch and what would now be data pointer nodes would be allocated as before. A second
+possibility would be to extend, dynamically, the free list and allocate a new block of nodes upon
+exhaustion. I happen to like multithreaded code. I have rewritten applications from multiprocess
+shared memory architectures to multithreaded architectures with considerable savings in code and
+complexity, plus an improved responsiveness. These routines are not thread safe. There are two ways
+to proceed. The first is simply to enclose each access from any thread about a mutex_(un)lock pair.
+This brute force method works, but limits access of the entire structure to one thread at a time. A
+more fine grain approach would be to lock only the data or branch nodes involved and any child nodes
+of these. If many threads are to read the structure and only one thread is to modify the structure,
+then a readers/writer lock, rw_[wrlrd]lock(), could be used.
+
+The structure as it stands is designed for records of unique keys. For applications with duplicate
+keys the data nodes could be modified to point to linked lists. I prefer to simply extend the key to
+include enough record data to make to keys unique. However, not all applications will want to do
+this. This algorithm, and my implementation of it, should be highly portable to environments other
+than the Sun I developed on. There are no system or library calls to worry about. If you want to use
+multiple trees in your application, I suggest duplicating the code and adding a descriptive prefix
+or postfix to the routine names. Everything is pretty much standard C.
+
+Endnotes: 1. Sedgewick, Robert. Algorithms in C. Reading, MA: Addison-Wesley, 1990. 
+
+2. Morrison, Donald R. "PATRICIA—Practical Algorithm To Retrieve Information Coded in Alphanumeric,"
+Journal of the Association for Computing Machinery, Oct. 1968, pp. 514-534. 
+
+3. Horowitz, Ellis, Sartaj Sahni, and Susan Anderson-Freed. Fundamentals of Data Structures in C.
+Salt Lake City, UT: Computer Science Press, 1993. 
+
+4. Knuth, Donald E. The Art of Computer Programming: Sorting and Searching. Reading, MA:
+Addison-Wesley, 1973.
+

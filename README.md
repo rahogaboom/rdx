@@ -443,4 +443,23 @@ rdx_pat_verify(
    VERIFY_MODE vm,
    FILE *fp)
 
+Common Usage:
+   static DNODE *dnp;    # data node pointer
+   static DNODE **nodes; # array of pointers to nodes in sorted order
+   static FILE *fp;      # file pointer
+
+   # NUM_KEYS keys of NUM_KEY_BYTES length for MAX_NUM_RDX_NODES nodes
+   static unsigned char rdx_data_keys[MAX_NUM_RDX_NODES][NUM_KEYS][NUM_KEY_BYTES];
+
+   static PNODE rdx_data; # allocate PATRICIA trie
+
+   rdx_pat_initialize(&rdx_data);                                   # initialize data structure
+   rdx_pat_print(&rdx_data, NULL, fp);                              # print data structure
+   rdx_pat_verify(&rdx_data, ERR_CODE_PRINT, fp);                   # verify data structure integrity
+   return_code = rdx_pat_insert(&rdx_data, rdx_data_keys[n], &dnp); # insert data node
+   dnp = rdx_pat_search(&rdx_data, rdx_data_keys[node1]);           # search for data node
+   return_code = rdx_pat_sort(&rdx_data, &nodes, k);                # sort nodes into array of pointers
+   tot_nodes = rdx_pat_nodes(&rdx_data);                            # return total number of allocated nodes
+   dnp = rdx_pat_delete(&rdx_data, rdx_data_keys[node1]);           # delete data node
+
 ```

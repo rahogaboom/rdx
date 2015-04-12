@@ -750,7 +750,7 @@ rdx_pat_sort(
    DNODE ***ptr_to_arr,
    unsigned int k)
 {
-   if ( k < 0 || k > NUM_KEYS-1 )
+   if ( k > NUM_KEYS-1 )
    {
       return -1;
    }

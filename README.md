@@ -9,9 +9,15 @@ Multi Key Radix PATRICIA Fast Search C/C++
    - see article in Embedded Systems Programming, Mar. 1997, "Highly dynamic Radix fast search algorithm with easy
      sort/deletion"(included)
    - see article in Embedded Systems Design, Jun. 2007, "Using multikey radix PATRICIA fast search"(included)
-   - 12 verification tests that show complex code usage examples, for C see rdx_pat_test.c and for C++ see
-     rdx_pat_test.cpp
-
+   - 15 verification tests that show complex code usage examples, see rdx_pat_test.c
+   - Latest version v1.0.2:
+         a. search/delete/print now only require a subset of keys(from 1 to NUM_KEYS keys) - insert still requires
+            a full set of keys of course.
+         b. the distinction between C and C++ code is removed.  only one version is provided.  the rdx_pat.mk
+            script can be run with clang, gcc or g++.
+         c. the test suite has been improved substantially.  new tests for search/delete/print with a single key
+            have been added.  the rdx_pat_test.results file of test output should be much more readable and the
+            correspondence of results with example code should be clearer.
 
 API:
 

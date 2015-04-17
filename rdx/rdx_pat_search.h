@@ -16,7 +16,7 @@
 #define MAX_NUM_RDX_NODES  8
 
 /* number of bytes in each key(s) */
-#define NUM_KEY_BYTES      20
+#define NUM_KEY_BYTES      4
 
 /* verify mode arg to rdx_pat_verify() */
 typedef enum verify_mode
@@ -92,7 +92,7 @@ rdx_pat_initialize(
    DNODE *
 rdx_pat_search(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
 
    int
 rdx_pat_insert(
@@ -103,7 +103,7 @@ rdx_pat_insert(
    DNODE *
 rdx_pat_delete(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
 
    int
 rdx_pat_sort(
@@ -118,7 +118,7 @@ rdx_pat_nodes(
    int
 rdx_pat_print(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES],
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES],
    FILE *fp);
 
    int

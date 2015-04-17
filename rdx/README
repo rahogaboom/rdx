@@ -1,6 +1,6 @@
 
 1. do "perldoc rdx_pat.man" to see the man page
-2. do "rdx_pat.mk" to do the default build and test(8 nodes, 3 keys, 20 bytes per key)
+2. do "rdx_pat.mk" to do the default build and test(3 keys, 8 nodes, 4 bytes per key)
 3. edit rdx_pat_search.h - change the following lines:
 
       /* number of rdx search keys */
@@ -10,7 +10,7 @@
       #define MAX_NUM_RDX_NODES  8
 
       /* number of bytes in each key(s) */
-      #define NUM_KEY_BYTES      20
+      #define NUM_KEY_BYTES      4
 
 4. do "rdx_pat.mk" again to build and test with your own NUM_KEYS/MAX_NUM_RDX_NODES/NUM_KEY_BYTES values
 

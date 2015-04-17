@@ -17,7 +17,7 @@
  *       DNODE *
  *    rdx_pat_search(
  *       PNODE *pnodep,
- *       unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+ *       unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
  *
  *       int
  *    rdx_pat_insert(
@@ -28,7 +28,7 @@
  *       DNODE *
  *    rdx_pat_delete(
  *       PNODE *pnodep,
- *       unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+ *       unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
  *
  *       int
  *    rdx_pat_sort(
@@ -43,7 +43,7 @@
  *       int
  *    rdx_pat_print(
  *       PNODE *pnodep,
- *       unsigned char key[NUM_KEYS][NUM_KEY_BYTES],
+ *       unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES],
  *       FILE *fp);
  *
  *       int
@@ -315,41 +315,75 @@ rdx_pat_initialize(
  *    rdx_pat_search()
  *
  * Purpose: 
- *    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique
+ *    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+ *    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+ *    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+ *    data node.
  *
  * Usage:
  *    PNODE data;
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
  *    DNODE *dnp;
  *
- *    dnp = rdx_pat_search(&data, keys);
+ *    dnp = rdx_pat_search(&data, key);
  *
  * Returns:
  *    data node pointer if search is successful or NULL if not
  *    
  * Parameters:
- *    PNODE *pnodep                               - pointer to the PNODE structure
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+ *    PNODE *pnodep                                - pointer to the PNODE structure
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
  *
  * Comments:
+ *    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+ *         example 1:
+ *         in key[][]:
+ *            key number  key
+ *            0           01 aa bb cc dd    
+ *            1           01 ee ee ee ee
+ *            2           01 ff ff ff ff
  *
+ *            use all three keys(0,1,2) in the search
+ *
+ *         example 2:
+ *         in key[][]:
+ *            0           00 aa bb cc dd
+ *            1           01 ee ee ee ee
+ *            2           00 ff ff ff ff
+ *
+ *            use only key 1 in the search
  */
 
    DNODE *
 rdx_pat_search(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES])
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES])
 {
    static unsigned int k;
+   static unsigned int n;
    static BNODE *c[NUM_KEYS];
    static unsigned char ky[NUM_KEYS][NUM_KEY_BYTES+1];
 
 
+   n = 0;
    for ( k=0 ; k<NUM_KEYS ; k++ )
    {
+      if ( key[k][0] == 0 )
+      {
+         continue;
+      }
+      else if ( key[k][0] == 1 )
+      {
+         n++;
+      }
+      else
+      {
+         return NULL;
+      }
+
       /* copy key to storage with extra byte for comparison */
       ky[k][0] = 0;
-      memmove(&ky[k][1], &key[k][0], NUM_KEY_BYTES);
+      memmove(&ky[k][1], &key[k][1], NUM_KEY_BYTES);
 
       /* search for key in rdx trie */
       c[k] = (BNODE *)pnodep->head[k]->l;
@@ -374,6 +408,11 @@ rdx_pat_search(
       }
    }
 
+   if ( n == 0 )
+   {
+      return NULL;
+   }
+
    /* success - all keys found in the same data node - return data node pointer */
    return (DNODE *)c[0];
 }
@@ -389,11 +428,11 @@ rdx_pat_search(
  *
  * Usage:
  *    PNODE data;
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+ *    unsigned char key[NUM_KEYS][NUM_KEY_BYTES];
  *    DNODE *dnp;
  *    int return_code;
  *
- *    return_code = rdx_pat_insert(&data, keys, &dnp);
+ *    return_code = rdx_pat_insert(&data, key, &dnp);
  *
  * Returns:
  *    1. if any key is found to already exist then set return_code to 1 and set dnp to point to the data node
@@ -401,10 +440,10 @@ rdx_pat_search(
  *    3. if insertion successful then set return_code to 0 and set dnp to point to the data node
  *
  * Parameters:
- *    PNODE *pnodep                               - pointer to the PNODE structure
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
- *    DNODE **return_ptr                          - pointer to pointer to the inserted data node
- *                                                  or NULL if insertion fails
+ *    PNODE *pnodep                              - pointer to the PNODE structure
+ *    unsigned char key[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+ *    DNODE **return_ptr                         - pointer to pointer to the inserted data node
+ *                                                 or NULL if insertion fails
  *
  * Comments:
  *
@@ -595,32 +634,53 @@ rdx_pat_insert(
  *    rdx_pat_delete()
  *
  * Purpose: 
- *    delete the data node with keys[NUM_KEYS][NUM_KEY_BYTES] and return the data node to the free list.
+ *    delete trie data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+ *    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+ *    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+ *    data node.  return the data node to the free list.
  *
  * Usage:
  *    PNODE data;
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
  *    DNODE *dnp;
  *
- *    dnp = rdx_pat_delete(&data, keys);
+ *    dnp = rdx_pat_delete(&data, key);
  *
  * Returns:
  *    DNODE *dnp - pointer to the data node deleted or NULL if no data node found to delete
  *
  * Parameters:
- *    PNODE *pnodep                               - pointer to the PNODE structure
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+ *    PNODE *pnodep                                - pointer to the PNODE structure
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
  *
  * Comments:
+ *    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+ *         example 1:
+ *         in key[][]:
+ *            key number  key
+ *            0           01 aa bb cc dd    
+ *            1           01 ee ee ee ee
+ *            2           01 ff ff ff ff
+ *
+ *            use all three keys(0,1,2) in the search
+ *
+ *         example 2:
+ *         in key[][]:
+ *            0           00 aa bb cc dd
+ *            1           01 ee ee ee ee
+ *            2           00 ff ff ff ff
+ *
+ *            use only key 1 in the search
  *
  */
 
    DNODE *
 rdx_pat_delete(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES])
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES])
 {
    static unsigned int k;
+   static unsigned int n;
 
    /* other child pointer */
    static BNODE *oc;
@@ -629,11 +689,25 @@ rdx_pat_delete(
    static unsigned char ky[NUM_KEYS][NUM_KEY_BYTES+1];
 
 
+   n = 0;
    for ( k=0 ; k<NUM_KEYS ; k++ )
    {
+      if ( key[k][0] == 0 )
+      {
+         continue;
+      }
+      else if ( key[k][0] == 1 )
+      {
+         n++;
+      }
+      else
+      {
+         return NULL;
+      }
+
       /* copy key to storage with extra byte for comparison */
       ky[k][0] = 0;
-      memmove(&ky[k][1], &key[k][0], NUM_KEY_BYTES);
+      memmove(&ky[k][1], &key[k][1], NUM_KEY_BYTES);
 
       /* search for key in rdx trie */
       c[k] = ((BNODE *)pnodep->head[k]->l);
@@ -656,6 +730,11 @@ rdx_pat_delete(
       {
          return NULL;
       }
+   }
+
+   if ( n == 0 )
+   {
+      return NULL;
    }
 
    /* for each key reset pointers for NUM_KEYS branch nodes and the data node */
@@ -836,35 +915,57 @@ rdx_pat_nodes(
  *    rdx_pat_print()
  *
  * Purpose: 
- *    print all the data in branch and data nodes for the entire trie or if a key is given print all the branch nodes
- *    for each key(0-NUM_KEYS) that leads to the found data node and including the data node.  the application data
- *    is not printed, only the trie structure data.
+ *    print all the data in branch and data nodes for the entire trie(second arg NULL) or if a second arg key is given
+ *    print all the branch nodes for each key(0-NUM_KEYS) that leads to the found data node and including the data node.
+ *    the application data is not printed, only the trie structure data.
+ *
+ *    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+ *    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+ *    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+ *    data node.
  *
  * Usage:
  *    PNODE data;
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
  *    FILE *fp;
  *    int return_code;
  *
  *    return_code = rdx_pat_print(&data, NULL, fp);
- *    return_code = rdx_pat_print(&data, keys, fp);
+ *    return_code = rdx_pat_print(&data, key, fp);
  *
  * Returns:
  *    int return_code - 0 on success and 1 if key(s) not found
  *
  * Parameters:
- *    PNODE *pnodep                               - pointer to the PNODE structure
- *    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
- *    FILE *fp                                    - file pointer for output
+ *    PNODE *pnodep                                - pointer to the PNODE structure
+ *    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+ *    FILE *fp                                     - file pointer for output
  *
  * Comments:
+ *    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+ *         example 1:
+ *         in key[][]:
+ *            key number  key
+ *            0           01 aa bb cc dd    
+ *            1           01 ee ee ee ee
+ *            2           01 ff ff ff ff
+ *
+ *            use all three keys(0,1,2) in the search
+ *
+ *         example 2:
+ *         in key[][]:
+ *            0           00 aa bb cc dd
+ *            1           01 ee ee ee ee
+ *            2           00 ff ff ff ff
+ *
+ *            use only key 1 in the search
  *
  */
 
    int
 rdx_pat_print(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES],
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES],
    FILE *fp)
 {
    static unsigned int i, j, k;
@@ -883,7 +984,7 @@ rdx_pat_print(
       for ( j=0 ; j<NUM_KEYS ; j++ )
       {
          fprintf(fp, "  key %-2d = ", j);
-         for ( i=0 ; i<NUM_KEY_BYTES ; i++ )
+         for ( i=0 ; i<1+NUM_KEY_BYTES ; i++ )
          {
             fprintf(fp, "%02x ", key[j][i]);
          }
@@ -908,7 +1009,7 @@ rdx_pat_print(
       fprintf(fp, "    p = (parent address)\n");
       fprintf(fp, "  nsn = (node sequence number, 0-MAX_NUM_RDX_NODES+1)\n");
       fprintf(fp, "alloc = (0-node not allocated, 1-node allocated)\n");
-      fprintf(fp, "  key n  = (hex key value)\n\n");
+      fprintf(fp, "key n = (hex key value)\n\n");
 
       if ( (dn = rdx_pat_search(pnodep, key)) == NULL )
       {
@@ -920,11 +1021,11 @@ rdx_pat_print(
       {
          /* copy key to storage with extra byte for comparison */
          ky[0] = 0;
-         memmove(&ky[1], &key[k][0], NUM_KEY_BYTES);
+         memmove(&ky[1], &key[k][1], NUM_KEY_BYTES);
 
          fprintf(fp, "========\n");
          fprintf(fp, "  key %-2d = ", k);
-         for ( j=0 ; j<NUM_KEY_BYTES ; j++ )
+         for ( j=0 ; j<1+NUM_KEY_BYTES ; j++ )
          {
             fprintf(fp, "%02x ", key[k][j]);
          }
@@ -960,12 +1061,12 @@ rdx_pat_print(
          }
          fprintf(fp, "\n");
 
-	 fprintf(fp, "  nsn = %d\n", ((DNODE *)c)->nsn);
-	 fprintf(fp, "alloc = %d\n", ((DNODE *)c)->alloc);
+	     fprintf(fp, "  nsn = %d\n", ((DNODE *)c)->nsn);
+	     fprintf(fp, "alloc = %d\n", ((DNODE *)c)->alloc);
          for ( j=0 ; j<NUM_KEYS ; j++ )
          {
             fprintf(fp, "  key %-2d = ", j);
-            for ( i=0 ; i<NUM_KEY_BYTES ; i++ )
+            for ( i=0 ; i<1+NUM_KEY_BYTES ; i++ )
             {
                fprintf(fp, "%02x ", key[j][i]);
             }
@@ -1002,8 +1103,8 @@ rdx_pat_print(
       fprintf(fp, "    p = (parent address)\n");
       fprintf(fp, "  nsn = (node sequence number, 0-MAX_NUM_RDX_NODES+1)\n");
       fprintf(fp, "alloc = (0-node not allocated, 1-node allocated)\n");
-      fprintf(fp, "  key n  = (hex key value)\n");
-      fprintf(fp, "  key n  = (hex key value)\n");
+      fprintf(fp, "key n = (hex key value)\n");
+      fprintf(fp, "key n = (hex key value)\n");
       fprintf(fp, "      .\n");
       fprintf(fp, "      .\n");
       fprintf(fp, "      .\n\n\n");
@@ -1085,8 +1186,8 @@ rdx_pat_print(
          }
          fprintf(fp, "\n");
 
-	 fprintf(fp, "  nsn = %d\n", pnodep->dnodes[i].nsn);
-	 fprintf(fp, "alloc = %d\n", pnodep->dnodes[i].alloc);
+	     fprintf(fp, "  nsn = %d\n", pnodep->dnodes[i].nsn);
+	     fprintf(fp, "alloc = %d\n", pnodep->dnodes[i].alloc);
          for ( k=0 ; k<NUM_KEYS ; k++ )
          {
             fprintf(fp, "  key %-2d = ", k);
@@ -1742,18 +1843,19 @@ rdx_pat_verify(
     */
    for ( n=1 ; n<tot_alloc_nodes ; n++ )
    {
-      unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+      unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
       DNODE *dnodep;
 
 
       /* get data node keys directly from allocated data node */
       for ( k=0 ; k<NUM_KEYS ; k++ )
       {
-         memmove(&keys[k][0], &pnodep->dnodes[n].key[k][1], NUM_KEY_BYTES);
+         key[k][0] = 1;
+         memmove(&key[k][1], &pnodep->dnodes[n].key[k][1], NUM_KEY_BYTES);
       }
 
       /* search for node n keys */
-      dnodep = rdx_pat_search(pnodep, keys);
+      dnodep = rdx_pat_search(pnodep, key);
 
       if ( dnodep == NULL )
       {

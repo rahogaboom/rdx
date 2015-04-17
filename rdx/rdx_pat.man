@@ -6,17 +6,18 @@
 
 =head1 NAME
 
- rdx_pat_search - library to do radix PATRICIA(see ref. 1) multi-key fast search.  any number of keys of any length
- are supported.
+ rdx_pat_search - library to do radix PATRICIA(see ref. 1) multi-key fast
+ search.  any number of keys of any length are supported.
 
 =head1 SYNOPSIS
 
- [see rdx_pat_search.h,
-      rdx_pat_search.c
-      rdx_pat_data.h
-  for a full description and
-      rdx_pat_test.c
-  for usage examples and test code] 
+     for a full description
+ see rdx_pat_search.h,
+     rdx_pat_search.c
+     rdx_pat_data.h
+
+     for usage examples and test code 
+ see rdx_pat_test.c
 
 =head1 DESCRIPTION
 
@@ -61,7 +62,7 @@ rdx_pat_initialize(
    DNODE *
 rdx_pat_search(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
 
    int
 rdx_pat_insert(
@@ -72,7 +73,7 @@ rdx_pat_insert(
    DNODE *
 rdx_pat_delete(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES]);
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
 
    int
 rdx_pat_sort(
@@ -87,7 +88,7 @@ rdx_pat_nodes(
    int
 rdx_pat_print(
    PNODE *pnodep,
-   unsigned char key[NUM_KEYS][NUM_KEY_BYTES],
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES],
    FILE *fp);
 
    int
@@ -157,7 +158,8 @@ Theoretic Notes:
 
 =head1 ROUTINE USAGE
 
-rdx_pat_initialize()
+ ####################################################################################################
+ rdx_pat_initialize()
 
  Purpose:
     Initialize the defined PNODE data structure.  This includes setting the data and branch node sequence numbers and
@@ -187,28 +189,50 @@ rdx_pat_initialize()
     3. certain pointers in the root node, such as parent pointers, are set to zero and permanently remain so since
        they have nothing to point to.  in root node printouts they should obviously be zero.
 
-rdx_pat_search()
+ ####################################################################################################
+ rdx_pat_search()
 
- Purpose:
-    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique
-
+ Purpose: 
+    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+    data node.
+ 
  Usage:
     PNODE data;
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
     DNODE *dnp;
 
-    dnp = rdx_pat_search(&data, keys);
+    dnp = rdx_pat_search(&data, key);
 
  Returns:
     data node pointer if search is successful or NULL if not
-
+    
  Parameters:
-    PNODE *pnodep                               - pointer to the PNODE structure
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+    PNODE *pnodep                                - pointer to the PNODE structure
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
 
  Comments:
+    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+         example 1:
+         in key[][]:
+            key number  key
+            0           01 aa bb cc dd    
+            1           01 ee ee ee ee
+            2           01 ff ff ff ff
 
-rdx_pat_insert()
+            use all three keys(0,1,2) in the search
+
+         example 2:
+         in key[][]:
+            0           00 aa bb cc dd
+            1           01 ee ee ee ee
+            2           00 ff ff ff ff
+
+            use only key 1 in the search
+
+ ####################################################################################################
+ rdx_pat_insert()
 
  Purpose:
     remove data node from free list in PNODE data structure and insert this node with keys[NUM_KEYS][NUM_KEY_BYTES].
@@ -235,28 +259,50 @@ rdx_pat_insert()
 
  Comments:
 
-rdx_pat_delete()
+ ####################################################################################################
+ rdx_pat_delete()
 
- Purpose:
-    delete the data node with keys[NUM_KEYS][NUM_KEY_BYTES] and return the data node to the free list.
-
+ Purpose: 
+    delete trie data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+    data node.  return the data node to the free list.
+ 
  Usage:
     PNODE data;
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
     DNODE *dnp;
 
-    dnp = rdx_pat_delete(&data, keys);
+    dnp = rdx_pat_delete(&data, key);
 
  Returns:
     DNODE *dnp - pointer to the data node deleted or NULL if no data node found to delete
 
  Parameters:
-    PNODE *pnodep                               - pointer to the PNODE structure
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+    PNODE *pnodep                                - pointer to the PNODE structure
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
 
  Comments:
+    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+         example 1:
+         in key[][]:
+            key number  key
+            0           01 aa bb cc dd    
+            1           01 ee ee ee ee
+            2           01 ff ff ff ff
 
-rdx_pat_sort()
+            use all three keys(0,1,2) in the search
+
+         example 2:
+         in key[][]:
+            0           00 aa bb cc dd
+            1           01 ee ee ee ee
+            2           00 ff ff ff ff
+
+            use only key 1 in the search
+
+ ####################################################################################################
+ rdx_pat_sort()
 
  Purpose:
     sort data nodes in PNODE data structure by key value of the key index k in key ascending order.
@@ -284,7 +330,8 @@ rdx_pat_sort()
     (DNODE *)nodes[0 to return_code-1])->data.id - to access node data
     (DNODE *)nodes[0 to return_code-1])->key[k]  - to access key values
 
-rdx_pat_nodes()
+ ####################################################################################################
+ rdx_pat_nodes()
 
  Purpose:
     return the number of allocated data nodes in the trie.
@@ -306,33 +353,57 @@ rdx_pat_nodes()
     key node with key(s) 0xff.  the number of user available nodes is MAX_NUM_RDX_NODES.  this function returns
     only the number of user allocated nodes in the trie.
 
-rdx_pat_print()
+ ####################################################################################################
+ rdx_pat_print()
 
- Purpose:
-    print all the data in branch and data nodes for the entire trie or if a key is given print all the branch nodes
-    for each key(0-NUM_KEYS) that leads to the found data node and including the data node.  the application data
-    is not printed, only the trie structure data.
+ Purpose: 
+    print all the data in branch and data nodes for the entire trie(second arg NULL) or if a second arg key is given
+    print all the branch nodes for each key(0-NUM_KEYS) that leads to the found data node and including the data node.
+    the application data is not printed, only the trie structure data.
+ 
+    search trie for data node with the key(s) - for each key index(0-NUM_KEYS) the key must exist and be unique.
+    the first byte of each key in key[NUM_KEYS][1+NUM_KEY_BYTES](the 1+ byte) should be set to 0(do not use key)
+    or 1(use key) in the search.  thus, 1 to NUM_KEYS-1 keys may be used.  only one key is necessary to find the
+    data node.
 
  Usage:
     PNODE data;
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
     FILE *fp;
     int return_code;
 
     return_code = rdx_pat_print(&data, NULL, fp);
-    return_code = rdx_pat_print(&data, keys, fp);
+    return_code = rdx_pat_print(&data, key, fp);
 
  Returns:
     int return_code - 0 on success and 1 if key(s) not found
 
  Parameters:
-    PNODE *pnodep                               - pointer to the PNODE structure
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
-    FILE *fp                                    - file pointer for output
+    PNODE *pnodep                                - pointer to the PNODE structure
+    unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+    FILE *fp                                     - file pointer for output
 
  Comments:
+    e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+         example 1:
+         in key[][]:
+            key number  key
+            0           01 aa bb cc dd    
+            1           01 ee ee ee ee
+            2           01 ff ff ff ff
+ 
+            use all three keys(0,1,2) in the search
 
-rdx_pat_verify()
+         example 2:
+         in key[][]:
+            0           00 aa bb cc dd
+            1           01 ee ee ee ee
+            2           00 ff ff ff ff
+
+            use only key 1 in the search
+
+ ####################################################################################################
+ rdx_pat_verify()
 
  Purpose:
     verify the integrity of a PNODE structure.  many tests are used to verify the integrity of all branch and
@@ -371,16 +442,7 @@ rdx_pat_verify()
 
  At present there are no known bugs, however, there is one known issue. :-)  If you increase the size of the entire
  trie by making any or all of the NUM_KEYS, MAX_NUM_RDX_NODES and NUM_KEY_BYTES constants larger, then eventually
- you'll run into trouble.  I've run tests on my Linux box with NUM_KEYS=16, MAX_NUM_RDX_NODES=100000 and
- NUM_KEY_BYTES=64 successfully.  This resulted, with the suite of tests provided, in a rdx_pat_test.results file
- size of 1.4G! - entertaining evening reading.  That doesn't mean that you can increase the trie size indefinitely.
- The same test with MAX_NUM_RDX_NODES=1000000 fails with the compile message:
-
- /tmp/ccupaapx.s: Assembler messages:
- /tmp/ccupaapx.s:238: Error: attempt to move .org backwards
- /tmp/ccupaapx.s:242: Error: attempt to move .org backwards
-
- and a segmentation fault.  For other RTOSs your mileage may vary.
+ you'll run into trouble.  Tests with very large values for MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES had problems.
 
  Please report problems to the author.
 

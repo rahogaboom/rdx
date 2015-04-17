@@ -8,6 +8,7 @@
 
 /* any user data structure of arbitrary complexity */
 typedef struct _app_data {
+   /* data stuff goes here */
    int id;
    char name[64];
 

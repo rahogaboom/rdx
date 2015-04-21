@@ -1,4 +1,4 @@
-/* tests for rdx routines - examples of usage */
+/* test cases and example code for rdx_pat_XXX() library routines */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,23 +63,6 @@ print_keys(
 }
 
 
-/* add a prefix byte to all keys and set this byte to 1(meaning use all the keys for search/delete/print) */
-   void
-add_key_byte(
-               unsigned char key1[NUM_KEYS][1+NUM_KEY_BYTES],
-               unsigned char key[NUM_KEYS][NUM_KEY_BYTES]
-            )
-{
-   static unsigned int k;
-
-   for ( k = 0 ; k < NUM_KEYS ; k++ )
-   {
-      key1[k][0] = 1; /* use all keys */
-      memmove(&key1[k][1], &key[k][0], NUM_KEY_BYTES); /* mv key */
-   }
-}
-
-
 /* test cases and example code for rdx_pat_XXX() library routines */
    int
 main()
@@ -97,13 +80,7 @@ main()
    static PNODE rdx1;
 
    /* holds sets of random keys for MAX_NUM_RDX_NODES sets with NUM_KEYS keys of NUM_KEY_BYTES length */
-   static unsigned char rdx1_key[MAX_NUM_RDX_NODES][NUM_KEYS][NUM_KEY_BYTES];
-
-   /*
-    * holds random keys for NUM_KEYS keys of one start prefix byte(value 0 or 1) followed by NUM_KEY_BYTES key bytes.
-    * keys are copied from rdx1_key[n][][] and all the prefix bytes set to 1(use all keys) by the add_key_byte() routine.
-    */
-   static unsigned char rdx1_key1[NUM_KEYS][1+NUM_KEY_BYTES];
+   static unsigned char rdx1_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
 
    /*
@@ -112,7 +89,7 @@ main()
    static PNODE rdx2;
 
    /* like rdx1_key[][][] except one extra set of keys allocated.  used in TEST 13 only. */
-   static unsigned char rdx2_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][NUM_KEY_BYTES];
+   static unsigned char rdx2_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
 
 
    static DNODE *dnp; /* data node pointer */
@@ -125,12 +102,16 @@ main()
    /* initialize rdx1 PNODE structure */
    rdx_pat_initialize(&rdx1);
 
-   /* in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of NUM_KEY_BYTES in length */
+   /*
+    * in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of
+    * NUM_KEY_BYTES in length and set all key booleans to 1
+    */
    for ( n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
    {
       for ( k = 0 ; k < NUM_KEYS ; k++ )
       {
-         for ( b = 0 ; b < NUM_KEY_BYTES ; b++ )
+         rdx1_key[n][k][0] = 1; /* set key boolean to 1 */
+         for ( b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
          {
             rdx1_key[n][k][b] = rand() & 0x000000ff;
          }
@@ -206,8 +187,7 @@ main()
 
    fprintf(fp, "TEST 2: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-   add_key_byte(rdx1_key1, rdx1_key[0]);
-   rdx_pat_print(&rdx1, rdx1_key1, fp);
+   rdx_pat_print(&rdx1, rdx1_key[0], fp);
 
    fprintf(fp, "TEST 2: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    fprintf(fp, "\n\n\n");
@@ -274,8 +254,7 @@ main()
 
    for ( n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
    {
-      add_key_byte(rdx1_key1, rdx1_key[n]);
-      dnp = rdx_pat_search(&rdx1, rdx1_key1);
+      dnp = rdx_pat_search(&rdx1, rdx1_key[n]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 4: Node = %d NULL return - search fail\n", n);
@@ -378,8 +357,7 @@ main()
 
    for ( n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
    {
-      add_key_byte(rdx1_key1, rdx1_key[n]);
-      dnp = rdx_pat_delete(&rdx1, rdx1_key1);
+      dnp = rdx_pat_delete(&rdx1, rdx1_key[n]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 7: Node = %d NULL return - delete fail\n", n);
@@ -425,7 +403,8 @@ main()
       {
          for ( k = 0 ; k < NUM_KEYS ; k++ )
          {
-            for ( b = 0 ; b < NUM_KEY_BYTES ; b++ )
+            rdx1_key[n][k][0] = 1; /* set key boolean to 1 */
+            for ( b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
             {
                rdx1_key[n][k][b] = rand() & 0x000000ff;
             }
@@ -446,8 +425,7 @@ main()
       /* search for full set of MAX_NUM_RDX_NODES data nodes */
       for ( n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
       {
-         add_key_byte(rdx1_key1, rdx1_key[n]);
-         dnp = rdx_pat_search(&rdx1, rdx1_key1);
+         dnp = rdx_pat_search(&rdx1, rdx1_key[n]);
          if (dnp == NULL)
          {
             fprintf(fp, "TEST 8: rdx_pat_search() error\n");
@@ -458,8 +436,7 @@ main()
       /* delete a full set of MAX_NUM_RDX_NODES data nodes */
       for ( n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
       {
-         add_key_byte(rdx1_key1, rdx1_key[n]);
-         dnp = rdx_pat_delete(&rdx1, rdx1_key1);
+         dnp = rdx_pat_delete(&rdx1, rdx1_key[n]);
          if (dnp == NULL)
          {
             fprintf(fp, "TEST 8: rdx_pat_delete() error\n");
@@ -490,19 +467,19 @@ main()
 
       for ( k = 0 ; k < NUM_KEYS ; k++ )
       {
-         for ( b = 0 ; b < NUM_KEY_BYTES ; b++ )
+         for ( b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
          {
             rdx1_key[0][k][b] = 0;
             rdx1_key[1][k][b] = 0;
          }
       }
-      rdx1_key[0][0][NUM_KEY_BYTES-1] = 1;
-      rdx1_key[0][1][NUM_KEY_BYTES-1] = 2;
-      rdx1_key[0][2][NUM_KEY_BYTES-1] = 3;
+      rdx1_key[0][0][NUM_KEY_BYTES] = 1;
+      rdx1_key[0][1][NUM_KEY_BYTES] = 2;
+      rdx1_key[0][2][NUM_KEY_BYTES] = 3;
 
-      rdx1_key[1][0][NUM_KEY_BYTES-1] = 4;
-      rdx1_key[1][1][NUM_KEY_BYTES-1] = 5;
-      rdx1_key[1][2][NUM_KEY_BYTES-1] = 6;
+      rdx1_key[1][0][NUM_KEY_BYTES] = 4;
+      rdx1_key[1][1][NUM_KEY_BYTES] = 5;
+      rdx1_key[1][2][NUM_KEY_BYTES] = 6;
 
       return_code = rdx_pat_insert(&rdx1, rdx1_key[0], &dnp);
       fprintf(fp, "TEST 9: Node = %d Return Code = %d\n\n", 0, return_code);
@@ -516,8 +493,7 @@ main()
       fprintf(fp, "TEST 9: the *dnp data node keys:\n\n");
       print_keys(fp, dnp);
 
-      add_key_byte(rdx1_key1, rdx1_key[0]);
-      dnp = rdx_pat_search(&rdx1, rdx1_key1);
+      dnp = rdx_pat_search(&rdx1, rdx1_key[0]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_search() - first search fail - unexpected.\n");
@@ -527,8 +503,7 @@ main()
          fprintf(fp, "TEST 9: rdx_pat_search() - first search succeeds - expected.\n");
       }
 
-      add_key_byte(rdx1_key1, rdx1_key[1]);
-      dnp = rdx_pat_search(&rdx1, rdx1_key1);
+      dnp = rdx_pat_search(&rdx1, rdx1_key[1]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_search() - second search fail - unexpected.\n");
@@ -539,13 +514,12 @@ main()
       }
       fprintf(fp, "\n");
 
-      rdx1_key[0][0][NUM_KEY_BYTES-1] = 1;
-      rdx1_key[0][1][NUM_KEY_BYTES-1] = 2;
-      rdx1_key[0][2][NUM_KEY_BYTES-1] = 6;
+      rdx1_key[0][0][NUM_KEY_BYTES] = 1;
+      rdx1_key[0][1][NUM_KEY_BYTES] = 2;
+      rdx1_key[0][2][NUM_KEY_BYTES] = 6;
 
       fprintf(fp, "TEST 9: rdx_pat_search() - search for data node with keys 1,2,6.\n");
-      add_key_byte(rdx1_key1, rdx1_key[0]);
-      dnp = rdx_pat_search(&rdx1, rdx1_key1);
+      dnp = rdx_pat_search(&rdx1, rdx1_key[0]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_search() - search fails - keys in different data nodes - expected.\n");
@@ -553,21 +527,19 @@ main()
       fprintf(fp, "\n");
 
       fprintf(fp, "TEST 9: rdx_pat_delete() - delete data node with keys 1,2,6.\n");
-      add_key_byte(rdx1_key1, rdx1_key[0]);
-      dnp = rdx_pat_delete(&rdx1, rdx1_key1);
+      dnp = rdx_pat_delete(&rdx1, rdx1_key[0]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_delete() - delete fails - keys in different data nodes - expected.\n");
       }
       fprintf(fp, "\n");
 
-      rdx1_key[1][0][NUM_KEY_BYTES-1] = 4;
-      rdx1_key[1][1][NUM_KEY_BYTES-1] = 5;
-      rdx1_key[1][2][NUM_KEY_BYTES-1] = 3;
+      rdx1_key[1][0][NUM_KEY_BYTES] = 4;
+      rdx1_key[1][1][NUM_KEY_BYTES] = 5;
+      rdx1_key[1][2][NUM_KEY_BYTES] = 3;
 
       fprintf(fp, "TEST 9: rdx_pat_search() - search for data node with keys 4,5,3.\n");
-      add_key_byte(rdx1_key1, rdx1_key[1]);
-      dnp = rdx_pat_search(&rdx1, rdx1_key1);
+      dnp = rdx_pat_search(&rdx1, rdx1_key[1]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_search() - search fails - keys in different data nodes - expected.\n");
@@ -575,109 +547,130 @@ main()
       fprintf(fp, "\n");
 
       fprintf(fp, "TEST 9: rdx_pat_delete() - delete data node with keys 4,5,3.\n");
-      add_key_byte(rdx1_key1, rdx1_key[1]);
-      dnp = rdx_pat_delete(&rdx1, rdx1_key1);
+      dnp = rdx_pat_delete(&rdx1, rdx1_key[1]);
       if (dnp == NULL)
       {
          fprintf(fp, "TEST 9: rdx_pat_delete() - delete fails - keys in different data nodes - expected.\n");
       }
+
+      fprintf(fp, "TEST 9: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    }
    else
    {
+      fprintf(fp, "####################################################################################################\n");
       fprintf(fp, "TEST 9: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
    }
-
-   fprintf(fp, "TEST 9: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    fprintf(fp, "\n\n\n");
 
 
-   fprintf(fp, "####################################################################################################\n");
-   fprintf(fp, "TEST 10: Search for one data node in rdx1 inserted in TEST 9(keys 1,2,3) with one key.\n");
-   fprintf(fp, "         Expected Results:\n");
-   fprintf(fp, "            a. node is found with only key 0(value 1) and keys 1(value 2) and 2(value 3) are ignored.\n");
-   fprintf(fp, "               number of nodes remains at two since a search does not change the number of nodes.\n\n");
-
-   fprintf(fp, "TEST 10: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
-
-   /* a data node with these keys was inserted in TEST 9 */
-   rdx1_key[0][0][NUM_KEY_BYTES-1] = 1;
-   rdx1_key[0][1][NUM_KEY_BYTES-1] = 2;
-   rdx1_key[0][2][NUM_KEY_BYTES-1] = 3;
-
-   add_key_byte(rdx1_key1, rdx1_key[0]);
-   rdx1_key1[0][0] = 1; /* use first key(0) in search */
-   rdx1_key1[1][0] = 0; /* ignore second key(1) in search */
-   rdx1_key1[2][0] = 0; /* ignore third key(2) in search */
-   dnp = rdx_pat_search(&rdx1, rdx1_key1);
-   if (dnp == NULL)
+   if ( NUM_KEYS == 3 && MAX_NUM_RDX_NODES >= 2 )
    {
-      fprintf(fp, "TEST 10: NULL return - search failed using only first(key 0 value 1) of three keys\n");
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 10: Search for one data node in rdx1 inserted in TEST 9(keys 1,2,3) with one key.\n");
+      fprintf(fp, "         Expected Results:\n");
+      fprintf(fp, "            a. node is found with only key 0(value 1) and keys 1(value 2) and 2(value 3) are ignored.\n");
+      fprintf(fp, "               number of nodes remains at two since a search does not change the number of nodes.\n\n");
+
+      fprintf(fp, "TEST 10: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
+
+      /* a data node with these keys was inserted in TEST 9 */
+      rdx1_key[0][0][NUM_KEY_BYTES] = 1;
+      rdx1_key[0][1][NUM_KEY_BYTES] = 2;
+      rdx1_key[0][2][NUM_KEY_BYTES] = 3;
+
+      rdx1_key[0][0][0] = 1; /* use first key(0) in search */
+      rdx1_key[0][1][0] = 0; /* ignore second key(1) in search */
+      rdx1_key[0][2][0] = 0; /* ignore third key(2) in search */
+      dnp = rdx_pat_search(&rdx1, rdx1_key[0]);
+      if (dnp == NULL)
+      {
+         fprintf(fp, "TEST 10: NULL return - search failed using only first(key 0 value 1) of three keys\n");
+      }
+      else
+      {
+         fprintf(fp, "TEST 10: search using only first(key 0 value 1) of three keys succeeded\n\n");
+
+         fprintf(fp, "TEST 10: the *dnp data node keys:\n\n");
+         print_keys(fp, dnp);
+      }
+
+      fprintf(fp, "TEST 10: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    }
    else
    {
-      fprintf(fp, "TEST 10: search using only first(key 0 value 1) of three keys succeeded\n\n");
-
-      fprintf(fp, "TEST 10: the *dnp data node keys:\n\n");
-      print_keys(fp, dnp);
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 10: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
    }
-
-   fprintf(fp, "TEST 10: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    fprintf(fp, "\n\n\n");
 
 
-   fprintf(fp, "####################################################################################################\n");
-   fprintf(fp, "TEST 11: Delete one data node in rdx1 inserted in TEST 9(keys 4,5,6) with one key.\n");
-   fprintf(fp, "         Expected Results:\n");
-   fprintf(fp, "            a. node is deleted with only key 2(value 6) and keys 1(value 5) and 0(value 4) are ignored.\n");
-   fprintf(fp, "               number of nodes decreases by one because of the delete.\n\n");
-
-   fprintf(fp, "TEST 11: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
-
-   /* a data node with these keys was inserted in TEST 9 */
-   rdx1_key[1][0][NUM_KEY_BYTES-1] = 4;
-   rdx1_key[1][1][NUM_KEY_BYTES-1] = 5;
-   rdx1_key[1][2][NUM_KEY_BYTES-1] = 6;
-
-   add_key_byte(rdx1_key1, rdx1_key[1]);
-   rdx1_key1[0][0] = 0; /* ignore first key(0) in search */
-   rdx1_key1[1][0] = 0; /* ignore second key(1) in search */
-   rdx1_key1[2][0] = 1; /* use third key(2) in search */
-   dnp = rdx_pat_delete(&rdx1, rdx1_key1);
-   if (dnp == NULL)
+   if ( NUM_KEYS == 3 && MAX_NUM_RDX_NODES >= 2 )
    {
-      fprintf(fp, "TEST 11: NULL return - delete failed using only third(key 2 value 6) of three keys\n");
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 11: Delete one data node in rdx1 inserted in TEST 9(keys 4,5,6) with one key.\n");
+      fprintf(fp, "         Expected Results:\n");
+      fprintf(fp, "            a. node is deleted with only key 2(value 6) and keys 1(value 5) and 0(value 4) are ignored.\n");
+      fprintf(fp, "               number of nodes decreases by one because of the delete.\n\n");
+
+      fprintf(fp, "TEST 11: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
+
+      /* a data node with these keys was inserted in TEST 9 */
+      rdx1_key[1][0][NUM_KEY_BYTES] = 4;
+      rdx1_key[1][1][NUM_KEY_BYTES] = 5;
+      rdx1_key[1][2][NUM_KEY_BYTES] = 6;
+
+      rdx1_key[1][0][0] = 0; /* ignore first key(0) in search */
+      rdx1_key[1][1][0] = 0; /* ignore second key(1) in search */
+      rdx1_key[1][2][0] = 1; /* use third key(2) in search */
+      dnp = rdx_pat_delete(&rdx1, rdx1_key[1]);
+      if (dnp == NULL)
+      {
+         fprintf(fp, "TEST 11: NULL return - delete failed using only third(key 2 value 6) of three keys\n");
+      }
+      else
+      {
+         fprintf(fp, "TEST 11: delete using only third(key 2 value 6) of three keys succeeded\n\n");
+
+         fprintf(fp, "TEST 11: the *dnp data node keys:\n\n");
+         print_keys(fp, dnp);
+      }
+
+      fprintf(fp, "TEST 11: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    }
    else
    {
-      fprintf(fp, "TEST 11: delete using only third(key 2 value 6) of three keys succeeded\n\n");
-
-      fprintf(fp, "TEST 11: the *dnp data node keys:\n\n");
-      print_keys(fp, dnp);
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 11: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
    }
-
-   fprintf(fp, "TEST 11: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
    fprintf(fp, "\n\n\n");
 
 
-   fprintf(fp, "####################################################################################################\n");
-   fprintf(fp, "TEST 12: Print one data node inserted in TEST 9(keys 1,2,3) with one key.\n");
-   fprintf(fp, "         Expected Results:\n");
-   fprintf(fp, "            a. node is printed with only key 1(value 2) and keys 0(value 1) and 2(value 3) are ignored\n\n");
+   if ( NUM_KEYS == 3 && MAX_NUM_RDX_NODES >= 2 )
+   {
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 12: Print one data node inserted in TEST 9(keys 1,2,3) with one key.\n");
+      fprintf(fp, "         Expected Results:\n");
+      fprintf(fp, "            a. node is printed with only key 1(value 2) and keys 0(value 1) and 2(value 3) are ignored\n\n");
 
-   fprintf(fp, "TEST 12: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
+      fprintf(fp, "TEST 12: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-   /* a data node with these keys was inserted in TEST 9 */
-   rdx1_key[0][0][NUM_KEY_BYTES-1] = 1;
-   rdx1_key[0][1][NUM_KEY_BYTES-1] = 2;
-   rdx1_key[0][2][NUM_KEY_BYTES-1] = 3;
+      /* a data node with these keys was inserted in TEST 9 */
+      rdx1_key[0][0][NUM_KEY_BYTES] = 1;
+      rdx1_key[0][1][NUM_KEY_BYTES] = 2;
+      rdx1_key[0][2][NUM_KEY_BYTES] = 3;
 
-   add_key_byte(rdx1_key1, rdx1_key[0]);
-   rdx1_key1[0][0] = 0; /* ignore first key(0) in search */
-   rdx1_key1[1][0] = 1; /* use second key(1) in search */
-   rdx1_key1[2][0] = 0; /* ignore third key(2) in search */
-   rdx_pat_print(&rdx1, rdx1_key1, fp);
+      rdx1_key[0][0][0] = 0; /* ignore first key(0) in search */
+      rdx1_key[0][1][0] = 1; /* use second key(1) in search */
+      rdx1_key[0][2][0] = 0; /* ignore third key(2) in search */
+      rdx_pat_print(&rdx1, rdx1_key[0], fp);
 
-   fprintf(fp, "TEST 12: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
+      fprintf(fp, "TEST 12: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
+   }
+   else
+   {
+      fprintf(fp, "####################################################################################################\n");
+      fprintf(fp, "TEST 12: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
+   }
    fprintf(fp, "\n\n\n");
 
 
@@ -689,7 +682,8 @@ main()
    {
       for ( k = 0 ; k < NUM_KEYS ; k++ )
       {
-         for ( b = 0 ; b < NUM_KEY_BYTES ; b++ )
+         rdx2_key[n][k][0] = 1; /* set key boolean to 1 */
+         for ( b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
          {
             rdx2_key[n][k][b] = rand() & 0x000000ff;
          }
@@ -705,7 +699,7 @@ main()
    fprintf(fp, "            c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n");
    fprintf(fp, "            d. No verification error\n\n");
 
-   fprintf(fp, "TEST 13: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
+   fprintf(fp, "TEST 13: rdx2 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
 
    for ( n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
    {
@@ -738,7 +732,7 @@ main()
       fprintf(fp, "TEST 13: rdx_pat_verify() verification successful\n");
    }
 
-   fprintf(fp, "TEST 13: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
+   fprintf(fp, "TEST 13: rdx2 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
    fprintf(fp, "\n\n\n");
 
 
@@ -747,11 +741,11 @@ main()
    fprintf(fp, "         Expected Results:\n");
    fprintf(fp, "            a. Should print all branch and data nodes in rdx2 trie\n\n");
 
-   fprintf(fp, "TEST 14: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
+   fprintf(fp, "TEST 14: rdx2 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
 
    rdx_pat_print(&rdx2, NULL, fp);
 
-   fprintf(fp, "TEST 14: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
+   fprintf(fp, "TEST 14: rdx2 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));
 
    return 0;
 }

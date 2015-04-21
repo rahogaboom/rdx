@@ -59,16 +59,16 @@ stored in branch nodes, related to printing, sorting and debugging.
 rdx_pat_initialize(
    PNODE *pnodep);
 
-   DNODE *
-rdx_pat_search(
-   PNODE *pnodep,
-   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
-
    int
 rdx_pat_insert(
    PNODE *pnodep,
    unsigned char key[NUM_KEYS][NUM_KEY_BYTES],
    DNODE **return_ptr);
+
+   DNODE *
+rdx_pat_search(
+   PNODE *pnodep,
+   unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]);
 
    DNODE *
 rdx_pat_delete(
@@ -190,6 +190,34 @@ Theoretic Notes:
        they have nothing to point to.  in root node printouts they should obviously be zero.
 
  ####################################################################################################
+ rdx_pat_insert()
+
+ Purpose:
+    remove data node from free list in PNODE data structure and insert this node with keys[NUM_KEYS][NUM_KEY_BYTES].
+    each key must be unique within it's key index(0-NUM_KEYS).
+
+ Usage:
+    PNODE data;
+    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
+    DNODE *dnp;
+    int return_code;
+
+    return_code = rdx_pat_insert(&data, keys, &dnp);
+
+ Returns:
+    1. if any key is found to already exist then set return_code to 1 and set dnp to point to the data node
+    2. if no data nodes on the free list then set return_code to 2 and set dnp to NULL
+    3. if insertion successful then set return_code to 0 and set dnp to point to the data node
+
+ Parameters:
+    PNODE *pnodep                               - pointer to the PNODE structure
+    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
+    DNODE **return_ptr                          - pointer to pointer to the inserted data node
+                                                  or NULL if insertion fails
+
+ Comments:
+
+ ####################################################################################################
  rdx_pat_search()
 
  Purpose: 
@@ -230,34 +258,6 @@ Theoretic Notes:
             2           00 ff ff ff ff
 
             use only key 1 in the search
-
- ####################################################################################################
- rdx_pat_insert()
-
- Purpose:
-    remove data node from free list in PNODE data structure and insert this node with keys[NUM_KEYS][NUM_KEY_BYTES].
-    each key must be unique within it's key index(0-NUM_KEYS).
-
- Usage:
-    PNODE data;
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES];
-    DNODE *dnp;
-    int return_code;
-
-    return_code = rdx_pat_insert(&data, keys, &dnp);
-
- Returns:
-    1. if any key is found to already exist then set return_code to 1 and set dnp to point to the data node
-    2. if no data nodes on the free list then set return_code to 2 and set dnp to NULL
-    3. if insertion successful then set return_code to 0 and set dnp to point to the data node
-
- Parameters:
-    PNODE *pnodep                               - pointer to the PNODE structure
-    unsigned char keys[NUM_KEYS][NUM_KEY_BYTES] - NUM_KEYS keys each of NUM_KEY_BYTES bytes
-    DNODE **return_ptr                          - pointer to pointer to the inserted data node
-                                                  or NULL if insertion fails
-
- Comments:
 
  ####################################################################################################
  rdx_pat_delete()

@@ -10,13 +10,13 @@
 #include "rdx_pat_data.h"
 
 /* number of rdx search keys */
-#define NUM_KEYS           5
+#define NUM_KEYS           3
 
 /* maximum number of data nodes stored in rdx trie */
-#define MAX_NUM_RDX_NODES  100
+#define MAX_NUM_RDX_NODES  8
 
 /* number of bytes in each key(s) */
-#define NUM_KEY_BYTES      16
+#define NUM_KEY_BYTES      4
 
 /* verify mode arg to rdx_pat_verify() */
 typedef enum verify_mode

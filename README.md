@@ -11,11 +11,13 @@ Multi Key Radix PATRICIA Fast Search C/C++
      sort/deletion"(included)
    - see article in Embedded Systems Design, Jun. 2007, "Using multikey radix PATRICIA fast search"(included)
    - 15 verification tests that show complex code usage examples, see rdx_pat_test.c
-   - Latest version v1.0.3:
+
+   - Latest Version v1.0.3:
          a. modified insert to use the same type keys array with key boolean bytes required to be set to 1
             (use all keys).  this makes the the keys array arguments uniform over all routines.
          b. updated and simplified the test code the reflect the change to the insert routine.
          c. ran tests with much larger MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES.
+
    - Version v1.0.2:
          a. search/delete/print now only require a subset of keys(from 1 to NUM_KEYS keys) - insert still requires
             a full set of keys of course.

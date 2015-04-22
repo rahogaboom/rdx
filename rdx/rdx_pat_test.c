@@ -11,6 +11,10 @@
  *    2. all tests use MAX_NUM_RDX_NODES node tries, NUM_KEYS keys and NUM_KEY_BYTES key length.
  *       these defines are set in rdx_pat_search.h.  modify these and recompile for different sized tries.
  *    3. if you fail to call rdx_pat_initialize() then absolutely anything can happen.
+ *    4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' arguments to the
+ *       insert/search/delete/print routines be first memset() to 0 and then the keys with the
+ *       key boolean prepended copied.  a key will only be added if it's needed and the key boolean
+ *       will be 1.  all other keys and their key booleans will be set to 0.
  */
 
 

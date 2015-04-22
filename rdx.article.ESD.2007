@@ -7,6 +7,12 @@ Richard Hogaboom
 
 June 6, 2007
 
+
+NOTE!: This article was written some time ago.  The rdx_pat_*() library has been substantially
+       updated.  The API is different.  The test routine suite has been improved.  Please
+       refer to GitHub at https://github.com/rahogaboom/rdx for the latest release.
+
+
 Here's a follow-up to an article about enhancing a fundamental storage algorithm for faster search.
 
 System designers can choose from several kinds of algorithms to store, search, and retrieve data.

@@ -8,6 +8,11 @@ Richard Hogaboom
 March 1997
 
 
+NOTE!: This article was written some time ago.  The rdx_pat_*() library has been substantially
+       updated.  The API is different.  The test routine suite has been improved.  Please
+       refer to GitHub at https://github.com/rahogaboom/rdx for the latest release.
+
+
 Good search algorithms are hard to find. Embedded systems in particular have some peculiar
 requirements. This article presents a search algorithm suitable for embedded applications.
 

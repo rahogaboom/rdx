@@ -2,7 +2,7 @@
 rdx
 ===
 
-Multi Key Radix PATRICIA Fast Search C/C++
+Multi Key Radix PATRICIA Fast Search C/C++/Clang
    - in which "PATRICIA--Practical Algorithm To Retrieve Information Coded in Alphanumeric," by Morrison, Donald R.
      ACM, Vol. 15, No. 4, Oct. 1968. is used to store data in a data structure of N keys of arbitrary length and
      arbitrary number of data nodes

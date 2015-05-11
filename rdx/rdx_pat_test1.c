@@ -472,7 +472,7 @@ main()
     fprintf(fp, "\n\n\n");
 
 
-    if ( NUM_KEYS != 3 && MAX_NUM_RDX_NODES < 2 )
+    if ( NUM_KEYS != 3 || MAX_NUM_RDX_NODES < 2 )
     {
         fprintf(fp, "####################################################################################################\n");
         fprintf(fp, "TEST 9: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
@@ -599,7 +599,7 @@ main()
     fprintf(fp, "\n\n\n");
 
 
-    if ( NUM_KEYS != 3 && MAX_NUM_RDX_NODES < 2 )
+    if ( NUM_KEYS != 3 || MAX_NUM_RDX_NODES < 2 )
     {
         fprintf(fp, "####################################################################################################\n");
         fprintf(fp, "TEST 10: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
@@ -642,7 +642,7 @@ main()
     fprintf(fp, "\n\n\n");
 
 
-    if ( NUM_KEYS != 3 && MAX_NUM_RDX_NODES < 2 )
+    if ( NUM_KEYS != 3 || MAX_NUM_RDX_NODES < 2 )
     {
         fprintf(fp, "####################################################################################################\n");
         fprintf(fp, "TEST 11: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");
@@ -685,7 +685,7 @@ main()
     fprintf(fp, "\n\n\n");
 
 
-    if ( NUM_KEYS != 3 && MAX_NUM_RDX_NODES < 2 )
+    if ( NUM_KEYS != 3 || MAX_NUM_RDX_NODES < 2 )
     {
         fprintf(fp, "####################################################################################################\n");
         fprintf(fp, "TEST 12: Not done - needs NUM_KEYS = 3 and MAX_NUM_RDX_NODES >= 2.\n");

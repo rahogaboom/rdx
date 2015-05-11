@@ -31,7 +31,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
                 3. 500 nodes, 5 keys, 12 bytes per key
             number 1 is the same as I have been using before.
             number 2 is the limiting case of 1 node with 1 key with 1 byte.
-            number 3 is a test with a much larger trie.  this procuces a 4M output file.
+            number 3 is a test with a much larger trie.  this produces a 4M output file.
             running './rdx_pat.mk' will run all the tests.  the code and output is numbered by 1,2,3.
          f. the rdx_pat.mk script now has a clean mode.  do './rdx_pat.mk clean'.
 

@@ -1,16 +1,29 @@
 
 1. do "perldoc rdx_pat.man" to see the man page
-2. do "rdx_pat.mk" to do the default build and test(3 keys, 8 nodes, 4 bytes per key)
-3. edit rdx_pat_search.h - change the following lines:
 
-      /* number of rdx search keys */
-      #define NUM_KEYS           3
+2. do "./rdx_pat.mk" to do the default builds.  there are three test builds with different defines:
+   a. 8 nodes, 3 keys, 4 bytes per key
+   b. 1 nodes, 1 keys, 1 bytes per key
+   c. 500 nodes, 5 keys, 12 bytes per key
+
+3. edit rdx_pat_search?.h - change the following lines:
 
       /* maximum number of data nodes stored in rdx trie */
       #define MAX_NUM_RDX_NODES  8
 
+      /* number of rdx search keys */
+      #define NUM_KEYS           3
+
       /* number of bytes in each key(s) */
       #define NUM_KEY_BYTES      4
 
-4. do "rdx_pat.mk" again to build and test with your own NUM_KEYS/MAX_NUM_RDX_NODES/NUM_KEY_BYTES values
+4. do "./rdx_pat.mk" again to build and test with your own MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES values
+
+5. do "./rdx_pat.mk clean" to clean the directory
+
+6. the test code is identical for all three test runs.  some tests are not run in case 'b' above
+   because of too few nodes.
+
+7. all tests should run with gcc, clang or g++.  the g++ run gives warnings about being compiled
+   with -std=c11 set.  this is ok.
 

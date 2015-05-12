@@ -16,6 +16,40 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
          2. 1 nodes, 1 keys, 1 bytes per key
          3. 500 nodes, 5 keys, 12 bytes per key
 
+   DESIGN GOALS:
+   1. Flexibility   - The specification of three parameters - MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES - allows
+                      the construction of a very wide range of PATRICIA tries without having to resort to reinvention
+                      of code to provide some spcific combination of these parameters.
+
+   2. Originality   - The property of PATRICIA that each new key insertion results in one new branch node allocation
+                      allows for the allocation of a data node and NUM_KEYS branch nodes for each new multi-key
+                      insertion.  This makes the full allocation of trie space at the outset possible and the
+                      insertion and deletion of data node entirely a matter of pointer manipulation.  I know of
+                      no other implementation using this approach.
+
+   3. Verifyability - With the use of the two routines, rdx_pat_print() and rdx_pat_verify(), the structural details
+                      of the tries may be checked.  rdx_pat_print() can print out the entire trie structure including
+                      pointers.  With a specific key argument the NUM_KEYS branch node paths to the data is printed.
+                      The rdx_pat_verify() routine checks for twenty five types of trie structural mishaps.
+
+   4. Testing       - Three tests of different sized tries are provided.  The test code is identical in each case.
+                      These are:
+                          a. 8 nodes, 3 keys, 4 bytes per key
+                          b. 1 nodes, 1 keys, 1 bytes per key
+                          c. 500 nodes, 5 keys, 12 bytes per key
+
+                      The a. trie has fifteen tests.  All tests are output to the rdx_pat_test1.results file.
+                      Each test output is delineated from other tests and documented as to what result is expected.
+                      Two tries are declared and used for the tests.  However, since the rdx_pat_search.h file is
+                      compiled in the tries must be of the same size.
+
+                      The b. trie is the minimum specifiable.  No one would actually use a trie of one node with
+                      one key of one byte, however, this minimal configuration should still work.  Some tests will
+                      not be run since they require exactly three keys.
+
+                      The c. trie is a much larger trie test.  Again, some tests will not be run since they require
+                      exactly three keys.
+
    - Latest Version v1.0.4:
          a. fixed bug related to search/delete for a subset(1 to NUM_KEYS-1) of keys.  a byproduct of this
             fix is faster execution for both search/delete - fewer array accesses.

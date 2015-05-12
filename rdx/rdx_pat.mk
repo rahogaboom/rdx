@@ -14,8 +14,8 @@ then
 fi
 
 # pick compiler - should work with all three
-CC="clang"
-#CC="gcc"
+#CC="clang"
+CC="gcc"
 #CC="g++"
 
 # add current directory to library path for shared libraries

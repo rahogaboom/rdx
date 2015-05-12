@@ -35,7 +35,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
             running './rdx_pat.mk' will run all the tests.  the code and output is numbered by 1,2,3.
          f. the rdx_pat.mk script now has a clean mode.  do './rdx_pat.mk clean'.
 
-   - Latest Version v1.0.3:
+   - Version v1.0.3:
          a. modified insert to use the same type keys array with key boolean bytes required to be set to 1
             (use all keys).  this makes the the keys array arguments uniform over all routines.
          b. updated and simplified the test code the reflect the change to the insert routine.

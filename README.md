@@ -55,6 +55,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
          a. new HISTORY.md file
          b. changed *test?.c file to not do some tests for one node/one key/one key byte case since
             these will always fail because these tests require three keys
+         c. changed back to gcc as compile default - was clang
 
    - Version v1.0.4:
          a. fixed bug related to search/delete for a subset(1 to NUM_KEYS-1) of keys.  a byproduct of this

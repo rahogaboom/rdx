@@ -48,7 +48,7 @@ $CC -std=c11 -g -pedantic -Wall -o rdx_pat_test2 rdx_pat_test2.c rdx_pat_search2
 # run test2 program
 ./rdx_pat_test2
 
-# compile test2 program
+# compile test3 program
 $CC -std=c11 -g -pedantic -Wall -o rdx_pat_test3 rdx_pat_test3.c rdx_pat_search3.c -lm
 
 # run test3 program

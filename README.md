@@ -27,7 +27,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
                       insertion and deletion of data node entirely a matter of pointer manipulation.  I know of
                       no other implementation using this approach.
 
-   3. Verifyability - With the use of the two routines, rdx_pat_print() and rdx_pat_verify(), the structural details
+   3. Verifiability - With the use of the two routines, rdx_pat_print() and rdx_pat_verify(), the structural details
                       of the tries may be checked.  rdx_pat_print() can print out the entire trie structure including
                       pointers.  With a specific key argument the NUM_KEYS branch node paths to the data is printed.
                       The rdx_pat_verify() routine checks for twenty five types of trie structural mishaps.

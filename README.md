@@ -50,7 +50,13 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
                       The c. trie is a much larger trie test.  Again, some tests will not be run since they require
                       exactly three keys.
 
-   - Latest Version v1.0.4:
+
+   - Latest Version v1.0.5:
+         a. new HISTORY.md file
+         b. changed *test?.c file to not do some tests for one node/one key/one key byte case since
+            these will always fail because these tests require three keys
+
+   - Version v1.0.4:
          a. fixed bug related to search/delete for a subset(1 to NUM_KEYS-1) of keys.  a byproduct of this
             fix is faster execution for both search/delete - fewer array accesses.
          b. the code is now compiled with -std=c11.  this required no changes, but some changes were

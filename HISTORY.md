@@ -1,4 +1,10 @@
 
+ rdx-1.0.5.tar.gz - 
+
+    a. new HISTORY.md file
+    b. changed *test?.c file to not do some tests for one node/one key/one key byte case since
+        these will always fail because these tests require three keys
+
  rdx-1.0.4.tar.gz - 
 
      a. fixed bug related to search/delete for a subset(1 to NUM_KEYS-1) of keys.  a byproduct of this

@@ -19,7 +19,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
    DESIGN GOALS:
    1. Flexibility   - The specification of three parameters - MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES - allows
                       the construction of a very wide range of PATRICIA tries without having to resort to reinvention
-                      of code to provide some spcific combination of these parameters.
+                      of code to provide some specific combination of these parameters.
 
    2. Originality   - The property of PATRICIA that each new key insertion results in one new branch node allocation
                       allows for the allocation of a data node and NUM_KEYS branch nodes for each new multi-key
@@ -27,7 +27,7 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
                       insertion and deletion of data node entirely a matter of pointer manipulation.  I know of
                       no other implementation using this approach.
 
-   3. Verifyability - With the use of the two routines, rdx_pat_print() and rdx_pat_verify(), the structural details
+   3. Verifiability - With the use of the two routines, rdx_pat_print() and rdx_pat_verify(), the structural details
                       of the tries may be checked.  rdx_pat_print() can print out the entire trie structure including
                       pointers.  With a specific key argument the NUM_KEYS branch node paths to the data is printed.
                       The rdx_pat_verify() routine checks for twenty five types of trie structural mishaps.
@@ -68,21 +68,6 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
             number 3 is a test with a much larger trie.  this produces a 4M output file.
             running './rdx_pat.mk' will run all the tests.  the code and output is numbered by 1,2,3.
          f. the rdx_pat.mk script now has a clean mode.  do './rdx_pat.mk clean'.
-
-   - Version v1.0.3:
-         a. modified insert to use the same type keys array with key boolean bytes required to be set to 1
-            (use all keys).  this makes the the keys array arguments uniform over all routines.
-         b. updated and simplified the test code the reflect the change to the insert routine.
-         c. ran tests with much larger MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES.
-
-   - Version v1.0.2:
-         a. search/delete/print now only require a subset of keys(from 1 to NUM_KEYS keys) - insert still requires
-            a full set of keys of course.
-         b. the distinction between C and C++ code is removed.  only one version is provided.  the rdx_pat.mk
-            script can be run with clang, gcc or g++.
-         c. the test suite has been improved substantially.  new tests for search/delete/print with a single key
-            have been added.  the rdx_pat_test.results file of test output should be much more readable and the
-            correspondence of results with example code should be clearer.
 
 API:
 

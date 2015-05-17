@@ -50,31 +50,34 @@ Multi Key Radix PATRICIA Fast Search C/C++/Clang
                       The c. trie is a much larger trie test.  Again, some tests will not be run since they require
                       exactly three keys.
 
+   5. Performance   - Actual measurements are the best measure of performance.  The rdx_pat_perf program is provided.
+                      rdx_pat_perf has two modes: repeated insertion(fill trie)/deletion(empty trie)(mode 1 - default)
+                      and repeated search(mode 2).  There are three cmd line options: rdx_pat_perf [-cn] [-sn] [-bn]
+                      with defaults -c1 -s60 -b500.  The options are:
+                          -cn - mode
+                          -sn - minimum seconds to run
+                          -bn - block multiplier:
+                                    a. mode 1 - the trie is filled then emtied * block multiplier times
+                                    b. mode 2 - the trie is filled then searched for MAX_NUM_RDX_NODES nodes *
+                                                block multiplier times
+                                then an elapsed time measurement is made and compared against the -sn minimum time
+                                to run.  the block multiplier is used to adjust the granularity of elapsed time
+                                calculations - allowing the minimization of time calculation cpu usage.
+                      The output is appended to rdx_pat_perf.results.
 
-   - Latest Version v1.0.5:
-         a. new HISTORY.md file
-         b. changed *test?.c file to not do some tests for one node/one key/one key byte case since
-            these will always fail because these tests require three keys
-         c. changed back to gcc as compile default - was clang
+                      The size of the trie used by rdx_pat_perf is set by editing rdx_pat_search_perf.h and setting
+                      MAX_NUM_RDX_NODES(5000 default), NUM_KEYS(8 default) and NUM_KEY_BYTES(32 default).
+                      rdx_pat_perf.c, rdx_pat_search_perf.c and rdx_pat_search_perf.h are compiled for the executable.
 
-   - Version v1.0.4:
-         a. fixed bug related to search/delete for a subset(1 to NUM_KEYS-1) of keys.  a byproduct of this
-            fix is faster execution for both search/delete - fewer array accesses.
-         b. the code is now compiled with -std=c11.  this required no changes, but some changes were
-            made that proved useful e.g. for (int=0 ;;) and %p.
-         c. the code for rdx_pat_print() and rdx_pat_verify() has been heavily updated to improve the
-            print outs.
-         d. all code, rdx_pat_search.c and test code, has been updated with many minor doc and formatting changes.
-         e. the test code now comes in three versions.  All tests are the same, however, the trie is different
-            in each case:
-                1. 8 nodes, 3 keys, 4 bytes per key
-                2. 1 nodes, 1 keys, 1 bytes per key
-                3. 500 nodes, 5 keys, 12 bytes per key
-            number 1 is the same as I have been using before.
-            number 2 is the limiting case of 1 node with 1 key with 1 byte.
-            number 3 is a test with a much larger trie.  this produces a 4M output file.
-            running './rdx_pat.mk' will run all the tests.  the code and output is numbered by 1,2,3.
-         f. the rdx_pat.mk script now has a clean mode.  do './rdx_pat.mk clean'.
+                      The rdx_pat_initialize(), rdx_pat_sort(), rdx_pat_nodes(), rdx_pat_print() and rdx_pat_verify()
+                      routines are not relevant for performance measurements.
+
+                      If other modes of insert/delete/search are deemed of interest then these will be added.
+
+   - Latest Version v1.0.6:
+         a. entirely a measuring performance release.  a new executable, rdx_pat_perf, is provided.  see the section
+            under DESIGN GOALS on Performance above.
+
 
 API:
 

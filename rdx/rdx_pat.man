@@ -88,6 +88,30 @@
                     The c. trie is a much larger trie test.  Again, some tests will not be run since they require
                     exactly three keys.
 
+ 5. Performance   - Actual measurements are the best measure of performance.  The rdx_pat_perf program is provided.
+                    rdx_pat_perf has two modes: repeated insertion(fill trie)/deletion(empty trie)(mode 1 - default)
+                    and repeated search(mode 2).  There are three cmd line options: rdx_pat_perf [-cn] [-sn] [-bn]
+                    with defaults -c1 -s60 -b500.  The options are:
+                        -cn - mode
+                        -sn - minimum seconds to run
+                        -bn - block multiplier:
+                                  a. mode 1 - the trie is filled then emtied * block multiplier times
+                                  b. mode 2 - the trie is filled then searched for MAX_NUM_RDX_NODES nodes *
+                                              block multiplier times
+                              then an elapsed time measurement is made and compared against the -sn minimum time
+                              to run.  the block multiplier is used to adjust the granularity of elapsed time
+                              calculations - allowing the minimization of time calculation cpu usage.
+                    The output is appended to rdx_pat_perf.results.
+
+                    The size of the trie used by rdx_pat_perf is set by editing rdx_pat_search_perf.h and setting
+                    MAX_NUM_RDX_NODES(5000 default), NUM_KEYS(8 default) and NUM_KEY_BYTES(32 default).
+                    rdx_pat_perf.c, rdx_pat_search_perf.c and rdx_pat_search_perf.h are compiled for the executable.
+
+                    The rdx_pat_initialize(), rdx_pat_sort(), rdx_pat_nodes(), rdx_pat_print() and rdx_pat_verify()
+                    routines are not relevant for performance measurements.
+
+                    If other modes of insert/delete/search are deemed of interest then these will be added.
+
 =head1 PROTOTYPES
 
      void

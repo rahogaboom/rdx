@@ -1,9 +1,16 @@
 
+ rdx-1.0.6.tar.gz - 
+
+    a. entirely a measuring performance release.  a new executable, rdx_pat_perf, is provided.  see
+       the README.md file section under DESIGN GOALS on Performance.
+
+
  rdx-1.0.5.tar.gz - 
 
     a. new HISTORY.md file
     b. changed *test?.c file to not do some tests for one node/one key/one key byte case since
         these will always fail because these tests require three keys
+
 
  rdx-1.0.4.tar.gz - 
 
@@ -25,12 +32,14 @@
         running './rdx_pat.mk' will run all the tests.  the code and output is numbered by 1,2,3.
      f. the rdx_pat.mk script now has a clean mode.  do './rdx_pat.mk clean'.
 
+
  rdx-1.0.3.tar.gz - 
 
      a. modified insert to use the same type keys array with key boolean bytes required to be set to 1
         (use all keys).  this makes the the keys array arguments uniform over all routines.
      b. updated and simplified the test code the reflect the change to the insert routine.
      c. ran tests with much larger MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES.
+
 
  rdx-1.0.2.tar.gz - 
 
@@ -42,6 +51,7 @@
         have been added.  the rdx_pat_test.results file of test output should be much more readable and the
         correspondence of results with example code should be clearer.
 
- Why are there no releases beyond the latest three?  For now, I only intend to maintain and answer questions
- about the most recent releases.  This may change in future.
+
+ Why are there no releases beyond the latest three on GitHub?  For now, I only intend to maintain and answer
+ questions about the most recent releases.  This may change in future.
 

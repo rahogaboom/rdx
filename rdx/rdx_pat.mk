@@ -6,11 +6,12 @@ set -v
 
 if [ "$1" == 'clean' ]
 then
-    rm -f librdxpatc1.a librdxpatc1.so librdxpatc1.so.1 librdxpatc.so.1.0.1;
+    rm -f librdxpatc1.a librdxpatc1.so librdxpatc1.so.1 librdxpatc.so.1.0.1
     rm -f rdx_pat_search1.o
-    rm -f rdx_pat_test1 rdx_pat_test1.results rdx_pat_test2 rdx_pat_test2.results rdx_pat_test3 rdx_pat_test3.results;
-    rm -f test_gbit test_gbit.results;
-    exit;
+    rm -f rdx_pat_test1 rdx_pat_test1.results rdx_pat_test2 rdx_pat_test2.results rdx_pat_test3 rdx_pat_test3.results
+    rm -f test_gbit test_gbit.results
+    rm -f rdx_pat_perf rdx_pat_perf.results
+    exit
 fi
 
 # pick compiler - should work with all three
@@ -53,6 +54,9 @@ $CC -std=c11 -g -pedantic -Wall -o rdx_pat_test3 rdx_pat_test3.c rdx_pat_search3
 
 # run test3 program
 ./rdx_pat_test3
+
+# compile perf program
+$CC -std=gnu99 -g -pedantic -Wall -o rdx_pat_perf rdx_pat_search_perf.c rdx_pat_perf.c -lm
 
 # compile gbit() test routine
 $CC -std=c11 -o test_gbit test_gbit.c -lm

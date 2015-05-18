@@ -217,11 +217,12 @@ gbit
  *
  * Usage:
  *     PNODE data;
+ *     unsigned int rdx_size;
  *
- *     rdx_pat_initialize(&data);
+ *     rdx_size = rdx_pat_initialize(&data);
  *
  * Returns:
- *     void
+ *     sizeof PNODE
  *
  * Parameters:
  *     PNODE *pnodep - pointer to the PNODE structure
@@ -239,7 +240,7 @@ gbit
  *        they have nothing to point to.  in root node printouts they should be zero.
  */
 
-    void
+    unsigned int
 rdx_pat_initialize
     (
         PNODE *pnodep
@@ -327,6 +328,8 @@ rdx_pat_initialize
     }
     pnodep->dnodes[MAX_NUM_RDX_NODES].nnfp = NULL;
     pnodep->dnodes[MAX_NUM_RDX_NODES].id = 1;
+
+    return sizeof(PNODE);
 }
 
 

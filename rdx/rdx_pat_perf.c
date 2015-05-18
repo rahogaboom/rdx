@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "rdx_pat_search_perf.h"
 
 /* take the difference of two timespec structs and return this in a timespec struct */
@@ -43,6 +44,8 @@ main
         char **argv
     )
 {
+    unsigned int rdx_size;
+
     /*
      * PNODE rdx1 related
      */
@@ -108,7 +111,7 @@ main
     fp = fopen("rdx_pat_perf.results", "a");
 
     /* initialize rdx1 PNODE structure */
-    rdx_pat_initialize(&rdx1);
+    rdx_size = rdx_pat_initialize(&rdx1);
 
     /*
      * in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of
@@ -138,8 +141,8 @@ main
 
                 fprintf(fp, "####################################################################################################\n");
                 fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_insert()(fill trie)/rdx_pat_delete()(empty trie) - random keys\n");
-                fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  NUM_KEYS = %d  NUM_KEY_BYTES = %d\n",
-                    MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+                fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  NUM_KEYS = %d  NUM_KEY_BYTES = %d  trie size = %db\n",
+                    MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES, rdx_size);
                 fprintf(fp, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
                 fprintf(fp, "                  Minimum run time(sec): %f\n", rtime_opt);
                 fprintf(fp, "                  Block Muliplier: %d\n", block_multiply_opt);
@@ -189,8 +192,8 @@ main
 
                 fprintf(fp, "####################################################################################################\n");
                 fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_search() - random keys\n");
-                fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  NUM_KEYS = %d  NUM_KEY_BYTES = %d\n",
-                    MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+                fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  NUM_KEYS = %d  NUM_KEY_BYTES = %d  trie size = %db\n",
+                    MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES, rdx_size);
                 fprintf(fp, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
                 fprintf(fp, "                  Minimum run time(sec): %f\n", rtime_opt);
                 fprintf(fp, "                  Block Muliplier: %d\n", block_multiply_opt);

@@ -85,7 +85,7 @@ typedef struct pnode
 
 /* function declarations */
 
-    void
+    unsigned int
 rdx_pat_initialize
     (
         PNODE *pnodep

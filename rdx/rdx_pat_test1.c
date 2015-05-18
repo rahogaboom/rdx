@@ -74,6 +74,7 @@ print_keys
 main()
 {
     unsigned int return_code;
+    unsigned int rdx_size;
 
 
     /*
@@ -108,7 +109,10 @@ main()
     fp = fopen("rdx_pat_test1.results", "w");
 
     /* initialize rdx1 PNODE structure */
-    rdx_pat_initialize(&rdx1);
+    rdx_size = rdx_pat_initialize(&rdx1);
+    fprintf(fp, "\n####################################################################################################\n");
+    fprintf(fp, "rdx1 size(bytes): %d\n", rdx_size);
+    fprintf(fp, "####################################################################################################\n\n");
 
     /*
      * in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of
@@ -717,7 +721,10 @@ main()
 
 
     /* initialize rdx2 PNODE structures */
-    rdx_pat_initialize(&rdx2);
+    rdx_size = rdx_pat_initialize(&rdx2);
+    fprintf(fp, "\n####################################################################################################\n");
+    fprintf(fp, "rdx2 size(bytes): %d\n", rdx_size);
+    fprintf(fp, "####################################################################################################\n\n");
 
     /* in rdx2_key[][][] generate MAX_NUM_RDX_NODES+1 sets of NUM_KEYS random keys each of NUM_KEY_BYTES in length */
     for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )

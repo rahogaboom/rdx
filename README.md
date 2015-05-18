@@ -93,7 +93,7 @@ API:
  *
  * Prototypes:
  *
- *         void
+ *         unsigned int
  *     rdx_pat_initialize
  *         (
  *             PNODE *pnodep
@@ -261,11 +261,12 @@ API:
  *
  * Usage:
  *     PNODE data;
+ *     unsigned int size;
  *
- *     rdx_pat_initialize(&data);
+ *     size = rdx_pat_initialize(&data);
  *
  * Returns:
- *     void
+ *     sizeof PNODE
  *
  * Parameters:
  *     PNODE *pnodep - pointer to the PNODE structure

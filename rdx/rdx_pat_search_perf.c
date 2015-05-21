@@ -10,7 +10,7 @@
  *
  * Prototypes:
  *
- *         void
+ *         unsigned int
  *     rdx_pat_initialize
  *         (
  *             PNODE *pnodep

@@ -7,7 +7,7 @@
 //
 
 // includes application defined data structure typedef APP_DATA
-#include "rdx_pat_data.h"
+#include "APP_DATA.h"
 
 // number of rdx search keys
 #define NUM_KEYS           5

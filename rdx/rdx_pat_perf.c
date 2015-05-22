@@ -112,6 +112,11 @@ main
 
     // initialize rdx1 PNODE structure
     rdx_size = rdx_pat_initialize(&rdx1);
+    if ( rdx_size == 0 )
+    {
+        fprintf(fp, "rdx_pat_initialize(&rdx1); FAIL\n");
+        exit(1);
+    }
 
     /*
      * in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of

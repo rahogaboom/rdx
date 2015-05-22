@@ -4,7 +4,7 @@
  * File Names:
  *     rdx_pat_search.c
  *     rdx_pat_search.h
- *     rdx_pat_data.h
+ *     APP_DATA.h
  *
  *======================================================================================================================
  *
@@ -80,7 +80,7 @@
  *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
  *     data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which
  *     has one data node and N branch nodes within it.  The user would define an arbitrarily complex data structure
- *     in the APP_DATA typedef in rdx_pat_data.h and then specify in rdx_pat_search.h the values of the three defines
+ *     in the APP_DATA typedef in APP_DATA.h and then specify in rdx_pat_search.h the values of the three defines
  *     noted above.  The number of actual nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for
  *     the initial branch node and the initial data node with the impossible key of all 0xff's.  The number of user
  *     storable nodes is MAX_NUM_RDX_NODES.   The user declares PNODEs, each of which contains a radix PATRICIA trie of
@@ -169,6 +169,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 // rdx function prototypes and typedefs of PNODE, BNODE and DNODE
@@ -223,6 +224,7 @@ gbit
  *
  * Returns:
  *     sizeof PNODE
+ *     0  -  if MAX_NUM_RDX_NODES, NUM_KEYS or NUM_KEY_BYTES is less than 1
  *
  * Parameters:
  *     PNODE *pnodep - pointer to the PNODE structure
@@ -246,6 +248,21 @@ rdx_pat_initialize
         PNODE *pnodep
     )
 {
+    if ( MAX_NUM_RDX_NODES < 1 )
+    {
+        return 0;
+    }
+
+    if ( NUM_KEYS < 1 )
+    {
+        return 0;
+    }
+
+    if ( NUM_KEY_BYTES < 1 )
+    {
+        return 0;
+    }
+
     /*
      * set full data struct to 0xf0 - shouldn't affect anything, but if bug
      * then 0xf0 pattern might start showing up in various output.  this will
@@ -620,7 +637,7 @@ rdx_pat_search
 
     unsigned char ky[NUM_KEYS][NUM_KEY_BYTES+1];
 
-    int firsttime = 1;
+    bool firsttime = true;
 
 
     n = 0;
@@ -651,10 +668,10 @@ rdx_pat_search
         }
 
         // check if all keys end at the same data node - if not return NULL
-        if ( firsttime == 1 )
+        if ( firsttime == true )
         {
             csav = c;
-            firsttime = 0;
+            firsttime = false;
         }
         else
         {
@@ -744,7 +761,7 @@ rdx_pat_remove
 
     unsigned char ky[NUM_KEYS][NUM_KEY_BYTES+1];
 
-    int firsttime = 1;
+    bool firsttime = true;
 
 
     n = 0;
@@ -775,10 +792,10 @@ rdx_pat_remove
         }
 
         // check if all keys end at the same data node - if not return NULL
-        if ( firsttime == 1 )
+        if ( firsttime == true )
         {
             csav = c;
-            firsttime = 0;
+            firsttime = false;
         }
         else
         {

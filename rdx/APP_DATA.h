@@ -1,5 +1,5 @@
-#ifndef _RDX_PAT_DATA_H
-#define _RDX_PAT_DATA_H
+#ifndef RDX_PAT_DATA_H
+#define RDX_PAT_DATA_H
 
 /*
  * application defined data is set here.  this file is included in rdx_pat_search.h.
@@ -31,4 +31,4 @@ typedef struct _app_data {
    } data2;
 } APP_DATA;
 
-#endif // _RDX_PAT_DATA_H
+#endif // RDX_PAT_DATA_H

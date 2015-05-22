@@ -14,7 +14,7 @@
      for a full description
  see rdx_pat_search.h,
      rdx_pat_search.c
-     rdx_pat_data.h
+     APP_DATA.h
 
      for usage examples and test code 
  see rdx_pat_test.c
@@ -30,7 +30,7 @@
  description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
  data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which
  has one data node and N branch nodes within it.  The user would define an arbitrarily complex data structure
- in the APP_DATA typedef in rdx_pat_data.h and then specify in rdx_pat_search.h the values of the three defines
+ in the APP_DATA typedef in APP_DATA.h and then specify in rdx_pat_search.h the values of the three defines
  noted above.  The number of actual nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for
  the initial branch node and the initial data node with the impossible key of all 0xff's.  The number of user
  storable nodes is MAX_NUM_RDX_NODES.   The user declares PNODEs, each of which contains a radix PATRICIA trie of

@@ -112,6 +112,11 @@ main()
 
     // initialize rdx1 PNODE structure
     rdx_size = rdx_pat_initialize(&rdx1);
+    if ( rdx_size == 0 )
+    {
+        fprintf(fp, "rdx_pat_initialize(&rdx1); FAIL\n");
+        exit(1);
+    }
     fprintf(fp, "\n####################################################################################################\n");
     fprintf(fp, "rdx1 size(bytes): %d\n", rdx_size);
     fprintf(fp, "####################################################################################################\n\n");
@@ -164,10 +169,10 @@ main()
     print_keys(fp, dnp);
 
     /*
-     * set some data in the APP_DATA struct of the data node - see rdx_pat_data.h.
+     * set some data in the APP_DATA struct of the data node - see APP_DATA.h.
      * this is the user application data and is set after rdx_pat_insert() has returned
      * a pointer to a free data node with the keys now set to rdx1_key[n].  open
-     * rdx_pat_data.h and install the APP_DATA structure that you want and use dnp to
+     * APP_DATA.h and install the APP_DATA structure that you want and use dnp to
      * set the structure data.  I only set id here.  for test I did not set the other APP_DATA
      * fields.  used id = 'aabbccdd' to be readily recognizable in the test output.
      */
@@ -237,7 +242,7 @@ main()
             if ( return_code == 0 )
             {
                 /*
-                 * set some data in the APP_DATA struct of the data node - see rdx_pat_data.h.
+                 * set some data in the APP_DATA struct of the data node - see APP_DATA.h.
                  * used 'aabbccdd' to be readily recognizable in the test output.
                  */
                 dnp->data.id = 0xaabbccdd;
@@ -726,6 +731,11 @@ main()
 
     // initialize rdx2 PNODE structures
     rdx_size = rdx_pat_initialize(&rdx2);
+    if ( rdx_size == 0 )
+    {
+        fprintf(fp, "rdx_pat_initialize(&rdx2); FAIL\n");
+        exit(1);
+    }
     fprintf(fp, "\n####################################################################################################\n");
     fprintf(fp, "rdx2 size(bytes): %d\n", rdx_size);
     fprintf(fp, "####################################################################################################\n\n");
@@ -767,7 +777,7 @@ main()
             print_keys(fp, dnp);
 
             /*
-             * set some data in the APP_DATA struct of the data node - see rdx_pat_data.h.
+             * set some data in the APP_DATA struct of the data node - see APP_DATA.h.
              * used 'aabbccdd' to be readily recognizable in the test output.
              */
             dnp->data.id = 0xaabbccdd;

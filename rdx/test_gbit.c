@@ -1,13 +1,13 @@
-/* test routine for gbit() */
+// test routine for gbit()
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* number of bytes in each key(s) */
+// number of bytes in each key(s)
 #define NUM_KEY_BYTES         25
 
-/* given a key and bit number (bits numbered 0 from right) will return that bit */
+// given a key and bit number (bits numbered 0 from right) will return that bit
    static unsigned int
 gbit(
    unsigned char *key,

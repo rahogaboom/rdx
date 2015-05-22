@@ -10,7 +10,7 @@
  *
  * Prototypes:
  *
- *         unsigned int
+ *         int
  *     rdx_pat_initialize
  *         (
  *             PNODE *pnodep
@@ -171,13 +171,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* rdx function prototypes and typedefs of PNODE, BNODE and DNODE */
+// rdx function prototypes and typedefs of PNODE, BNODE and DNODE
 #include "rdx_pat_search_perf.h"
 
-/* max number of key bits */
+// max number of key bits
 #define MAX_KEY_BITS          NUM_KEY_BYTES*8
 
-/* given a key and bit number (bits numbered 0 from right) will return that bit */
+// given a key and bit number (bits numbered 0 from right) will return that bit
     static unsigned int
 gbit
     (
@@ -217,7 +217,7 @@ gbit
  *
  * Usage:
  *     PNODE data;
- *     unsigned int rdx_size;
+ *     int rdx_size;
  *
  *     rdx_size = rdx_pat_initialize(&data);
  *
@@ -240,7 +240,7 @@ gbit
  *        they have nothing to point to.  in root node printouts they should be zero.
  */
 
-    unsigned int
+    int
 rdx_pat_initialize
     (
         PNODE *pnodep
@@ -253,8 +253,8 @@ rdx_pat_initialize
      */
     memset(pnodep, 0xf0, sizeof(PNODE));
 
-    /* set data and branch node sequence numbers and node allocated status */
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+    // set data and branch node sequence numbers and node allocated status
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
     {
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
@@ -264,18 +264,18 @@ rdx_pat_initialize
         pnodep->dnodes[n].nsn = n;
         pnodep->dnodes[n].alloc = 0;
     }
-    pnodep->dnodes[0].alloc = 1; /* root impossible key(0xff) node */
+    pnodep->dnodes[0].alloc = 1; // root impossible key(0xff) node
 
-    /* reset total allocated nodes */
+    // reset total allocated nodes
     pnodep->tot_nodes = 0;
 
-    /* for each key set various branch/data/head fields and pointers */
+    // for each key set various branch/data/head fields and pointers
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
-        /* set rdx trie head pointer(s) */
+        // set rdx trie head pointer(s)
         pnodep->head[k] = &pnodep->bnodes[0][k];
 
-        /* init head branch node */
+        // init head branch node
         pnodep->bnodes[0][k].id = 0;
         pnodep->bnodes[0][k].br = 0;
         pnodep->bnodes[0][k].p = NULL;
@@ -283,9 +283,9 @@ rdx_pat_initialize
         pnodep->bnodes[0][k].l = &pnodep->dnodes[0];
         pnodep->bnodes[0][k].r = NULL;
 
-        /* build the branch node free list */
+        // build the branch node free list
         pnodep->bfree_head[k] = &pnodep->bnodes[1][k];
-        for ( unsigned int n = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             pnodep->bnodes[n][k].id = 0;
             pnodep->bnodes[n][k].br = 0;
@@ -301,27 +301,27 @@ rdx_pat_initialize
         pnodep->bnodes[MAX_NUM_RDX_NODES][k].l = NULL;
         pnodep->bnodes[MAX_NUM_RDX_NODES][k].r = NULL;
 
-        /* init data node fields */
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        // init data node fields
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
         {
             pnodep->dnodes[n].br[k] = 0;
             pnodep->dnodes[n].p[k] = 0;
             memset(&pnodep->dnodes[n].key[k][0], 0, NUM_KEY_BYTES+1);
         }
 
-        /* set data node parent pointers of root node to branch nodes for each key */
+        // set data node parent pointers of root node to branch nodes for each key
         pnodep->dnodes[0].p[k] = &pnodep->bnodes[0][k];
 
-        /* init head data node key to impossible value, (the extra high order 0xff byte). */
+        // init head data node key to impossible value, (the extra high order 0xff byte).
         memset(&pnodep->dnodes[0].key[k][0], 0xff, NUM_KEY_BYTES+1);
     }
 
-    /* build the data node free list - use DNODE nnfp as pointer to next node */
+    // build the data node free list - use DNODE nnfp as pointer to next node
     pnodep->dnodes[0].id = 1;
 
     pnodep->dfree_head = &pnodep->dnodes[1];
 
-    for ( unsigned int n = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
+    for ( int n = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
     {
         pnodep->dnodes[n].nnfp = (BNODE *)&pnodep->dnodes[n+1];
         pnodep->dnodes[n].id = 1;
@@ -414,11 +414,11 @@ rdx_pat_insert
             return 3;
         }
 
-        /* copy key to storage with extra byte for comparison */
+        // copy key to storage with extra byte for comparison
         ky[k][0] = 0;
         memmove( &ky[k][1], &key[k][1], NUM_KEY_BYTES );
 
-        /* search for key in rdx trie */
+        // search for key in rdx trie
         c[k] = (BNODE *)pnodep->head[k]->l;
         while ( c[k]->id == 0 )
         {
@@ -432,7 +432,7 @@ rdx_pat_insert
         }
     }
 
-    /* if no data nodes free set return_ptr to NULL and return 2 */
+    // if no data nodes free set return_ptr to NULL and return 2
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
         if ( pnodep->bfree_head[k] == NULL || pnodep->dfree_head == NULL )
@@ -442,12 +442,12 @@ rdx_pat_insert
         }
     }
 
-    /* get free node from free list */
+    // get free node from free list
     dna = pnodep->dfree_head;
     pnodep->dfree_head = (DNODE *)pnodep->dfree_head->nnfp;
     pnodep->tot_nodes++;
 
-    /* insert new data node with NUM_KEYS keys */
+    // insert new data node with NUM_KEYS keys
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
         /*
@@ -467,7 +467,7 @@ rdx_pat_insert
             key_bit[k]--;
         }
 
-        /* allocate new nodes from free list */
+        // allocate new nodes from free list
         bna[k] = pnodep->bfree_head[k];
         pnodep->bfree_head[k] = ((BNODE *)pnodep->bfree_head[k]->p);
 
@@ -493,7 +493,7 @@ rdx_pat_insert
             }
         }
 
-        /* set parent and child links to new branch node address */
+        // set parent and child links to new branch node address
         if ( lr[k] == 0 )
         {
             p[k]->l = bna[k];
@@ -512,7 +512,7 @@ rdx_pat_insert
             ((DNODE *)c[k])->p[k] = bna[k];
         }
 
-        /* set new branch node links and both child parent branches(dna->br[k],c[k]->br) */
+        // set new branch node links and both child parent branches(dna->br[k],c[k]->br)
         bna[k]->br = lr[k];
         bna[k]->b = key_bit[k];
         bna[k]->p = p[k];
@@ -545,17 +545,17 @@ rdx_pat_insert
             }
         }
 
-        /* set child key */
+        // set child key
         memmove( dna->key[k], ky[k], NUM_KEY_BYTES+1 );
 
-        /* set back pointer */
+        // set back pointer
         dna->p[k] = bna[k];
     }
 
-    /* set node to allocated status */
+    // set node to allocated status
     dna->alloc = 1;
 
-    /* new data node insertion successful, set return values */
+    // new data node insertion successful, set return values
     *return_ptr = dna;
     return 0;
 }
@@ -613,7 +613,7 @@ rdx_pat_search
         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
     )
 {
-    unsigned int n;
+    int n;
 
     BNODE *c;
     BNODE *csav;
@@ -639,18 +639,18 @@ rdx_pat_search
             return NULL;
         }
 
-        /* copy key to storage with extra byte for comparison */
+        // copy key to storage with extra byte for comparison
         ky[k][0] = 0;
         memmove( &ky[k][1], &key[k][1], NUM_KEY_BYTES );
 
-        /* search for key in rdx trie */
+        // search for key in rdx trie
         c = (BNODE *)pnodep->head[k]->l;
         while ( c->id == 0 )
         {
             c = ( gbit( ky[k], c->b ) ) ? (BNODE *)c->r : (BNODE *)c->l ;
         }
 
-        /* check if all keys end at the same data node - if not return NULL */
+        // check if all keys end at the same data node - if not return NULL
         if ( firsttime == 1 )
         {
             csav = c;
@@ -664,7 +664,7 @@ rdx_pat_search
             }
         }
 
-        /* if key not found return NULL */
+        // if key not found return NULL
         if ( memcmp( ky[k], ((DNODE *)c)->key[k], NUM_KEY_BYTES+1 ) != 0 )
         {
             return NULL;
@@ -676,7 +676,7 @@ rdx_pat_search
         return NULL;
     }
 
-    /* success - all keys found in the same data node - return data node pointer */
+    // success - all keys found in the same data node - return data node pointer
     return (DNODE *)c;
 }
 
@@ -734,9 +734,9 @@ rdx_pat_delete
         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
     )
 {
-    unsigned int n;
+    int n;
 
-    /* other child pointer */
+    // other child pointer
     BNODE *oc;
 
     BNODE *c;
@@ -763,18 +763,18 @@ rdx_pat_delete
             return NULL;
         }
 
-        /* copy key to storage with extra byte for comparison */
+        // copy key to storage with extra byte for comparison
         ky[k][0] = 0;
         memmove( &ky[k][1], &key[k][1], NUM_KEY_BYTES );
 
-        /* search for key in rdx trie */
+        // search for key in rdx trie
         c = ((BNODE *)pnodep->head[k]->l);
         while ( c->id == 0 )
         {
             c = ( gbit( ky[k], c->b ) ) ? ((BNODE *)c->r) : ((BNODE *)c->l) ;
         }
 
-        /* check if all keys end at the same data node - if not return NULL */
+        // check if all keys end at the same data node - if not return NULL
         if ( firsttime == 1 )
         {
             csav = c;
@@ -788,7 +788,7 @@ rdx_pat_delete
             }
         }
 
-        /* if key not found return NULL */
+        // if key not found return NULL
         if ( memcmp( ky[k], ((DNODE *)c)->key[k], NUM_KEY_BYTES+1 ) != 0 )
         {
             return NULL;
@@ -800,10 +800,10 @@ rdx_pat_delete
         return NULL;
     }
 
-    /* for each key reset pointers for NUM_KEYS branch nodes and the data node */
+    // for each key reset pointers for NUM_KEYS branch nodes and the data node
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
-        /* set ptr to other child of branch node to delete */
+        // set ptr to other child of branch node to delete
         if ( ((DNODE *)c)->br[k] == 0 )
         {
             oc = ((BNODE *)((BNODE *)((DNODE *)c)->p[k])->r);
@@ -815,18 +815,18 @@ rdx_pat_delete
 
         if ( oc->id == 0 )
         {
-            /* other child is a branch node - repair other child ptrs */
+            // other child is a branch node - repair other child ptrs
             ((BNODE *)oc)->p = ((BNODE *)((DNODE *)c)->p[k])->p;
             ((BNODE *)oc)->br = ((BNODE *)((DNODE *)c)->p[k])->br;
         }
         else
         {
-            /* other child is a data node - repair other child ptrs */
+            // other child is a data node - repair other child ptrs
             ((DNODE *)oc)->p[k] = ((BNODE*)((BNODE *)((DNODE *)c)->p[k])->p);
             ((DNODE *)oc)->br[k] = ((BNODE *)((DNODE *)c)->p[k])->br;
         }
 
-        /* repair ptr of parent of parent */
+        // repair ptr of parent of parent
         if ( ((BNODE *)((DNODE *)c)->p[k])->br == 0 )
         {
             ((BNODE *)((BNODE *)((DNODE *)c)->p[k])->p)->l = oc;
@@ -836,22 +836,22 @@ rdx_pat_delete
             ((BNODE *)((BNODE *)((DNODE *)c)->p[k])->p)->r = oc;
         }
 
-        /* return branch nodes to free list */
+        // return branch nodes to free list
         ((BNODE *)((DNODE *)c)->p[k])->p = pnodep->bfree_head[k];
         pnodep->bfree_head[k] = ((DNODE *)c)->p[k];
     }
 
-    /* set node to free status */
+    // set node to free status
     ((DNODE *)c)->alloc = 0;
 
-    /* return data node to free list */
+    // return data node to free list
     ((DNODE *)c)->nnfp = pnodep->dfree_head;
     pnodep->dfree_head = (DNODE *)c;
 
-    /* decrement total allocated nodes */
+    // decrement total allocated nodes
     pnodep->tot_nodes--;
 
-    /* set return pointer to deleted node APP_DATA */
+    // set return pointer to deleted node APP_DATA
     return (DNODE *)c;
 }
 
@@ -888,7 +888,7 @@ rdx_pat_delete
  *
  */
 
-/* recursive routine to descend rdx trie */
+// recursive routine to descend rdx trie
     static void
 rdx_pat_rec
     (
@@ -896,13 +896,13 @@ rdx_pat_rec
         BNODE *bnode_ptr
     )
 {
-    /* bnode_ptr is NULL only at end of trie traversal */
+    // bnode_ptr is NULL only at end of trie traversal
     if ( bnode_ptr == NULL )
     {
         return;
     }
 
-    /* if branch node continue down trie.  if data node inc count and store node ptr */
+    // if branch node continue down trie.  if data node inc count and store node ptr
     if ( bnode_ptr->id != 1 )
     {
         rdx_pat_rec(pnodep, (BNODE *)bnode_ptr->l);
@@ -1054,8 +1054,9 @@ rdx_pat_print
     )
 {
     unsigned char ky[NUM_KEY_BYTES+1];
+
     BNODE *c;
-    DNODE *dn;
+    DNODE *dnodep;
 
 
     if ( key == NULL )
@@ -1097,7 +1098,7 @@ rdx_pat_print
         fprintf(fp, "      .\n");
         fprintf(fp, "      .\n\n\n");
 
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
         {
             if ( pnodep->dnodes[n].alloc != 1 )
             {
@@ -1237,7 +1238,7 @@ rdx_pat_print
         fprintf(fp, "      .\n");
         fprintf(fp, "      .\n\n\n");
 
-        if ( (dn = rdx_pat_search(pnodep, key)) == NULL )
+        if ( (dnodep = rdx_pat_search(pnodep, key)) == NULL )
         {
             fprintf(fp, "rdx_pat_print():(file %s  line %d): Key not found.\n", __FILE__, __LINE__);
             return 1;
@@ -1245,7 +1246,7 @@ rdx_pat_print
 
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
-            /* copy key to storage with extra byte for comparison */
+            // copy key to storage with extra byte for comparison
             ky[0] = 0;
             memmove( &ky[1], &key[k][1], NUM_KEY_BYTES );
 
@@ -1341,7 +1342,7 @@ rdx_pat_print
  *
  */
 
-/* used to compare node addresses stored in unsigned longs */
+// used to compare node addresses stored in unsigned longs
     static int
 unsigned_int_compare
     (
@@ -1361,7 +1362,7 @@ unsigned_int_compare
     return 0;
 }
 
-/* used to compare keys */
+// used to compare keys
     static int
 string_compare
     (
@@ -1395,26 +1396,26 @@ rdx_pat_verify
     unsigned int tot_free_nodes;
     unsigned int tot_alloc_nodes;
 
-    /* branch node and data node free list head pointers */
+    // branch node and data node free list head pointers
     BNODE *bhead;
     DNODE *dhead;
 
-    /* holds all of the allocated branch node addresses */
+    // holds all of the allocated branch node addresses
     unsigned long bnode_addrs[NUM_KEYS][MAX_NUM_RDX_NODES+1];
 
-    /* holds all of the unallocated branch node addresses */
+    // holds all of the unallocated branch node addresses
     unsigned long free_bnode_addrs[NUM_KEYS][MAX_NUM_RDX_NODES+1];
 
-    /* holds all of the allocated data node addresses */
+    // holds all of the allocated data node addresses
     unsigned long dnode_addrs[MAX_NUM_RDX_NODES+1];
 
-    /* holds all of the unallocated data node addresses */
+    // holds all of the unallocated data node addresses
     unsigned long free_dnode_addrs[MAX_NUM_RDX_NODES+1];
 
-    /* hold all of the allocated data node keys */
+    // hold all of the allocated data node keys
     unsigned char dnode_keys[NUM_KEYS][MAX_NUM_RDX_NODES+1][NUM_KEY_BYTES];
 
-    /* holds integer indexes(0-MAX_NUM_RDX_NODES) of free and allocated nodes */
+    // holds integer indexes(0-MAX_NUM_RDX_NODES) of free and allocated nodes
     unsigned int node_index[2][MAX_NUM_RDX_NODES+1];
 
 
@@ -1424,7 +1425,7 @@ rdx_pat_verify
      */
     tot_free_nodes = 0;
     tot_alloc_nodes = 0;
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
     {
         if ( pnodep->dnodes[n].alloc == 0 )
         {
@@ -1451,7 +1452,7 @@ rdx_pat_verify
         }
     }
 
-    /* print all of the free/alloc data structure addresses, node indexes and keys */
+    // print all of the free/alloc data structure addresses, node indexes and keys
     if ( vm == ERR_CODE_PRINT )
     {
         fprintf(fp, "Free Data Node Address(DNA)/Keys and Branch Node Addresses(BNAs)\n");
@@ -1464,7 +1465,7 @@ rdx_pat_verify
         }
         fprintf(fp, "\n");
 
-        for ( unsigned int n = 0 ; n < tot_free_nodes ; n++ )
+        for ( int n = 0 ; n < tot_free_nodes ; n++ )
         {
             fprintf(fp, "%4d  %-20p", node_index[FREE][n], (void *)free_dnode_addrs[n]);
             fprintf(fp, "%10s", " ");
@@ -1486,7 +1487,7 @@ rdx_pat_verify
         }
         fprintf(fp, "\n");
 
-        for ( unsigned int n = 0 ; n < tot_alloc_nodes ; n++ )
+        for ( int n = 0 ; n < tot_alloc_nodes ; n++ )
         {
             fprintf(fp, "%4d  %-20p", node_index[ALLOC][n], (void *)dnode_addrs[n]);
             fprintf(fp, "%10s", " ");
@@ -1515,7 +1516,7 @@ rdx_pat_verify
      * be NUM_KEYS branch nodes and one data node in the root node - these
      * values should remain permanently invariant at zero
      */
-    for ( unsigned int k = 0 ; k < NUM_KEYS ; k++ )
+    for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
         if ( pnodep->bnodes[0][k].id != 0 )
         {
@@ -1586,7 +1587,7 @@ rdx_pat_verify
      * save data node, free node, branch node and key node address queues(will be unsorted),
      * total number of free nodes and total number of allocated nodes
      */
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
     {
         if ( pnodep->dnodes[n].id != 1 )
         {
@@ -1634,7 +1635,7 @@ rdx_pat_verify
         }
     }
 
-    /* verify that the sum of free and allocated nodes is MAX_NUM_RDX_NODES+1 nodes */
+    // verify that the sum of free and allocated nodes is MAX_NUM_RDX_NODES+1 nodes
     if ( (tot_alloc_nodes + tot_free_nodes) != MAX_NUM_RDX_NODES+1 )
     {
         if ( vm == ERR_CODE_PRINT )
@@ -1646,7 +1647,7 @@ rdx_pat_verify
         return 11;
     }
 
-    /* verify that the tot_alloc_nodes equals tot_nodes */
+    // verify that the tot_alloc_nodes equals tot_nodes
     if ( tot_alloc_nodes != (pnodep->tot_nodes+1) )
     {
         if ( vm == ERR_CODE_PRINT )
@@ -1658,7 +1659,7 @@ rdx_pat_verify
         return 12;
     }
 
-    /* sort data node, free node, branch node and data node key address queues */
+    // sort data node, free node, branch node and data node key address queues
     qsort(
              (void *)&dnode_addrs[0],
              tot_alloc_nodes,
@@ -1701,9 +1702,9 @@ rdx_pat_verify
      * check for multiple nodes with same key in a given key index - in sorted
      * order identical keys will show up next to each other
      */
-    for ( unsigned int k = 0 ; k < NUM_KEYS ; k++ )
+    for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
-        for ( unsigned int n = 0 ; n < tot_alloc_nodes-1 ; n++ )
+        for ( int n = 0 ; n < tot_alloc_nodes-1 ; n++ )
         {
             if ( memcmp( &dnode_keys[k][n][0], &dnode_keys[k][n+1][0], NUM_KEY_BYTES ) == 0 )
             {
@@ -1731,12 +1732,12 @@ rdx_pat_verify
     {
         bhead = (BNODE *)pnodep->bfree_head[k];
 
-        /* walk data node free list */
+        // walk data node free list
         while ( bhead != NULL )
         {
             void *ptr;
 
-            /* check if current pointer is in free data node list */
+            // check if current pointer is in free data node list
             ptr = bsearch(
                              (void *)&bhead,
                              (void *)&free_bnode_addrs[k][0],
@@ -1764,12 +1765,12 @@ rdx_pat_verify
      */
     dhead = (DNODE *)pnodep->dfree_head;
 
-    /* walk data node free list */
+    // walk data node free list
     while ( dhead != NULL )
     {
         void *ptr;
 
-        /* check if current pointer is in free data node list */
+        // check if current pointer is in free data node list
         ptr = bsearch(
                          (void *)&dhead,
                          (void *)&free_dnode_addrs[0],
@@ -1789,8 +1790,8 @@ rdx_pat_verify
         dhead = (DNODE *)dhead->nnfp;
     }
 
-    /* for each allocated node check for valid branch and data node values */
-    for ( unsigned int n = 0 ; n < tot_alloc_nodes ; n++ )
+    // for each allocated node check for valid branch and data node values
+    for ( int n = 0 ; n < tot_alloc_nodes ; n++ )
     {
         unsigned long ui;
         void *ptr, *bptr, *dptr;
@@ -1798,7 +1799,7 @@ rdx_pat_verify
 
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
-            /* check if bad branch node id */
+            // check if bad branch node id
             if ( pnodep->bnodes[n][k].id != 0 )
             {
                 if ( vm == ERR_CODE_PRINT )
@@ -1810,7 +1811,7 @@ rdx_pat_verify
                 return 16;
             }
 
-            /* check if bad parent branch indicator */
+            // check if bad parent branch indicator
             if ( pnodep->bnodes[n][k].br != 0 && pnodep->bnodes[n][k].br != 1 )
             {
                 if ( vm == ERR_CODE_PRINT )
@@ -1822,7 +1823,7 @@ rdx_pat_verify
                 return 17;
             }
 
-            /* check if branch node parent pointers are valid - the root node(i=0) will not have a parent */
+            // check if branch node parent pointers are valid - the root node(i=0) will not have a parent
             if ( n != 0 )
             {
                 ui = (unsigned long)pnodep->bnodes[n][k].p;
@@ -1845,7 +1846,7 @@ rdx_pat_verify
                 }
             }
 
-            /* check if PATRICIA algorithm branch test bit number is valid */
+            // check if PATRICIA algorithm branch test bit number is valid
             if ( pnodep->bnodes[n][k].b > NUM_KEY_BYTES*8 )
             {
                 if ( vm == ERR_CODE_PRINT )
@@ -1857,7 +1858,7 @@ rdx_pat_verify
                 return 19;
             }
 
-            /* check if left child pointer is another branch or data node */
+            // check if left child pointer is another branch or data node
             ui = (unsigned long)pnodep->bnodes[n][k].l;
             bptr = bsearch(
                               (void *)&ui,
@@ -1917,7 +1918,7 @@ rdx_pat_verify
                 }
             }
 
-            /* check if data node parent pointers are all valid branch node addresses */
+            // check if data node parent pointers are all valid branch node addresses
             ui = (unsigned long)pnodep->dnodes[n].p[k];
             ptr = bsearch(
                              (void *)&ui,
@@ -1937,7 +1938,7 @@ rdx_pat_verify
                 return 22;
             }
 
-            /* check if all data node parent branch indicators are valid */
+            // check if all data node parent branch indicators are valid
             if ( pnodep->dnodes[n].br[k] != 0 && pnodep->dnodes[n].br[k] != 1 )
             {
                 if ( vm == ERR_CODE_PRINT )
@@ -1955,20 +1956,20 @@ rdx_pat_verify
      * retrieve all keys from all data nodes and use normal search(rdx_pat_search())
      * to find them - ignore root node keys
      */
-    for ( unsigned int n = 1 ; n < tot_alloc_nodes ; n++ )
+    for ( int n = 1 ; n < tot_alloc_nodes ; n++ )
     {
         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
         DNODE *dnodep;
 
 
-        /* get data node keys directly from allocated data node */
+        // get data node keys directly from allocated data node
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
             key[k][0] = 1;
             memmove( &key[k][1], &pnodep->dnodes[n].key[k][1], NUM_KEY_BYTES );
         }
 
-        /* search for node n keys */
+        // search for node n keys
         dnodep = rdx_pat_search(pnodep, key);
 
         if ( dnodep == NULL )

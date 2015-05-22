@@ -1,4 +1,4 @@
-/* performance measurements for rdx_pat_insert()/rdx_pat_delete()/rdx_pat_search() library routines */
+// performance measurements for rdx_pat_insert()/rdx_pat_delete()/rdx_pat_search() library routines
 
 #include <stdio.h>
 #include <unistd.h>
@@ -7,7 +7,7 @@
 #include <locale.h>
 #include "rdx_pat_search_perf.h"
 
-/* take the difference of two timespec structs and return this in a timespec struct */
+// take the difference of two timespec structs and return this in a timespec struct
     struct timespec
 timespec_diff
     (
@@ -110,7 +110,7 @@ main
 
     fp = fopen("rdx_pat_perf.results", "a");
 
-    /* initialize rdx1 PNODE structure */
+    // initialize rdx1 PNODE structure
     rdx_size = rdx_pat_initialize(&rdx1);
 
     /*
@@ -122,7 +122,7 @@ main
     {
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
-            rdx1_key[n][k][0] = 1; /* set key boolean to 1 */
+            rdx1_key[n][k][0] = 1; // set key boolean to 1
             for ( int b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
             {
                 rdx1_key[n][k][b] = rand() & 0x000000ff; // not crypto random - will produce some duplicates - ok

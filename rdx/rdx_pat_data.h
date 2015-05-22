@@ -6,9 +6,9 @@
  * key storage is not handled by the user, but is allocated in the PNODE struct.
  */
 
-/* any user data structure of arbitrary complexity */
+// any user data structure of arbitrary complexity
 typedef struct _app_data {
-   /* data stuff goes here */
+   // data stuff goes here
    int id;
    char name[64];
 
@@ -31,4 +31,4 @@ typedef struct _app_data {
    } data2;
 } APP_DATA;
 
-#endif /* _RDX_PAT_DATA_H */
+#endif // _RDX_PAT_DATA_H

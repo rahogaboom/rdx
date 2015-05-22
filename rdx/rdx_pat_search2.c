@@ -32,7 +32,7 @@
  *         );
  *
  *         DNODE *
- *     rdx_pat_delete
+ *     rdx_pat_remove
  *         (
  *             PNODE *pnodep,
  *             unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
@@ -683,13 +683,13 @@ rdx_pat_search
 
 /*
  *======================================================================================================================
- *     rdx_pat_delete()
+ *     rdx_pat_remove()
  *
  * Purpose: 
- *     delete trie data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all
+ *     remove trie data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all
  *     keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or 0(do not use key).
  *     the actual key bytes(key[k][1 to NUM_KEY_BYTES]) follow the key boolean.  thus, 1 to NUM_KEYS keys may be used.
- *     only one key is necessary to delete the data node.  each key must be unique within it's key
+ *     only one key is necessary to remove the data node.  each key must be unique within it's key
  *     index(0 to NUM_KEYS-1).
  *
  * Usage:
@@ -697,10 +697,10 @@ rdx_pat_search
  *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
  *     DNODE *dnp;
  *
- *     dnp = rdx_pat_delete(&data, key);
+ *     dnp = rdx_pat_remove(&data, key);
  *
  * Returns:
- *     DNODE *dnp - pointer to the data node deleted or NULL if no data node found
+ *     DNODE *dnp - pointer to the data node removed or NULL if no data node found
  *
  * Parameters:
  *     PNODE *pnodep                                - pointer to the PNODE structure
@@ -728,7 +728,7 @@ rdx_pat_search
  */
 
     DNODE *
-rdx_pat_delete
+rdx_pat_remove
     (
         PNODE *pnodep,
         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
@@ -803,7 +803,7 @@ rdx_pat_delete
     // for each key reset pointers for NUM_KEYS branch nodes and the data node
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
-        // set ptr to other child of branch node to delete
+        // set ptr to other child of branch node to remove
         if ( ((DNODE *)c)->br[k] == 0 )
         {
             oc = ((BNODE *)((BNODE *)((DNODE *)c)->p[k])->r);
@@ -851,7 +851,7 @@ rdx_pat_delete
     // decrement total allocated nodes
     pnodep->tot_nodes--;
 
-    // set return pointer to deleted node APP_DATA
+    // set return pointer to removed node APP_DATA
     return (DNODE *)c;
 }
 

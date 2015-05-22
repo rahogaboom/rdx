@@ -1,4 +1,4 @@
-// performance measurements for rdx_pat_insert()/rdx_pat_delete()/rdx_pat_search() library routines
+// performance measurements for rdx_pat_insert()/rdx_pat_remove()/rdx_pat_search() library routines
 
 #include <stdio.h>
 #include <unistd.h>
@@ -134,13 +134,13 @@ main
     {
         case 1:
             {
-                long total_inserts_deletes = 0;
+                long total_inserts_removes = 0;
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
 
                 fprintf(fp, "####################################################################################################\n");
-                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_insert()(fill trie)/rdx_pat_delete()(empty trie) - random keys\n");
+                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_insert()(fill trie)/rdx_pat_remove()(empty trie) - random keys\n");
                 fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  NUM_KEYS = %d  NUM_KEY_BYTES = %d  trie size = %db\n",
                     MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES, rdx_size);
                 fprintf(fp, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
@@ -162,11 +162,11 @@ main
 
                         for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
                         {
-                            rdx_pat_delete(&rdx1, rdx1_key[n]);
+                            rdx_pat_remove(&rdx1, rdx1_key[n]);
                         }
                     }
 
-                    total_inserts_deletes += MAX_NUM_RDX_NODES*2*block_multiply_opt;
+                    total_inserts_removes += MAX_NUM_RDX_NODES*2*block_multiply_opt;
 
                     clock_gettime(CLOCK_MONOTONIC, &tend);
 
@@ -178,7 +178,7 @@ main
                         break;
                     }
                 }
-                fprintf(fp, "seconds = %f  total inserts/deletes = %ld\n\n", sec, total_inserts_deletes);
+                fprintf(fp, "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
             }
             break;
 

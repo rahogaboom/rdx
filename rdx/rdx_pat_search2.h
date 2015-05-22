@@ -1,10 +1,10 @@
-#ifndef _RDX_PAT_SEARCH_H
-#define _RDX_PAT_SEARCH_H
+#ifndef RDX_PAT_SEARCH_H
+#define RDX_PAT_SEARCH_H
 
-/*
- * header file for rdx_pat_search.c radix PATRICIA search trie routines.
- * to be included in application code.
- */
+//
+// header file for rdx_pat_search.c radix PATRICIA search trie routines.
+// to be included in application code.
+//
 
 // includes application defined data structure typedef APP_DATA
 #include "rdx_pat_data.h"
@@ -21,9 +21,9 @@
 // verify mode arg to rdx_pat_verify()
 typedef enum verify_mode
 {
-    ERR_CODE,              // return 0 for no error and positive int with error code for any errors
-    ERR_CODE_PRINT         // return same error code above but also print current data structure data
-                           // node addresses/keys, branch node addresses and error messages
+    ERR_CODE,         // return 0 for no error and positive int with error code for any errors
+    ERR_CODE_PRINT    // return same error code above but also print current data structure data
+                      // node addresses/keys, branch node addresses and error messages
 } VERIFY_MODE;
 
 // branch node typedef
@@ -37,12 +37,10 @@ typedef struct bnode
     void *l, *r;      // Left and Right node ptrs
 } BNODE;
 
-/*
- * data node typedef for application declarations.
- * the key must have one extra byte from NUM_KEY_BYTES
- * specified above in order to have an "impossible"
- * key data node set at initialization 
- */
+// data node typedef for application declarations.
+// the key must have one extra byte from NUM_KEY_BYTES
+// specified above in order to have an "impossible"
+// key data node set at initialization 
 typedef struct dnode
 {
     unsigned int id;           // IDentification(id=1) for data node - must be first field in node
@@ -64,10 +62,8 @@ typedef struct pnode
     // head of rdx search node trie for each key
     BNODE *head[NUM_KEYS];
 
-    /*
-     * array holding ptrs to DNODES used in rdx_pat_sort().  initialized to all 0xf0 which should not affect
-     * anything, but might be useful for debugging(the last element points to the root node with key 0xff)
-     */
+    // array holding ptrs to DNODES used in rdx_pat_sort().  initialized to all 0xf0 which should not affect
+    // anything, but might be useful for debugging(the last element points to the root node with key 0xff)
     DNODE *node_ptrs[MAX_NUM_RDX_NODES+1];
 
     // number of ptrs in node_ptrs array(not including root node)
@@ -107,7 +103,7 @@ rdx_pat_search
     );
 
     DNODE *
-rdx_pat_delete
+rdx_pat_remove
     (
         PNODE *pnodep,
         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
@@ -143,4 +139,4 @@ rdx_pat_verify
         FILE *fp
     );
 
-#endif // _RDX_PAT_SEARCH_H
+#endif // RDX_PAT_SEARCH_H

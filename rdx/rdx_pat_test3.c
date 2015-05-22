@@ -75,8 +75,8 @@ print_keys
     int
 main()
 {
-    unsigned int return_code;
-    unsigned int rdx_size;
+    int return_code;
+    int rdx_size;
 
 
     /*
@@ -121,7 +121,7 @@ main()
      * NUM_KEY_BYTES in length and set all key booleans to 1
      */
     srand(time(NULL));
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
     {
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
@@ -225,7 +225,7 @@ main()
 
         fprintf(fp, "TEST 3: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-        for ( unsigned int n = 1 ; n < 5 ; n++ )
+        for ( int n = 1 ; n < 5 ; n++ )
         {
             return_code = rdx_pat_insert(&rdx1, rdx1_key[n], &dnp);
 
@@ -269,7 +269,7 @@ main()
 
     fprintf(fp, "TEST 4: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
     {
         dnp = rdx_pat_search(&rdx1, rdx1_key[n]);
         if (dnp == NULL)
@@ -303,7 +303,7 @@ main()
         return_code = rdx_pat_sort(&rdx1, &sorted_nodes, k);
         fprintf(fp, "TEST 5: rdx_pat_sort(&rdx1, &sorted_nodes, %d); - Return code = %d\n", k, return_code);
 
-        for ( unsigned int n = 0 ; n < return_code ; n++ )
+        for ( int n = 0 ; n < return_code ; n++ )
         {
             if ( sorted_nodes[n] == NULL )
             {
@@ -331,12 +331,12 @@ main()
 
     fprintf(fp, "TEST 6: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-    unsigned int tot_nodes;
+    int tot_nodes;
 
     tot_nodes = rdx_pat_nodes(&rdx1);
     fprintf(fp, "TEST 6: tot_nodes = %d\n", tot_nodes);
 
-    for ( unsigned int n = 0 ; n < tot_nodes ; n++ )
+    for ( int n = 0 ; n < tot_nodes ; n++ )
     {
         ((DNODE *)rdx1.node_ptrs[n])->data.data1.d = n;
         fprintf(fp, "TEST 6: node: %d  (void *)(DNODE *)rdx1.node_ptrs[%d]: %p  ((DNODE *)rdx1.node_ptrs[%d])->data.data1.d: %f\n",
@@ -346,7 +346,7 @@ main()
 
     qsort(&rdx1.node_ptrs[0], tot_nodes, sizeof(DNODE *), double_compare);
 
-    for ( unsigned int n = 0 ; n < tot_nodes ; n++ )
+    for ( int n = 0 ; n < tot_nodes ; n++ )
     {
         fprintf(fp, "TEST 6: node: %d  (void *)(DNODE *)rdx1.node_ptrs[%d]: %p  ((DNODE *)rdx1.node_ptrs[%d])->data.data1.d: %f\n",
             n, n, (void *)(DNODE *)rdx1.node_ptrs[n], n, ((DNODE *)rdx1.node_ptrs[n])->data.data1.d);
@@ -376,7 +376,7 @@ main()
 
     fprintf(fp, "TEST 7: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
     {
         fprintf(fp, "TEST 7: rdx_pat_remove(&rdx1, rdx1_key[%d]);\n", n);
         dnp = rdx_pat_remove(&rdx1, rdx1_key[n]);
@@ -416,14 +416,14 @@ main()
 
     fprintf(fp, "TEST 8: rdx1 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx1));
 
-    unsigned int tot_errs;
-    unsigned int test_num;
+    int tot_errs;
+    int test_num;
 
     for ( test_num = 0,tot_errs = 0 ; test_num < 32 ; test_num++ )
     {
         // in rdx1_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS random keys each of NUM_KEY_BYTES in length
         srand(time(NULL));
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
@@ -436,7 +436,7 @@ main()
         }
 
         // insert full set of MAX_NUM_RDX_NODES data nodes
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             fprintf(fp, "TEST 8: rdx_pat_insert(&rdx1, rdx1_key[%d], &dnp);\n", n);
             return_code = rdx_pat_insert(&rdx1, rdx1_key[n], &dnp);
@@ -448,7 +448,7 @@ main()
         }
 
         // search for full set of MAX_NUM_RDX_NODES data nodes
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             fprintf(fp, "TEST 8: rdx_pat_search(&rdx1, rdx1_key[%d]);\n", n);
             dnp = rdx_pat_search(&rdx1, rdx1_key[n]);
@@ -460,7 +460,7 @@ main()
         }
 
         // remove a full set of MAX_NUM_RDX_NODES data nodes
-        for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             fprintf(fp, "TEST 8: rdx_pat_remove(&rdx1, rdx1_key[%d]);\n", n);
             dnp = rdx_pat_remove(&rdx1, rdx1_key[n]);
@@ -732,7 +732,7 @@ main()
 
     // in rdx2_key[][][] generate MAX_NUM_RDX_NODES+1 sets of NUM_KEYS random keys each of NUM_KEY_BYTES in length
     srand(time(NULL));
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
     {
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
@@ -753,7 +753,7 @@ main()
     fprintf(fp, "            c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n");
     fprintf(fp, "            d. No verification error\n\n");
 
-    for ( unsigned int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+    for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
     {
         fprintf(fp, "TEST 13: rdx_pat_insert(&rdx2, rdx2_key[%d], &dnp);\n", n);
         fprintf(fp, "TEST 13: rdx2 - Nodes allocated = %d\n\n", rdx_pat_nodes(&rdx2));

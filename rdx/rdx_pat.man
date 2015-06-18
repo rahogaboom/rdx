@@ -114,7 +114,7 @@
 
 =head1 PROTOTYPES
 
-     unsigned int
+     int
  rdx_pat_initialize
      (
          PNODE *pnodep
@@ -136,7 +136,7 @@
      );
 
      DNODE *
- rdx_pat_delete
+ rdx_pat_remove
      (
          PNODE *pnodep,
          unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
@@ -233,6 +233,10 @@
  No configuration files or environment variables are used.
 
 =head1 CONSTRUCTION
+
+ dnf install gcc
+ dnf install gcc-c++
+ dnf install clang
 
  ./rdx_pat.mk
  ./rdx_pat.mk clean

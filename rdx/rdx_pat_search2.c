@@ -1410,8 +1410,8 @@ rdx_pat_verify
         FILE *fp
     )
 {
-    unsigned int tot_free_nodes;
-    unsigned int tot_alloc_nodes;
+    int tot_free_nodes;
+    int tot_alloc_nodes;
 
     // branch node and data node free list head pointers
     BNODE *bhead;
@@ -1618,7 +1618,7 @@ rdx_pat_verify
 
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
-            if ( pnodep->bnodes[n][k].nsn != n )
+            if ( pnodep->bnodes[n][k].nsn != (unsigned) n )
             {
                 if ( vm == ERR_CODE_PRINT )
                 {
@@ -1630,7 +1630,7 @@ rdx_pat_verify
             }
         }
 
-        if ( pnodep->dnodes[n].nsn != n )
+        if ( pnodep->dnodes[n].nsn != (unsigned) n )
         {
             if ( vm == ERR_CODE_PRINT )
             {
@@ -1665,7 +1665,7 @@ rdx_pat_verify
     }
 
     // verify that the tot_alloc_nodes equals tot_nodes
-    if ( tot_alloc_nodes != (pnodep->tot_nodes+1) )
+    if ( (unsigned) tot_alloc_nodes != (pnodep->tot_nodes+1) )
     {
         if ( vm == ERR_CODE_PRINT )
         {

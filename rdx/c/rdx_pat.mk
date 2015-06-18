@@ -19,9 +19,6 @@ fi
 CC="gcc"
 #CC="g++"
 
-# add current directory to library path for shared libraries
-export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
-
 # build static library
 rm -rf librdxpatc.a
 $CC -std=c11 -c -fpic -g -pedantic -Wall -o rdx_pat_search1.o rdx_pat_search1.c

@@ -6,7 +6,7 @@ set -v
 
 if [ "$1" == 'clean' ]
 then
-    rm -f librdxpatc1.a librdxpatc1.so librdxpatc1.so.1 librdxpatc.so.1.0.1
+    rm -f librdxpatc.a librdxpatc.so librdxpatc.so.1 librdxpatc.so.1.0.1
     rm -f rdx_pat_search1.o
     rm -f rdx_pat_test1 rdx_pat_test1.results rdx_pat_test2 rdx_pat_test2.results rdx_pat_test3 rdx_pat_test3.results
     rm -f test_gbit test_gbit.results
@@ -25,17 +25,17 @@ export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 # build static library
 rm -rf librdxpatc.a
 $CC -std=c11 -c -fpic -g -pedantic -Wall -o rdx_pat_search1.o rdx_pat_search1.c
-ar rcv librdxpatc1.a rdx_pat_search1.o
-ar ts librdxpatc1.a
+ar rcv librdxpatc.a rdx_pat_search1.o
+ar ts librdxpatc.a
 
 # build dynamic library and set up links
 rm -rf librdxpatc.so.1.0.1
-$CC -shared -Wl,-soname,librdxpatc1.so.1 -o librdxpatc.so.1.0.1 rdx_pat_search1.o -lc
-ln -sf librdxpatc1.so.1.0.1 librdxpatc1.so.1
-ln -sf librdxpatc1.so.1.0.1 librdxpatc1.so
+$CC -shared -Wl,-soname,librdxpatc.so.1 -o librdxpatc.so.1.0.1 rdx_pat_search1.o -lc
+ln -sf librdxpatc.so.1.0.1 librdxpatc.so.1
+ln -sf librdxpatc.so.1.0.1 librdxpatc.so
 
 # compile test1 program and link with shared library
-#$CC -std=c11 -g -pedantic -Wall -o rdx_pat_test1 rdx_pat_test1.c -L. -lrdxpatc1 -lm
+$CC -std=c11 -g -pedantic -Wall -o rdx_pat_test1 rdx_pat_test1.c -L. -lrdxpatc -lm
 
 # compile test1 program
 #clang -std=c11 -g -pedantic -Wall -o rdx_pat_test1 rdx_pat_test1.c rdx_pat_search1.c -lm

@@ -119,6 +119,7 @@
  *
  *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to 0 and then
  *        the keys added with the key boolean prepended and set appropriately in one operation.
+ *        e.g. memset(key, 0, num_keys*(num_key_bytes+1));
  *
  *======================================================================================================================
  *

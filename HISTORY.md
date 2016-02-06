@@ -1,4 +1,10 @@
 
+ rdx-1.0.7.tar.gz - 
+
+    a. an OO C++ release.  the test suite is very basic; the next release will focus on an
+       updates test suite.
+
+
  rdx-1.0.6.tar.gz - 
 
     a. entirely a measuring performance release.  a new executable, rdx_pat_perf, is provided.  see

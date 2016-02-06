@@ -1,4 +1,4 @@
-Copyright (c) 2014, Richard A Hogaboom
+Copyright (c) 1997-2016, Richard A Hogaboom
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

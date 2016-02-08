@@ -2,7 +2,7 @@
 #define RDX_PAT_DATA_H
 
 /*
- * application defined data is set here.  this file is included in rdx_pat_search.h.
+ * application defined data is set here.  this file is included in MKRdxPat.h.
  * key storage is not handled by the user, but is allocated in the PNODE struct.
  */
 

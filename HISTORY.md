@@ -2,7 +2,9 @@
  rdx-1.0.7.tar.gz - 
 
     a. an OO C++ release.  the test suite is very basic; the next release will focus on an
-       updated test suite.
+       updated test suite.  an OO release allows multiply defined data structures in the same compilation unit:
+           MKRdxPat *rdx0 = new MKRdxPat( 512 /* MAX_NUM_RDX_NODES */, 3 /* NUM_KEYS */, 4 /* NUM_KEY_BYTES */ );
+           MKRdxPat *rdx1 = new MKRdxPat( 1024 /* MAX_NUM_RDX_NODES */, 2 /* NUM_KEYS */, 16 /* NUM_KEY_BYTES */ );
 
 
  rdx-1.0.6.tar.gz - 

@@ -15,8 +15,8 @@ then
 fi
 
 # pick compiler - should work with all three
-#CC="clang"
-CC="gcc"
+CC="clang"
+#CC="gcc"
 #CC="g++"
 
 # build static library

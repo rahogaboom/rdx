@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #
-# man page in perldoc format for rdx_pat_*() library routines.  do "perldoc rdx_pat.man" to see the man page.
+# man page in perldoc format for rdx_pat_*() library routines.  do "perldoc rdx_pat.pl" to see the man page.
 #
 
 =head1 NAME

@@ -1,5 +1,5 @@
 
- 1. do "perldoc rdx_pat.man" to see the man page
+ 1. do "perldoc rdx_pat.pl" to see the man page
 
  2. do "./rdx_pat.mk" to do the default builds.  there are three test builds with different defines:
     a. 8 nodes, 3 keys, 4 bytes per key

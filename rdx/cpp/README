@@ -3,7 +3,7 @@
 
  2. adjust $CC in ./rdx_pat.mk to use clang or g++
 
- 3. do "./rdx_pat.mk" to do the build and run the test program.
+ 3. do "./rdx_pat.mk" to do the build and run the test program
 
  4. do "./rdx_pat.mk clean" to clean the directory
 

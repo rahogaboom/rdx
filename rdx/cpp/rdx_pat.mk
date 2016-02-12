@@ -7,7 +7,7 @@ set -v
 if [ "$1" == 'clean' ]
 then
     rm -f rdx_pat_test
-    rm -f MKRdxPat-test.results
+    rm -f MKRdxPat.TEST?.results
     rm -f rdx_pat_perf
     exit
 fi

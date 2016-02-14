@@ -8,6 +8,7 @@
 
 // any user data structure of arbitrary complexity
 typedef struct _app_data {
+
    // data stuff goes here
    int id;
    char name[64];
@@ -29,6 +30,7 @@ typedef struct _app_data {
       int id;
       char data2_id[16];
    } data2;
+
 } APP_DATA;
 
 #endif // RDX_PAT_DATA_H

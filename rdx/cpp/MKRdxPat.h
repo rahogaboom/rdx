@@ -83,13 +83,13 @@
  *     Routines to support multi-key radix PATRICIA(Practical Algorithm To Retrieve Information Coded In Alphanumeric)
  *     fast search(see ref. 1).  A data structure is supported of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
  *     data node with keys of NUM_KEY_BYTES bytes length.  Each of these three defines may be set to any arbitrary
- *     integer value one or higher in rdx_pat_search.h(a trie of one node with one key of one byte will work, but might
+ *     integer value one or higher in MKRdxPat.h(a trie of one node with one key of one byte will work, but might
  *     not be very useful).  For a trie of N keys each data node will have N branch nodes associated with it, each of
  *     the N branch nodes is associated with one of the N keys.  Again, see reference 1 on the PATRICIA algorithm for a
  *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
  *     data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which
  *     has one data node and N branch nodes within it.  The user would define an arbitrarily complex data structure
- *     in the APP_DATA typedef in APP_DATA.h and then specify in rdx_pat_search.h the values of the three defines
+ *     in the APP_DATA typedef in APP_DATA.h and then specify in MKRdxPat.h the values of the three defines
  *     noted above.  The number of actual nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for
  *     the initial branch node and the initial data node with the impossible key of all 0xff's.  The number of user
  *     storable nodes is MAX_NUM_RDX_NODES.   The user declares PNODEs, each of which contains a radix PATRICIA trie of
@@ -101,16 +101,16 @@
  *     keys (2,3) this fails since the key at key index 0 - 2 - is the same as the previously inserted node key index
  *     0 key value of 2.  
  *
- *     These routines are a modification of the algorithm cited in reference 1 below.  Specifically, the upward pointers
- *     used to terminate search are not used, and are instead used to point to data nodes as trie leaves.  In multi-key
- *     search with PATRICIA the upward pointer scheme will not work since each key would have pointed to a different
- *     branch node with it's associated data structure.  In multi-key PATRICIA search all keys must lead to the same
- *     data node.  The viability of multi-key radix PATRICIA search depends on the fact that each data node insertion
- *     requires only one new branch node for each key, thus the initial allocation of N branch nodes with each data node.
- *     This implementation has several branch and data node members not used in the reference 1 PATRICIA search algorithm
- *     description.  These are for various purposes; related to changes in the original algorithm for multi-key search,
- *     related to changes in the original algorithm for leaf data nodes instead of upward pointers to data structures
- *     stored in branch nodes, related to printing, sorting and debugging.
+ *     These routines are a modification of the algorithm cited in reference 1 below.  Specifically, the upward
+ *     pointers used to terminate search are not used, and are instead used to point to data nodes as trie leaves.  In
+ *     multi-key search with PATRICIA the upward pointer scheme will not work since each key would have pointed to a
+ *     different branch node with it's associated data structure.  In multi-key PATRICIA search all keys must lead to
+ *     the same data node.  The viability of multi-key radix PATRICIA search depends on the fact that each data node
+ *     insertion requires only one new branch node for each key, thus the initial allocation of N branch nodes with
+ *     each data node.  This implementation has several branch and data node members not used in the reference 1
+ *     PATRICIA search algorithm description.  These are for various purposes; related to changes in the original
+ *     algorithm for multi-key search, related to changes in the original algorithm for leaf data nodes instead of
+ *     upward pointers to data structures stored in branch nodes, related to printing, sorting and debugging.
  *
  *======================================================================================================================
  *
@@ -1970,7 +1970,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 1): Root branch node with non-zero id - %d\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 1): Root branch node with non-zero id - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].id);
                             fp << msg;
                         }
@@ -1981,7 +1981,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 2): Root branch node with non-zero br - %d\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 2): Root branch node with non-zero br - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].br);
                             fp << msg;
                         }
@@ -1992,7 +1992,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 3): Root branch node with non-zero p - 0x%08lx\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 3): Root branch node with non-zero p - 0x%08lx\n",
                                 __FILE__, __LINE__, (unsigned long)rdx_.bnodes[0*num_keys_+k].p);
                             fp << msg;
                         }
@@ -2003,7 +2003,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 4): Root branch node with b not equal to"
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 4): Root branch node with b not equal to"
                                         " num_key_bytes_*8 - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].b);
                             fp << msg;
@@ -2015,7 +2015,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 5): Root branch node with non-zero r - 0x%08lx\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 5): Root branch node with non-zero r - 0x%08lx\n",
                                 __FILE__, __LINE__, (unsigned long)rdx_.bnodes[0*num_keys_+k].r);
                             fp << msg;
                         }
@@ -2028,7 +2028,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 6): Root data node keys not all 0xff\n",
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 6): Root data node keys not all 0xff\n",
                                     __FILE__, __LINE__);
                                 fp << msg;
                             }
@@ -2047,7 +2047,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 7): Data node id not 1 in node sequence number %d\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 7): Data node id not 1 in node sequence number %d\n",
                                 __FILE__, __LINE__, n);
                             fp << msg;
                         }
@@ -2060,7 +2060,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 8): Branch node sequence number of key index %d"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 8): Branch node sequence number of key index %d"
                                             " not valid - %d\n",
                                     __FILE__, __LINE__, k, rdx_.bnodes[n*num_keys_+k].nsn);
                                 fp << msg;
@@ -2073,7 +2073,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 9): Data node sequence number not valid - %d\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 9): Data node sequence number not valid - %d\n",
                                 __FILE__, __LINE__, rdx_.dnodes[n].nsn);
                             fp << msg;
                         }
@@ -2084,7 +2084,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 10): Data node allocated boolean not 0/1"
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 10): Data node allocated boolean not 0/1"
                                         " in node sequence number %d\n",
                                 __FILE__, __LINE__, rdx_.dnodes[n].nsn);
                             fp << msg;
@@ -2098,7 +2098,7 @@ namespace MultiKeyRdxPat
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
-                        snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 11): Total allocated nodes(%d) + free nodes(%d)"
+                        snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 11): Total allocated nodes(%d) + free nodes(%d)"
                                     " not equal max_num_rdx_nodes_+1(%d)\n",
                             __FILE__, __LINE__, tot_alloc_nodes, tot_free_nodes, max_num_rdx_nodes_+1);
                         fp << msg;
@@ -2111,7 +2111,7 @@ namespace MultiKeyRdxPat
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
-                        snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
+                        snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
                                     " not equal rdx_.tot_nodes(%d)\n",
                             __FILE__, __LINE__, tot_alloc_nodes, rdx_.tot_nodes);
                         fp << msg;
@@ -2244,7 +2244,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 13): Multiple nodes with same key of key index %d"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 13): Multiple nodes with same key of key index %d"
                                             " and key value\n   ",
                                     __FILE__, __LINE__, k);
                                 fp << msg;
@@ -2285,7 +2285,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 14): Pointer in branch node free list"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 14): Pointer in branch node free list"
                                             " with key index %d corrupted\n",
                                     __FILE__, __LINE__, k);
                                 fp << msg;
@@ -2319,7 +2319,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 15): Pointer in data node free list corrupted\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 15): Pointer in data node free list corrupted\n",
                                 __FILE__, __LINE__);
                             fp << msg;
                         }
@@ -2342,7 +2342,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 16): Branch node id at key index %d and node %d not"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 16): Branch node id at key index %d and node %d not"
                                             " valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].id);
                                 fp << msg;
@@ -2355,7 +2355,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 17): Branch node parent branch boolean of key index %d"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 17): Branch node parent branch boolean of key index %d"
                                             " and node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].br);
                                 fp << msg;
@@ -2378,7 +2378,7 @@ namespace MultiKeyRdxPat
                             {
                                 if ( vm == ERR_CODE_PRINT )
                                 {
-                                    snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 18): Branch node parent pointer of key index %d"
+                                    snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 18): Branch node parent pointer of key index %d"
                                                 " and node %d corrupted\n",
                                         __FILE__, __LINE__, k, n);
                                     fp << msg;
@@ -2392,7 +2392,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 19): Branch node bit number branch test value of"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 19): Branch node bit number branch test value of"
                                             " key index %d and node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].b);
                                 fp << msg;
@@ -2420,7 +2420,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 20): Branch node left pointer of key index %d"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 20): Branch node left pointer of key index %d"
                                             " and node %d corrupted\n",
                                     __FILE__, __LINE__, k, n);
                                 fp << msg;
@@ -2453,7 +2453,7 @@ namespace MultiKeyRdxPat
                             {
                                 if ( vm == ERR_CODE_PRINT )
                                 {
-                                    snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 21): Branch node right pointer of key index %d"
+                                    snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 21): Branch node right pointer of key index %d"
                                                 " and node %d corrupted\n",
                                         __FILE__, __LINE__, k, n);
                                     fp << msg;
@@ -2475,7 +2475,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 22): Data node parent pointer of key index %d"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 22): Data node parent pointer of key index %d"
                                             " and node %d corrupted\n",
                                     __FILE__, __LINE__, k, n);
                                 fp << msg;
@@ -2488,7 +2488,7 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 23): Data node parent branch boolean of key index %d and"
+                                snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 23): Data node parent branch boolean of key index %d and"
                                             " node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.dnodes[n].br[k]);
                                 fp << msg;
@@ -2499,7 +2499,7 @@ namespace MultiKeyRdxPat
                 }
 
                 /*
-                 * retrieve all keys from all data nodes and use normal search(rdx_pat_search())
+                 * retrieve all keys from all data nodes and use normal search(rdx->search())
                  * to find them - ignore root node keys
                  */
                 // unsigned char key[num_keys_][1+num_key_bytes_]
@@ -2523,7 +2523,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 24): Data node %d searched for with it's keys not found\n",
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 24): Data node %d searched for with it's keys not found\n",
                                 __FILE__, __LINE__, n);
                             fp << msg;
                         }
@@ -2538,7 +2538,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx_pat_verify():(file %s  line %d  ERR_CODE 25): Data node at index %d and data node found by search"
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 25): Data node at index %d and data node found by search"
                                         " with index %d keys are not the same\n",
                                 __FILE__, __LINE__, n, n);
                             fp << msg;

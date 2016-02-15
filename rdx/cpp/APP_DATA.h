@@ -1,5 +1,5 @@
-#ifndef RDX_PAT_DATA_H
-#define RDX_PAT_DATA_H
+#ifndef RDX_CPP_APP_DATA_H_
+#define RDX_CPP_APP_DATA_H_
 
 /*
  * application defined data is set here.  this file is included in MKRdxPat.h.
@@ -33,4 +33,4 @@ typedef struct _app_data {
 
 } APP_DATA;
 
-#endif // RDX_PAT_DATA_H
+#endif // RDX_CPP_APP_DATA_H_

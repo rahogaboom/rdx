@@ -6,7 +6,7 @@ set -v
 
 if [ "$1" == 'clean' ]
 then
-    rm -f MKrdxPat_test
+    rm -f MKRdxPat_test
     rm -f MKRdxPat.TEST?.results
     rm -f MKRdxPat.TEST??.results
     rm -f MKRdxPat_perf

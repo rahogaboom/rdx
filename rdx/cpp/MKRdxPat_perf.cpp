@@ -1,4 +1,4 @@
-// performance measurements for rdx_pat_insert()/rdx_pat_remove()/rdx_pat_search() library routines
+// performance measurements for rdx->insert()/rdx->remove()/rdx->search() library routines
 
 #include <stdio.h>
 #include <unistd.h>
@@ -144,7 +144,7 @@ main
 
 
                 fprintf(fp, "####################################################################################################\n");
-                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_insert()(fill trie)/rdx_pat_remove()(empty trie) - random keys\n");
+                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie)/rdx->remove()(empty trie) - random keys\n");
                 fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n",
                     max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 fprintf(fp, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
@@ -195,7 +195,7 @@ main
 
 
                 fprintf(fp, "####################################################################################################\n");
-                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx_pat_search() - random keys\n");
+                fprintf(fp, "PERFORMANCE TEST: Do repeated rdx->search() - random keys\n");
                 fprintf(fp, "                  MAX_NUM_RDX_NODES = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n",
                     max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 fprintf(fp, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
@@ -207,7 +207,7 @@ main
                 srand(time(NULL));
                 for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                 {
-                    rdx_pat_insert(&rdx1, rdx1_key[n], &dnp);
+                    rdx->insert(&rdx1, rdx1_key[n], &dnp);
                     random[n] = rand() % max_num_rdx_nodes; // not crypto random - will produce some duplicates - ok
                 }
 
@@ -219,7 +219,7 @@ main
                     {
                         for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                         {
-                            rdx_pat_search(&rdx1, rdx1_key[random[n]]);
+                            rdx->search(&rdx1, rdx1_key[random[n]]);
                             total_searches++;
                         }
                     }

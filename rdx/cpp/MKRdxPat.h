@@ -18,7 +18,7 @@
  *             int num_keys_,
  *             int num_key_bytes_
  *         );
- *         e.g. MKRdxPat *rdx = new MKRdxPat( 512, 3, 4 );
+ *         e.g. MKRdxPat *rdx = new MKRdxPat(512, 3, 4);
  *
  *         int
  *     insert
@@ -26,14 +26,14 @@
  *             unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
  *             DNODE **return_ptr
  *         );
- *         e.g. return_code = rdx->insert( key, &dnodep );
+ *         e.g. return_code = rdx->insert(key, &dnodep);
  *
  *         DNODE *
  *     search
  *         (
  *             unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
  *         );
- *         e.g. dnodep = rdx->search( key );
+ *         e.g. dnodep = rdx->search(key);
  *
  *
  *         DNODE *
@@ -41,7 +41,7 @@
  *         (
  *             unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
  *         );
- *         e.g. rdx->remove( key );
+ *         e.g. dnodep = rdx->remove(key);
  *
  *         int
  *     sort
@@ -49,7 +49,7 @@
  *             DNODE ***data_nodep,
  *             int k
  *         );
- *         e.g. return_code = rdx->sort( &sorted_nodes, 1);
+ *         e.g. return_code = rdx->sort(&sorted_nodes, 1);
  *
  *         int
  *     nodes
@@ -63,8 +63,8 @@
  *             unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
  *             ofstream& os
  *         );
- *         e.g. rdx->print( key, os );
- *         e.g. rdx->print( NULL, os );
+ *         e.g. return_code = rdx->print(NULL, os);
+ *         e.g. return_code = rdx->print(key, os);
  *
  *         int
  *     verify
@@ -684,6 +684,7 @@ namespace MultiKeyRdxPat
 
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
+                    // for insertion all key booleans must be 1
                     if ( key[k*(1+num_key_bytes_)+0] != 1 )
                     {
                         *return_ptr = NULL;

@@ -826,7 +826,7 @@ namespace MultiKeyRdxPat
                     {
                         printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf("\n");
+                    printf(endl);
                     #endif
 
                     // set child key
@@ -1002,14 +1002,14 @@ namespace MultiKeyRdxPat
                     {
                         printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf("\n");
+                    printf(endl);
 
                     for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
                     {
                         printf("DEBUG: %p\n",  &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i );
                         printf("DEBUG: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
                     }
-                    printf("\n");
+                    printf(endl);
 
                     printf("DEBUG: dna = %p\n", (DNODE *)c );
                     #endif
@@ -1190,14 +1190,14 @@ namespace MultiKeyRdxPat
                     {
                         printf("DEBUG: %X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf("\n");
+                    printf(endl);
 
                     for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
                     {
                         printf("DEBUG: %p\n",  &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i );
                         printf("DEBUG: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
                     }
-                    printf("\n");
+                    printf(endl);
                     #endif
 
                     // if key not found return NULL
@@ -1481,7 +1481,7 @@ namespace MultiKeyRdxPat
                     os << "    b = (PATRICIA key bit(0 on right) at which this branch node distinguishes keys)\n";
                     os << "    l = (address of left node child)\n";
                     os << "    r = (address of right node child)\n";
-                    os << "\n";
+                    os << endl;
                     os << "Data Node Format:\n";
                     os << "   id = (node id - 0 = branch node, 1 - data node)\n";
                     os << "  dna = (data node address)\n";
@@ -1508,56 +1508,56 @@ namespace MultiKeyRdxPat
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "  key =", k);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "  nsn =", rdx_.bnodes[n*num_keys_+k].nsn);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "   id =", rdx_.bnodes[n*num_keys_+k].id);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "  bna =", (void *)&rdx_.bnodes[n*num_keys_+k]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "   br =", rdx_.bnodes[n*num_keys_+k].br);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "    p =", (void *)rdx_.bnodes[n*num_keys_+k].p);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "    b =", rdx_.bnodes[n*num_keys_+k].b);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "    l =", (void *)rdx_.bnodes[n*num_keys_+k].l);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
@@ -1568,30 +1568,30 @@ namespace MultiKeyRdxPat
 
                         snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "   id =", rdx_.dnodes[n].id);
                         os << msg;
-                        os << "\n";
+                        os << endl;
                         snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "  dna =", (void *)&rdx_.dnodes[n]);
                         os << msg;
-                        os << "\n";
+                        os << endl;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "   br =", rdx_.dnodes[n].br[k]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "    p =", (void *)rdx_.dnodes[n].p[k]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "  nsn =", rdx_.dnodes[n].nsn);
                         os << msg;
-                        os << "\n";
+                        os << endl;
                         snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "alloc =", rdx_.dnodes[n].alloc);
                         os << msg;
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
@@ -1602,10 +1602,10 @@ namespace MultiKeyRdxPat
                                 snprintf(msg, MSG_BUF_SIZE, "%02x ", rdx_.dnodes[n].key[k*(1+num_key_bytes_)+b+1]);
                                 os << msg;
                             }
-                            os << "\n";
+                            os << endl;
                         }
 
-                        os << "\n";
+                        os << endl;
                     }
 
                     return 0;
@@ -1613,7 +1613,7 @@ namespace MultiKeyRdxPat
                 else
                 {
                     os << "==========\n\n";
-                    os << "print(key,) called with key[][] first arg.\n\n";
+                    os << "print(key, os) called with key[][] first arg.\n\n";
                     os << "print the data node and each branch node for each key(1-num_keys_) that leads to the found data node.\n"
                                 "the application data is not printed, only the trie structure data.  the number of branch nodes printed\n"
                                 "is indeterminate; it depends on the order of the data node insertion.  as few as one branch node and\n"
@@ -1629,9 +1629,9 @@ namespace MultiKeyRdxPat
                             snprintf(msg, MSG_BUF_SIZE, "%02x ", key[k*(1+num_key_bytes_)+b]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
                     }
-                    os << "\n";
+                    os << endl;
 
                     os << "Branch Node Format:\n";
                     os << "  nsn = (node sequence number, 0-max_num_rdx_nodes_+1)\n";
@@ -1642,7 +1642,7 @@ namespace MultiKeyRdxPat
                     os << "    b = (PATRICIA key bit(0 on right) at which this branch node distinguishes keys)\n";
                     os << "    l = (address of left node child)\n";
                     os << "    r = (address of right node child)\n";
-                    os << "\n";
+                    os << endl;
                     os << "Data Node Format:\n";
                     os << "   id = (node id - 0 = branch node, 1 - data node)\n";
                     os << "  dna = (data node address)\n";
@@ -1697,7 +1697,7 @@ namespace MultiKeyRdxPat
                             os << msg;
                             snprintf(msg, MSG_BUF_SIZE, "    r = %p\n", (void *)c->r);
                             os << msg;
-                            os << "\n";
+                            os << endl;
 
                             c = ( gbit( ky, c->b ) ) ? (BNODE *)c->r : (BNODE *)c->l;
                         }
@@ -1711,14 +1711,14 @@ namespace MultiKeyRdxPat
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18d  ", "   br =", ((DNODE *)c)->br[k]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
                             snprintf(msg, MSG_BUF_SIZE, "%7s %18p  ", "    p =", (void *)((DNODE *)c)->p[k]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         snprintf(msg, MSG_BUF_SIZE, "  nsn = %d\n", ((DNODE *)c)->nsn);
                         os << msg;
@@ -1733,9 +1733,9 @@ namespace MultiKeyRdxPat
                                 snprintf(msg, MSG_BUF_SIZE, "%02x ", key[k*(1+num_key_bytes_)+b]);
                                 os << msg;
                             }
-                            os << "\n";
+                            os << endl;
                         }
-                        os << "\n";
+                        os << endl;
                     }
 
                     return 0;
@@ -1908,7 +1908,7 @@ namespace MultiKeyRdxPat
                         snprintf(msg, MSG_BUF_SIZE, "key = %-2d  ", k);
                         os << msg;
                     }
-                    os << "\n";
+                    os << endl;
 
                     for ( int n = 0 ; n < tot_free_nodes ; n++ )
                     {
@@ -1919,9 +1919,9 @@ namespace MultiKeyRdxPat
                            snprintf(msg, MSG_BUF_SIZE, "  %08lx", free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
                     }
-                    os << "\n";
+                    os << endl;
 
                     os << "Allocated Data Node Address(DNA)/Keys and Branch Node Addresses(BNAs)\n";
                     os << "node  DNA         BNA(s)  ";
@@ -1930,7 +1930,7 @@ namespace MultiKeyRdxPat
                         snprintf(msg, MSG_BUF_SIZE, "key = %-2d  ", k);
                         os << msg;
                     }
-                    os << "\n";
+                    os << endl;
 
                     for ( int n = 0 ; n < tot_alloc_nodes ; n++ )
                     {
@@ -1941,7 +1941,7 @@ namespace MultiKeyRdxPat
                             snprintf(msg, MSG_BUF_SIZE, "  %08lx", bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
                             os << msg;
                         }
-                        os << "\n";
+                        os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
@@ -1952,11 +1952,11 @@ namespace MultiKeyRdxPat
                                 snprintf(msg, MSG_BUF_SIZE, "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
                                 os << msg;
                             }
-                            os << "\n";
+                            os << endl;
                         }
-                        os << "\n";
+                        os << endl;
                     }
-                    os << "\n";
+                    os << endl;
                 }
 
                 /*
@@ -2253,7 +2253,7 @@ namespace MultiKeyRdxPat
                                     snprintf(msg, MSG_BUF_SIZE, "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
                                     os << msg;
                                 }
-                                os << "\n";
+                                os << endl;
                             }
                             return 13;
                         }

@@ -1,55 +1,75 @@
 #ifndef RDX_CPP_MKRDXPAT_H_
 #define RDX_CPP_MKRDXPAT_H_
 
+// Copyright 2015-2016 Richard A Hogaboom  [legal/copyright]
+
 /*
  *======================================================================================================================
  *
  * File Names:
  *     MKRdxPat.h
- *     APP_DATA.h
  *
  *======================================================================================================================
  *
  * Member Functions:
  *
- *     MKRdxPat
+ *     MKRdxPat<app_data>
  *         (
- *             int max_num_rdx_nodes_,
- *             int num_keys_,
- *             int num_key_bytes_
+ *             int MAX_NUM_RDX_NODES,
+ *             int NUM_KEYS,
+ *             int NUM_KEY_BYTES
  *         );
- *         e.g. MKRdxPat *rdx = new MKRdxPat(512, 3, 4);
+ *         e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
+ *
+ *
+ *     struct app_data
+ *     {
+ *         int data;  // user specified application data structure
+ *     }
  *
  *         int
  *     insert
  *         (
- *             unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
- *             DNODE **return_ptr
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             app_data **app_datapp
  *         );
- *         e.g. return_code = rdx->insert(key, &dnodep);
+ *         e.g. return_code = rdx->insert((unsigned char *)key, &app_datap);
  *
- *         DNODE *
+ *
+ *     struct app_data
+ *     {
+ *         int data;  // user specified application data structure
+ *     }
+ *
+ *         app_data *
  *     search
  *         (
- *             unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
  *         );
- *         e.g. dnodep = rdx->search(key);
+ *         e.g. app_datap = rdx->search((unsigned char *)key);
  *
  *
- *         DNODE *
+ *     struct app_data
+ *     {
+ *         int data;  // user specified application data structure
+ *     }
+ *
+ *         app_data *
  *     remove
  *         (
- *             unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
  *         );
- *         e.g. dnodep = rdx->remove(key);
+ *         e.g. app_datap = rdx->remove((unsigned char *)key);
+ *
  *
  *         int
  *     sort
  *         (
- *             DNODE ***data_nodep,
+ *             app_data ***app_datappp,
  *             int k
  *         );
- *         e.g. return_code = rdx->sort(&sorted_nodes, 1);
+ *         e.g. return_code = rdx->sort(&app_datapp, k);
+ *
  *
  *         int
  *     nodes
@@ -57,14 +77,16 @@
  *         );
  *         e.g. nodes = rdx->nodes();
  *
+ *
  *         int
  *     print
  *         (
- *             unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
  *             ofstream& os
  *         );
  *         e.g. return_code = rdx->print(NULL, os);
- *         e.g. return_code = rdx->print(key, os);
+ *         e.g. return_code = rdx->print((unsigned char *)key, os);
+ *
  *
  *         int
  *     verify
@@ -73,6 +95,8 @@
  *             ofstream& os
  *         );
  *         e.g. return_code = rdx->verify(ERR_CODE, os);
+ *         e.g. return_code = rdx->verify(ERR_CODE_PRINT, os);
+ *
  *
  *     ~MKRdxPat()
  *         e.g. delete rdx;
@@ -89,7 +113,7 @@
  *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
  *     data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which
  *     has one data node and N branch nodes within it.  The user would define an arbitrarily complex data structure
- *     in the APP_DATA typedef in APP_DATA.h and then specify in MKRdxPat.h the values of the three defines
+ *     in the app_data typedef in app_data.h and then specify in MKRdxPat.h the values of the three defines
  *     noted above.  The number of actual nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for
  *     the initial branch node and the initial data node with the impossible key of all 0xff's.  The number of user
  *     storable nodes is MAX_NUM_RDX_NODES.   The user declares PNODEs, each of which contains a radix PATRICIA trie of
@@ -124,11 +148,12 @@
  *
  *     3. all keys are the same length - NUM_KEY_BYTES bytes.  the performance hit, the small memory savings and the
  *        added code complexity of having individually sized keys did not seem worth it.  thus, the longest required key
- *        will determine NUM_KEY_BYTES.
+ *        will determine NUM_KEY_BYTES.  shorter keys may be left justified in the NUM_KEY_BYTES bytes.
  *
  *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to 0 and then
- *        the keys added with the key boolean prepended and set appropriately in one operation.
- *        e.g. memset(key, 0, num_keys*(num_key_bytes+1));
+ *        all the keys to be used with key boolean 1 added in one operation(keys with key boolean 0 are never needed).
+ *        e.g. memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+ *
  *
  *======================================================================================================================
  *
@@ -177,28 +202,23 @@
  *======================================================================================================================
  */
 
-#include <string.h>
-
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 
-using namespace std;
+namespace std {}
 using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
-
-// Note: add explanation of multi-dimensional array access to flat array access
-// Note: Investigate storing addresses in "int32/int64" instead of "unsigned long"
+using std::ofstream;
 
 namespace MultiKeyRdxPat
 {
-    #include "APP_DATA.h"
-
-    // verify mode arg to verify()
+    // verify_mode arg to verify()
     typedef enum verify_mode
     {
         ERR_CODE,            // return 0 for no error and positive int with error code for any errors
@@ -206,41 +226,37 @@ namespace MultiKeyRdxPat
                              // node addresses/keys, branch node addresses and error messages
     } VERIFY_MODE;
 
-    // branch node typedef
-    typedef struct bnode
-    {
-        unsigned int id;     // IDentification(id=0) for branch node - must be first field in nod
-        unsigned int br;     // br=0: from left parent BRanch - br=1: from right parent branch
-        void *p;             // ptr to Parent node
-        unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
-        unsigned int b;      // Bit number to do branch test on(bits start at 0 from right to left)
-        void *l, *r;         // Left and Right node ptrs
-    } BNODE;
-
-    /*
-     * data node typedef for application declarations.
-     * the key must have one extra byte from num_key_bytes_
-     * specified above in order to have an "impossible"
-     * key data node set at initialization 
-     */
-    typedef struct dnode
-    {
-        unsigned int id;     // IDentification(id=1) for data node - must be first field in node
-        unsigned int *br;    // br=0: from left parent BRanch - br=1: from right parent branch - br[num_keys_]
-        BNODE **p;           // ptr to Parent node - p[num_keys_]
-        unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
-        void *nnfp;          // Next Node Free Ptr
-        unsigned int alloc;  // 1 - ALLOCated in rdx trie, 0 - on free queue
-        unsigned char *key;  // search KEY(s) - key[num_keys_][1+num_key_bytes_]
-        APP_DATA data;       // user defined data structure
-    } DNODE;
-
-    class MKRdxPat
+    template <typename app_data> class MKRdxPat
     {
         private:
             const int max_num_rdx_nodes_;
             const int num_keys_;
             const int num_key_bytes_;
+
+            // branch node typedef
+            typedef struct bnode
+            {
+                unsigned int id;     // IDentification(id=0) for branch node - must be first field in nod
+                unsigned int br;     // br=0: from left parent BRanch - br=1: from right parent branch
+                void *p;             // ptr to Parent node
+                unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
+                unsigned int b;      // Bit number to do branch test on(bits start at 0 from right to left)
+                void *l, *r;         // Left and Right node ptrs
+            } BNODE;
+
+            // data node typedef for application declarations.  the key must have one extra byte from num_key_bytes_
+            // specified above in order to have an "impossible" key data node set at initialization
+            typedef struct dnode
+            {
+                unsigned int id;     // IDentification(id=1) for data node - must be first field in node
+                unsigned int *br;    // br=0: from left parent BRanch - br=1: from right parent branch - br[num_keys_]
+                BNODE **p;           // ptr to Parent node - p[num_keys_]
+                unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
+                void *nnfp;          // Next Node Free Ptr
+                unsigned int alloc;  // 1 - ALLOCated in rdx trie, 0 - on free queue
+                unsigned char *key;  // search KEY(s) - key[num_keys_][1+num_key_bytes_]
+                app_data data;       // user defined data structure
+            } DNODE;
 
             // typedef of struct for PATRICIA node holding max_num_rdx_nodes_ data nodes with num_keys_ keys of length num_key_bytes_
             typedef struct pnode
@@ -251,11 +267,11 @@ namespace MultiKeyRdxPat
                 // head of rdx search node trie for each key
                 BNODE **head;  // BNODE *head[num_keys_]
 
-                // array holding ptrs to DNODES used in sort()
-                DNODE **node_ptrs;  // DNODE *node_ptrs[max_num_rdx_nodes_+1]
+                // array holding ptrs to app_data used in sort()
+                app_data **app_data_ptrs;  // app_data *app_data_ptrs[max_num_rdx_nodes_+1]
 
                 // number of ptrs in node_ptrs array(not including root node)
-                unsigned int node_ptrs_cnt;
+                unsigned int app_data_ptrs_cnt;
 
                 // branch nodes and free queue head ptr(s) of branch nodes
                 BNODE *bnodes;  // BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]
@@ -288,12 +304,10 @@ namespace MultiKeyRdxPat
                 unsigned int bit;
                 unsigned char mask;
 
-                /*
-                 * the byte index set here assumes one extra prefix byte in the input parameter key(for the 0xff of the root
-                 * node impossible key). thus, data nodes with keys of num_key_bytes_ will have a 0 byte prefix added, and the
-                 * byte index set here is not 0 to num_key_bytes_ but 1 to num_key_bytes_+1. e.g. if num_key_bytes_=1 and bit_num=0
-                 * then byte is set to 1 not 0.  if num_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
-                 */
+                // the byte index set here assumes one extra prefix byte in the input parameter key(for the 0xff of the root
+                // node impossible key). thus, data nodes with keys of num_key_bytes_ will have a 0 byte prefix added, and the
+                // byte index set here is not 0 to num_key_bytes_ but 1 to num_key_bytes_+1. e.g. if num_key_bytes_=1 and bit_num=0
+                // then byte is set to 1 not 0.  if num_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
                 mask = 1;
                 byte = num_key_bytes_ - bit_num/8;
                 mask <<= bit_num%8;
@@ -325,7 +339,7 @@ namespace MultiKeyRdxPat
                 }
                 else
                 {
-                    rdx_.node_ptrs[rdx_.node_ptrs_cnt++] = (DNODE *)(bnode_ptr);
+                    rdx_.app_data_ptrs[rdx_.app_data_ptrs_cnt++] = &( ((DNODE *)(bnode_ptr))->data );
                 }
             }  // recursive()
 
@@ -363,11 +377,13 @@ namespace MultiKeyRdxPat
              *     initialize();
              *
              * Returns:
+             *     None
              *
              * Parameters:
+             *     None
              *
              * Comments:
-             *     1. remember that the data structure has max_num_rdx_nodes_+1 nodes(each of which has one data and num_keys_
+             *     1. remember that the data structure has 1+max_num_rdx_nodes_ nodes(each of which has one data and num_keys_
              *        branch nodes).  the first is the always allocated impossible key root node.  the rest are the
              *        max_num_rdx_nodes_ user usable nodes.
              *
@@ -510,7 +526,7 @@ namespace MultiKeyRdxPat
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
                 free_msg_.push_back(msg);
 
-                rdx_.node_ptrs = (DNODE **)(fptr);
+                rdx_.app_data_ptrs = (app_data **)(fptr);
                 fptr += (max_num_rdx_nodes_+1) * sizeof(DNODE *);
                 snprintf(msg, MSG_BUF_SIZE, "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE *node_ptrs[max_num_rdx_nodes_+1]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
@@ -585,36 +601,41 @@ namespace MultiKeyRdxPat
              * Purpose: 
              *     remove a data node from the free list in the PNODE_ data structure and insert this node into the trie with keys
              *     key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all keys(key[k][0]) is the key boolean.
-             *     the key boolean should always be set to 1 since all keys are needed.  the actual key bytes (key[k][1 to
-             *     NUM_KEY_BYTES]) follow the key boolean.  each key must be unique within it's key index(0 to NUM_KEYS-1).
+             *     the key boolean should always be set to 1 since all keys are needed for insertion.  the actual key bytes
+             *     (key[k][1 to NUM_KEY_BYTES]) follow the key boolean.  each key must be unique within it's key
+             *     index(0 to NUM_KEYS-1).
              *
              * Usage:
+             *     struct app_data
+             *     {
+             *         int data;
+             *     }
+             *
              *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
-             *     DNODE *dnp;
+             *     app_data *app_datap;
              *     int return_code;
              *
-             *     return_code = rdx->insert(key, &dnp);
+             *     return_code = rdx->insert((unsigned char *)key, &app_datap);
              *
              * Returns:
-             *     1. if insertion is successful then set return_code to 0 and set dnp to point to the data node
-             *     2. if any key is found to already exist then set return_code to 1 and set dnp to point to the data node
-             *     3. if no data nodes are on the free list then set return_code to 2 and set dnp to NULL
-             *     4. if any key boolean is not 1 set return_code to 3 and set dnp to NULL
+             *     1. if insertion is successful then set return_code to 0 and set app_datap to point to app_data
+             *     2. if any key is found to already exist then set return_code to 1 and set app_datap to point to app_data
+             *     3. if no data nodes are on the free list then set return_code to 2 and set app_datap to NULL
+             *     4. if any key boolean is not 1 set return_code to 3 and set app_datap to NULL
              *
              * Parameters:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys of a one byte key boolean and NUM_KEY_BYTES key bytes
-             *     DNODE **return_ptr                           - pointer to pointer to the inserted data node
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     app_data **app_datapp                        - pointer to pointer to the inserted data node app_data struct
              *                                                    or NULL if insertion fails
              *
              * Comments:
-             *
              */
 
                 int
             insert
                 (
-                    unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
-                    DNODE **return_ptr
+                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+                    app_data **app_datapp
                 )
             {
                 /*
@@ -687,10 +708,13 @@ namespace MultiKeyRdxPat
                     // for insertion all key booleans must be 1
                     if ( key[k*(1+num_key_bytes_)+0] != 1 )
                     {
-                        *return_ptr = NULL;
+                        *app_datapp = NULL;
                         return 3;
                     }
+                }
 
+                for ( int k = 0 ; k < num_keys_ ; k++ )
+                {
                     // copy key to storage with extra byte for comparison
                     ky[k*(1+num_key_bytes_)+0] = 0;
                     memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
@@ -705,17 +729,17 @@ namespace MultiKeyRdxPat
                     // if key found return node in arg and set return to 1
                     if ( memcmp( &ky[k*(1+num_key_bytes_)], &((DNODE *)c[k])->key[k*(1+num_key_bytes_)], num_key_bytes_+1 ) == 0 )
                     {
-                        *return_ptr = (DNODE *)(c[k]);
+                        *app_datapp = &( ((DNODE *)(c[k]))->data );
                         return 1;
                     }
                 }
 
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
-                    // if no nodes free set return_ptr to NULL and return 2
+                    // if no nodes free set app_datapp to NULL and return 2
                     if ( rdx_.bfree_head[k] == NULL || rdx_.dfree_head == NULL )
                     {
-                        *return_ptr = NULL;
+                        *app_datapp = NULL;
                         return 2;
                     }
                 }
@@ -827,7 +851,7 @@ namespace MultiKeyRdxPat
                     {
                         printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf(endl);
+                    printf("\n");
                     #endif
 
                     // set child key
@@ -854,7 +878,7 @@ namespace MultiKeyRdxPat
                 #endif
 
                 // new node insertion successful, set return values
-                *return_ptr = dna;
+                *app_datapp = &( dna->data );
 
                 #ifdef DEBUG
                 cout << "DEBUG: end insert(): " << dna->data.id << endl;
@@ -865,50 +889,64 @@ namespace MultiKeyRdxPat
 
             /*
              *======================================================================================================================
-             *    search()
+             *     search()
              *
              * Purpose: 
-             *    search trie for the data node with the keys key[num_keys_][1+num_key_bytes_].  the second subscript first byte for
-             *    all keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or 0(do not use key).
-             *    the actual key bytes(key[k][1 to num_key_bytes_]) follow the key boolean.  thus, 1 to num_keys_ keys may be used.
-             *    only one key is necessary to find the data node.  each key must be unique within it's key index(0-num_keys_).
+             *     search trie for the data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte
+             *     for all keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or
+             *     0(do not use key).  the actual key bytes(key[k][1 to num_key_bytes_]) follow the key boolean.  thus, 1 to
+             *     num_keys_ keys may be used in any given search.  only one key is necessary to find the data node.  each key
+             *     must be unique within it's key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *    unsigned char key[num_keys_][1+num_key_bytes_];
-             *    DNODE *dnp;
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     app_data *app_datap;
              *
-             *    dnp = rdx->search(key);
+             *     app_datap = rdx->search((unsigned char *)key);
              *
              * Returns:
-             *    data node pointer if search is successful or NULL if not
+             *     1. if search is successful then return pointer to app_data(app_datap)
+             *     2. if any key boolean is not 0 or 1 return NULL
+             *     3. if two key searches end at different data nodes return NULL
+             *     4. if any key search does not end at a data node return NULL
+             *     5. if no key boolean is 1 then no keys are used and return NULL
              *    
              * Parameters:
-             *    unsigned char key[num_keys_][1+num_key_bytes_] - num_keys_ keys each of num_key_bytes_ bytes
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
              *
              * Comments:
-             *    e.g. set num_keys_=3 and num_key_bytes_=4
-             *         example 1:
-             *         in key[][]:
-             *            key number  key
-             *            0           01 aa bb cc dd    
-             *            1           01 ee ee ee ee
-             *            2           01 ff ff ff ff
+             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
              *
-             *            use all three keys(0,1,2) in the search
+             *          example 1:
+             *          in key[][]:
+             *             key number  key
+             *             0           01 aa bb cc dd    
+             *             1           01 ee ee ee ee
+             *             2           01 ff ff ff ff
              *
-             *         example 2:
-             *         in key[][]:
-             *            0           00 aa bb cc dd
-             *            1           01 ee ee ee ee
-             *            2           00 ff ff ff ff
+             *             use all three keys(0,1,2) in the search
              *
-             *            use only key 1 in the search
+             *          example 2:
+             *          in key[][]:
+             *             0           00 aa bb cc dd
+             *             1           01 ee ee ee ee
+             *             2           00 ff ff ff ff
+             *
+             *             use only key 1 in the search
+             *
+             *          example 3:
+             *          in key[][]:
+             *             0           01 00 00 00 01
+             *             1           01 00 00 00 01
+             *             2           01 00 00 00 01
+             *
+             *             inserted successfuly - a. all key booleans 1  b. each key unique in it's own key index(0 - 2)
              */
 
-                DNODE *
+                app_data *
             search
                 (
-                    unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
+                    unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
                 )
             {
                 /*
@@ -924,9 +962,9 @@ namespace MultiKeyRdxPat
 
                 static unsigned char *ky;  // static unsigned char ky[num_keys_][1+num_key_bytes_];
 
-                static bool alloc = false; // static - only first time search() for calloc() calls
+                static bool alloc = false;  // static - only first time search() for calloc() calls
 
-                bool firsttime = true; // not static - every search() call
+                bool firsttime = true;  // not static - every search() call
 
 
                 if ( alloc == false )
@@ -956,15 +994,15 @@ namespace MultiKeyRdxPat
 
                     if ( key[k*(1+num_key_bytes_)+0] == 0 )
                     {
-                        continue;
+                        continue;  // if key boolean is 0 skip key
                     }
                     else if ( key[k*(1+num_key_bytes_)+0] == 1 )
                     {
-                        n++;
+                        n++;  // if key boolean is 1 use key
                     }
                     else
                     {
-                        return NULL;
+                        return NULL;  // if a key boolean is not 0 or 1
                     }
 
                     // copy key to storage with extra byte for comparison
@@ -994,7 +1032,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( c != csav )
                         {
-                            return NULL;
+                            return NULL;  // a key does not end at the same data node as a previous key
                         }
                     }
 
@@ -1003,14 +1041,14 @@ namespace MultiKeyRdxPat
                     {
                         printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf(endl);
+                    printf("\n");
 
                     for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
                     {
                         printf("DEBUG: %p\n",  &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i );
                         printf("DEBUG: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
                     }
-                    printf(endl);
+                    printf("\n");
 
                     printf("DEBUG: dna = %p\n", (DNODE *)c );
                     #endif
@@ -1022,7 +1060,7 @@ namespace MultiKeyRdxPat
                         cout << "DEBUG: k = " << "exit2" << endl;
                         #endif
 
-                        return NULL;
+                        return NULL;  // key not found
                     }
                 }
 
@@ -1032,60 +1070,65 @@ namespace MultiKeyRdxPat
                     cout << "DEBUG: " << "k = " << "exit3" << endl;
                     #endif
 
-                    return NULL;
+                    return NULL;  // no keys are used(all key booleans are 0)
                 }
 
                 // success - all keys found in the same data node - return data node pointer
-                return (DNODE *)(c);
+                return &( ((DNODE *)(c))->data );
             }  // search()
 
             /*
              *======================================================================================================================
-             *    remove()
+             *     remove()
              *
              * Purpose: 
-             *    remove trie data node with the keys key[num_keys_][1+num_key_bytes_].  the second subscript first byte for all
-             *    keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or 0(do not use key).
-             *    the actual key bytes(key[k][1 to num_key_bytes_]) follow the key boolean.  thus, 1 to num_keys_ keys may be used.
-             *    only one key is necessary to remove the data node.  each key must be unique within it's key index(0-num_keys_).
+             *     remove trie data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all
+             *     keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or 0(do not use key).
+             *     the actual key bytes(key[k][1 to NUM_KEY_BYTES]) follow the key boolean.  thus, 1 to NUM_KEYS keys may be used
+             *     for any given remove.  only one key is necessary to remove the data node.  each key must be unique within it's
+             *     key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *    unsigned char key[num_keys_][1+num_key_bytes_];
-             *    DNODE *dnp;
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     app_data *app_datap;
              *
-             *    dnp = rdx->remove(key);
+             *     app_datap = rdx->remove((unsigned char *)key);
              *
              * Returns:
-             *    DNODE *dnp - pointer to the data node removed or NULL if no data node found to remove
+             *     1. if search is successful then return pointer to app_data(app_datap)
+             *     2. if any key boolean is not 0 or 1 return NULL
+             *     3. if two key searches end at different data nodes return NULL
+             *     4. if any key search does not end at a data node return NULL
+             *     5. if no key boolean is 1 then no keys are used and return NULL
              *
              * Parameters:
-             *    unsigned char key[num_keys_][1+num_key_bytes_] - num_keys_ keys each of num_key_bytes_ bytes
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
              *
              * Comments:
-             *    e.g. set num_keys_=3 and num_key_bytes_=4
-             *         example 1:
-             *         in key[][]:
-             *            key number  key
-             *            0           01 aa bb cc dd    
-             *            1           01 ee ee ee ee
-             *            2           01 ff ff ff ff
+             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
              *
-             *            use all three keys(0,1,2) in the search
+             *          example 1:
+             *          in key[][]:
+             *             key number  key
+             *             0           01 aa bb cc dd    
+             *             1           01 ee ee ee ee
+             *             2           01 ff ff ff ff
              *
-             *         example 2:
-             *         in key[][]:
-             *            0           00 aa bb cc dd
-             *            1           01 ee ee ee ee
-             *            2           00 ff ff ff ff
+             *             use all three keys(0,1,2) in the search
              *
-             *            use only key 1 in the search
+             *          example 2:
+             *          in key[][]:
+             *             0           00 aa bb cc dd
+             *             1           01 ee ee ee ee
+             *             2           00 ff ff ff ff
              *
+             *             use only key 1 in the search
              */
 
-                DNODE *
+                app_data *
             remove
                 (
-                    unsigned char *key  // unsigned char key[num_keys_][1+num_key_bytes_]
+                    unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
                 )
             {
                 int n;
@@ -1106,9 +1149,9 @@ namespace MultiKeyRdxPat
 
                 static unsigned char *ky;  // static unsigned char ky[num_keys_][1+num_key_bytes_];
 
-                static bool alloc = false; // static - only first time remove() for calloc() calls
+                static bool alloc = false;  // static - only first time remove() for calloc() calls
 
-                bool firsttime = true; // not static - every remove() call
+                bool firsttime = true;  // not static - every remove() call
 
 
                 if ( alloc == false )
@@ -1142,7 +1185,7 @@ namespace MultiKeyRdxPat
                     }
                     else if ( key[k*(1+num_key_bytes_)+0] == 1 )
                     {
-                        n++;
+                        n++;  // if key boolean is 1 use key
                     }
                     else
                     {
@@ -1150,7 +1193,7 @@ namespace MultiKeyRdxPat
                         cout << "DEBUG: k = " << "exit0" << endl;
                         #endif
 
-                        return NULL;
+                        return NULL;  // if a key boolean is not 0 or 1
                     }
 
                     #ifdef DEBUG
@@ -1182,7 +1225,7 @@ namespace MultiKeyRdxPat
                     {
                         if ( c != csav )
                         {
-                            return NULL;
+                            return NULL;  // a key does not end at the same data node as a previous key
                         }
                     }
 
@@ -1191,20 +1234,20 @@ namespace MultiKeyRdxPat
                     {
                         printf("DEBUG: %X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
                     }
-                    printf(endl);
+                    printf("\n");
 
                     for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
                     {
                         printf("DEBUG: %p\n",  &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i );
                         printf("DEBUG: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
                     }
-                    printf(endl);
+                    printf("\n");
                     #endif
 
                     // if key not found return NULL
                     if ( memcmp( &ky[k*(1+num_key_bytes_)+0], &((DNODE *)c)->key[k*(1+num_key_bytes_)], num_key_bytes_+1 ) != 0 )
                     {
-                        return NULL;
+                        return NULL;  // key not found
                     }
                 }
 
@@ -1214,7 +1257,7 @@ namespace MultiKeyRdxPat
                     cout << "DEBUG: k = " << "exit3" << endl;
                     #endif
 
-                    return NULL;
+                    return NULL;  // no keys are used(all key booleans are 0)
                 }
 
                 // for each key reset pointers for num_keys_ branch nodes and the data node
@@ -1268,91 +1311,84 @@ namespace MultiKeyRdxPat
                 // decrement total allocated nodes
                 rdx_.tot_nodes--;
 
-                // set return pointer to removed node APP_DATA
-                return (DNODE *)c;
+                // set return pointer to removed node app_data
+                return &( ((DNODE *)(c))->data );
             }  // remove()
 
             /*
              *======================================================================================================================
-             *    sort()
+             *     sort()
              *
              * Purpose: 
-             *    sort data nodes in PNODE_ data structure by key value of the key index k in key ascending order.  
+             *     sort pointers to app_data by key index k in PNODE_ data structure in key ascending order.
              *
              * Usage:
-             *    DNODE **nodes;
-             *    unsigned int k;
-             *    int return_code;
+             *     app_data **app_datapp;
+             *     int k;
+             *     int return_code;
              *
-             *    return_code = rdx->sort(&nodes, k);
+             *     return_code = rdx->sort(&app_datapp, k);
              *
              * Returns:
-             *    int return_code - the number of sorted entries in nodes.  if no keys return 0.  if k outside 0 to num_keys_-1
-             *                      return -1.
-             *    DNODE **nodes   - an array of pointer to pointer to DNODEs.
+             *     int return_code - the number of sorted nodes.  if no keys return 0.  if k outside 0 to NUM_KEYS-1 return -1.
+             *     app_data **app_datapp - pointer to array of pointers to app_data
              *
              * Parameters:
-             *    DNODE ***nodes  - pointer to pointer to pointer to DNODEs
-             *    unsigned int k  - key index(0-num_keys_)
+             *     app_data ***app_data - pointer to pointer to pointer to app_data
+             *     int k                - key index(0 - NUM_KEYS-1)
              *
              * Comments:
-             *    (DNODE *)nodes[0 to return_code-1])          - pointers to DNODEs
-             *    (DNODE *)nodes[0 to return_code-1])->data.id - to access node data
-             *    (DNODE *)nodes[0 to return_code-1])->key[k]  - to access key values
-             *
+             *     (app_data *)app_data[0 to return_code-1]     - array of pointers to app_data
+             *     (app_data *)app_data[0 to return_code-1]->id - to access app_data data
              */
 
                 int
             sort
                 (
-                    DNODE ***data_nodep,
+                    app_data ***app_datappp,
                     int k
                 )
             {
-                if ( k > num_keys_-1 )
+                if ( k < 0 || k > num_keys_-1 )
                 {
                     return -1;
                 }
 
-                /*
-                 * set full node_ptrs array to 0xf0 - shouldn't affect anything - then 0xf0 pattern
-                 * will be in array elements not allocated - makes debugging easier
-                 */
+                // set full node_ptrs array to 0xf0 - shouldn't affect anything - then 0xf0 pattern
+                // will be in array elements not allocated - makes debugging easier
+                memset( rdx_.app_data_ptrs, 0xf0, (max_num_rdx_nodes_+1) * sizeof(app_data *) );
 
-                // DNODE **node_ptrs; -> DNODE *node_ptrs[max_num_rdx_nodes_+1]
-                memset( rdx_.node_ptrs, 0xf0, (max_num_rdx_nodes_+1) * sizeof(DNODE *) );
-
-                rdx_.node_ptrs_cnt = 0;
+                rdx_.app_data_ptrs_cnt = 0;
 
                 recursive( rdx_.head[k] );
 
-                *data_nodep = rdx_.node_ptrs;
+                *app_datappp = rdx_.app_data_ptrs;
 
-                return rdx_.node_ptrs_cnt-1;
+                return rdx_.app_data_ptrs_cnt-1;
             }  // sort()
 
             /*
              *======================================================================================================================
-             *    nodes()
+             *     nodes()
              *
              * Purpose: 
-             *    return the number of allocated data nodes in the trie.
+             *     return the number of allocated data nodes in the trie.
              *
              * Usage:
-             *    int n;
+             *     int n;
              *
-             *    n = rdx->nodes();
+             *     n = rdx->nodes();
              *
              * Returns:
-             *    int n - number of allocated nodes in the trie(0-max_num_rdx_nodes_)
+             *     int n - number of allocated nodes in the trie(0 - NAX_NUM_RDX_NODES)
              *
              * Parameters:
+             *     None
              *
              * Comments:
-             *    the number of actual nodes in the trie is max_num_rdx_nodes_+1.  the extra node is the always allocated impossible
-             *    key node with key(s) 0xff.  the number of user available nodes is max_num_rdx_nodes_.  this function returns
-             *    only the number of user allocated nodes in the trie.
-             *
+             *     the number of actual nodes in the trie is MAX_NUM_RDX_NODES+1.  the extra node is the always allocated impossible
+             *     key node with key(s) 0xff.  the number of user available nodes is MAX_NUM_RDX_NODES.  this function returns
+             *     only the number of user allocated nodes in the trie.
              */
 
                 int
@@ -1372,42 +1408,42 @@ namespace MultiKeyRdxPat
              *         a. the first arg is NULL
              *
              *            print all the data in branch and data nodes for the entire trie.  for each data node allocated there
-             *            will be num_keys_ new branch nodes allocated.  thus, for n data nodes allocated, there will be n*num_keys_
+             *            will be NUM_KEYS new branch nodes allocated.  thus, for n data nodes allocated, there will be n*NUM_KEYS
              *            branch nodes printed and n data nodes printed.  the path along branch nodes to data nodes is not
              *            demonstrated.  useful only for small tries for debugging purposes.
              *
-             *         b. the first arg is an array of 'unsigned char key[num_keys_][1+num_key_bytes_]' of an existing allocated
+             *         b. the first arg is an array of 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' of an existing allocated
              *            data node
              *
-             *            print the data node and each branch node for each key(1-num_keys_) that leads to the found data node.
-             *            the application data is not printed, only the trie structure data.  the number of branch nodes printed
-             *            is indeterminate; it depends on the order of the data node insertion.  as few as one branch node and
-             *            as many as n branch nodes(n being the total number of data nodes already inserted) could be printed.
+             *            print the data node and each branch node for each key(1 - NUM_KEYS) that leads to the found data node.
+             *            the application data is not printed, only the trie structure data.
              *
-             *     Setting 'unsigned char key[num_keys_][1+num_key_bytes_]':
+             *     Setting 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]':
              *
              *     the second subscript first byte for all keys(key[k][0]) is the key boolean.  the key boolean should be set to
-             *     1(use the key) or 0(do not use key).  the actual key bytes(key[k][1 to num_key_bytes_]) follow the key boolean.
-             *     thus, 1 to num_keys_ keys may be used.  only one key is necessary to find the data node.  each key must be unique
-             *     within it's key index(0-(num_keys_-1)).
+             *     1(use the key) or 0(do not use key).  the actual key bytes(key[k][1 to NUM_KEY_BYTES]) follow the key boolean.
+             *     thus, 1 to NUM_KEYS keys may be used.  only one key is necessary to find the data node.  each key must be unique
+             *     within it's key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *     unsigned char key[num_keys_][1+num_key_bytes_];
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
              *     ofstream& os;
              *     int return_code;
              *
              *     return_code = rdx->print(NULL, os);
-             *     return_code = rdx->print(key, os);
+             *     return_code = rdx->print((unsigned char *)key, os);
              *
              * Returns:
-             *     int return_code - 0 on success and 1 if data node for key[][] not found
+             *     1. return_code = 0 on success
+             *     2. return_code = 1 if data node for key[][] not found
              *
              * Parameters:
-             *     unsigned char key[num_keys_][1+num_key_bytes_] - num_keys_ keys of a one byte key boolean and num_key_bytes_ key bytes
-             *     ofstream& os                                   - output stream
+             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     ofstream& os                                 - output stream
              *
              * Comments:
-             *     e.g. set num_keys_=3 and num_key_bytes_=4
+             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+             *
              *          example 1:
              *          in key[][]:
              *             key number  key
@@ -1424,13 +1460,12 @@ namespace MultiKeyRdxPat
              *             2           00 ff ff ff ff
              *
              *             use only key 1 in the search
-             *
              */
 
                 int
             print
                 (
-                    unsigned char *key,  // unsigned char key[num_keys_][1+num_key_bytes_]
+                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
                     ofstream& os
                 )
             {
@@ -1440,7 +1475,7 @@ namespace MultiKeyRdxPat
                 static unsigned char *ky;  // unsigned char ky[1+num_key_bytes_];
 
                 BNODE *c;
-                DNODE *dnodep;
+                app_data *app_datap;
 
                 static bool alloc = false;
 
@@ -1656,7 +1691,7 @@ namespace MultiKeyRdxPat
                     os << "      .\n";
                     os << "      .\n\n\n";
 
-                    if ( (dnodep = search(key)) == NULL )
+                    if ( (app_datap = search(key)) == NULL )
                     {
                         snprintf(msg, MSG_BUF_SIZE, "print():(file %s  line %d): Key not found.\n", __FILE__, __LINE__);
                         os << msg;
@@ -1745,33 +1780,32 @@ namespace MultiKeyRdxPat
 
             /*
              *======================================================================================================================
-             *    verify()
+             *     verify()
              *
              * Purpose: 
-             *    verify the integrity of a PNODE_ structure.  many tests are used to verify the integrity of all branch and
-             *    data node structures.  the input parameter enum VERIFY_MODE may be set to either ERR_CODE, which will have
-             *    verify() return an integer error code(1-25) for each of the possible detected errors, or ERR_CODE_PRINT,
-             *    which will return the same numerical error code and print to ofstream& os a text error message and current data
-             *    structure data node addresses/keys and branch node addresses as well.
+             *     verify the integrity of a PNODE_ structure.  multiple tests are used to verify the integrity of all branch and
+             *     data node structures.  the input parameter enum VERIFY_MODE may be set to either ERR_CODE, which will
+             *     return an integer error code(1-25) for each of the possible detected errors, or ERR_CODE_PRINT, which will
+             *     return the same numerical error code and print to ofstream& os a text error message and current data
+             *     structure data node addresses/keys and branch node addresses as well.
              *
              * Usage:
-             *    ofstream& os;
-             *    int return_code;
+             *     ofstream& os;
+             *     int return_code;
              *
-             *    return_code = rdx->verify(ERR_CODE, os);
-             *    return_code = rdx->verify(ERR_CODE_PRINT, os);
+             *     return_code = rdx->verify(ERR_CODE, os);
+             *     return_code = rdx->verify(ERR_CODE_PRINT, os);
              *
              * Returns:
-             *    int return_code - integer numerical error code, 0 if no error or 1-25 for the many possible detected errors
+             *     1. return_code = 0    - 0 if no error
+             *     2. return_code = 1-25 - 1-25 for the various errors
              *
              * Parameters:
-             *    VERIFY_MODE vm  - enum with possible values (ERR_CODE, ERR_CODE_PRINT)
-             *    ofstream& os    - output stream
+             *     VERIFY_MODE vm  - enum with possible values (ERR_CODE, ERR_CODE_PRINT)
+             *     ofstream& os    - output stream
              *
              * Comments:
-             *    all error messages have the file name and line number included so as to make finding the exact source location
-             *    in verify() easy.
-             *
+             *     all error messages have the verify() file name and line number included
              */
 
             const unsigned int FREE = 0;
@@ -1819,7 +1853,7 @@ namespace MultiKeyRdxPat
                 // unsigned long node_index[2][max_num_rdx_nodes_+1]; -> node_index[i*(max_num_rdx_nodes_+1)+n]
                 static unsigned long *node_index;
 
-                static bool alloc = false; // static - only first time verify() for calloc() calls
+                static bool alloc = false;  // static - only first time verify() for calloc() calls
 
 
                 if ( alloc == false )
@@ -1902,6 +1936,7 @@ namespace MultiKeyRdxPat
                 // print all of the free/alloc data structure addresses, node indexes and keys
                 if ( vm == ERR_CODE_PRINT )
                 {
+                    os << "return_code = rdx->verify(ERR_CODE_PRINT, os);\n";
                     os << "Free Data Node Address(DNA)/Keys and Branch Node Addresses(BNAs)\n";
                     os << "node  DNA         BNA(s)  ";
                     for ( int k = 0 ; k < num_keys_ ; k++ )
@@ -1957,7 +1992,6 @@ namespace MultiKeyRdxPat
                         }
                         os << endl;
                     }
-                    os << endl;
                 }
 
                 /*
@@ -2507,7 +2541,7 @@ namespace MultiKeyRdxPat
                 unsigned char *key = (unsigned char *)calloc( num_keys_ * (1+num_key_bytes_), sizeof(unsigned char) );
                 for ( int n = 1 ; n < tot_alloc_nodes ; n++ )
                 {
-                    DNODE *dnodep;
+                    app_data *app_datap;
 
 
                     // get data node keys directly from allocated data node
@@ -2518,9 +2552,9 @@ namespace MultiKeyRdxPat
                     }
 
                     // search for node n keys
-                    dnodep = search(key);
+                    app_datap = search(key);
 
-                    if ( dnodep == NULL )
+                    if ( app_datap == NULL )
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
@@ -2532,16 +2566,16 @@ namespace MultiKeyRdxPat
                     }
 
                     /*
-                     * do full data node memory compare of node i and node found with keys
-                     * from node i - if they are not the same then error
+                     * do full compare of 'app_data data;' obtained from rdx->search() and the same data obtained from rdx_.dnodes[n].data.
+                     * if they do not match, error.
                      */
-                    if ( memcmp( dnodep, &rdx_.dnodes[n], sizeof(DNODE) ) != 0 )
+                    if ( memcmp( app_datap, &rdx_.dnodes[n].data, sizeof(app_data) ) != 0 )
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 25): Data node at index %d and data node found by search"
-                                        " with index %d keys are not the same\n",
-                                __FILE__, __LINE__, n, n);
+                            snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 25): compare of 'app_data data;' obtained from rdx->search() and"
+                                        " the same data obtained from rdx_.dnodes[%d].data do not match",
+                                __FILE__, __LINE__, n);
                             os << msg;
                         }
                         return 25;
@@ -2556,5 +2590,5 @@ namespace MultiKeyRdxPat
 
 }  // namespace MultiKeyRdxPat
 
-#endif // RDX_CPP_MKRDXPAT_H_
+#endif  // RDX_CPP_MKRDXPAT_H_
 

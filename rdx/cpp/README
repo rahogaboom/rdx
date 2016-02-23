@@ -1,9 +1,7 @@
 
- 1. put your application data in APP_DATA.h
+ 1. adjust $CC in ./MKRdxPat.mk to use clang or g++
 
- 2. adjust $CC in ./MKRdxPat.mk to use clang or g++
+ 2. do "./MKRdxPat.mk" to build and run the tests
 
- 3. do "./MKRdxPat.mk" to do the build and run the test program
-
- 4. do "./MKRdxPat.mk clean" to clean the directory
+ 3. do "./MKRdxPat.mk clean" to clean the directory
 

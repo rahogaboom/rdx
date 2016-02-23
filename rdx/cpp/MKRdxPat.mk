@@ -13,7 +13,7 @@ then
     exit
 fi
 
-# pick compiler - should work with both
+# pick compiler
 CC="clang"
 #CC="g++"
 

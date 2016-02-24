@@ -14,6 +14,7 @@
  * . scrub test descriptions very well
  * . use test description labled sections as os << "" << endl; test requirements
  * . remove sorted_
+ * . open source Copyright
  *
  * . do test insert() one node and search() for same node with one key and remove() for same node with another key
  * . do test with IPv4 and IPv6 keys - big

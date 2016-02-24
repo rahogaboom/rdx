@@ -1,9 +1,5 @@
 
 /*
- * test cases and example code for MKRdxPat.h class member functions
- *
- * NOTES:
- *
  * MKRdxPat.h:
  * . update Description
  * . investigate removing 0xff... 0 node from sort() to avoid collision
@@ -13,20 +9,20 @@
  * . cpplint everything - get latest version
  * . scrub test descriptions very well
  * . use test description labled sections as os << "" << endl; test requirements
- * . remove sorted_
  * . open source Copyright
+ */
+
+/*
+ * test cases and example code for MKRdxPat.h class member functions
  *
- * . do test insert() one node and search() for same node with one key and remove() for same node with another key
- * . do test with IPv4 and IPv6 keys - big
- * . do test with all keys the same
- * . do test of really large nodes, keys, key length
+ * NOTES:
+ *
  */
 
 
 #include <iostream>
 #include <fstream>
 
-//#define DEBUG
 #include "MKRdxPat.h"
 
 using namespace MultiKeyRdxPat;
@@ -534,7 +530,7 @@ main()
 
         app_data *app_datap;
 
-        app_data **sorted_app_data;
+        app_data **app_datapp;
 
         // maximum number of data nodes stored in rdx trie
         const int MAX_NUM_RDX_NODES = 4;
@@ -580,15 +576,15 @@ main()
 
 
         os << "a. Sort rdx with no nodes inserted and key index set to 3 - should return -1\n";
-        return_code = rdx->sort(&sorted_app_data, 3);
+        return_code = rdx->sort(&app_datapp, 3);
 
-        os << "return_code = rdx->sort(&sorted_nodes, " << 3 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&nodes, " << 3 << "); return_code = " << return_code << "\n\n";
 
 
         os << "b. Sort rdx with no nodes inserted and key index set to 0 - should return 0\n";
-        return_code = rdx->sort(&sorted_app_data, 0);
+        return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&sorted_nodes, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&nodes, " << 0 << "); return_code = " << return_code << "\n\n";
 
 
         os << "c. Sort rdx with one node inserted and key index set to 0 - should return 1\n";
@@ -602,9 +598,9 @@ main()
         snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n\n", 0, app_datap->id);
         os << string;
 
-        return_code = rdx->sort(&sorted_app_data, 0);
+        return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&sorted_nodes, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&nodes, " << 0 << "); return_code = " << return_code << "\n\n";
 
 
         os << "d. For each key the return code will equal the number of sorted nodes and the\n";
@@ -628,13 +624,13 @@ main()
         {
             os << "Sort the nodes by key " << k << ".\n\n";
 
-            return_code = rdx->sort(&sorted_app_data, k);
+            return_code = rdx->sort(&app_datapp, k);
 
-            os << "return_code = rdx->sort(&sorted_nodes, " << k << "); return_code = " << return_code << endl;
+            os << "return_code = rdx->sort(&nodes, " << k << "); return_code = " << return_code << endl;
 
             for ( int n = 0 ; n < return_code ; n++ )
             {
-                if ( sorted_app_data[n] == NULL )
+                if ( app_datapp[n] == NULL )
                 {
                     os << "n = " << n << " NULL\n";
                 }
@@ -643,7 +639,7 @@ main()
                     const size_t MSG_BUF_SIZE = 256;
                     char string[MSG_BUF_SIZE];
 
-                    snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n", n, ((app_data *)sorted_app_data[n])->id);
+                    snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n", n, ((app_data *)app_datapp[n])->id);
                     os << string;
                 }
             }
@@ -1350,10 +1346,216 @@ main()
 
         os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
 
+
+        os << "g. No verification error\n";
+        return_code = rdx->verify(ERR_CODE_PRINT, os);
+        if ( return_code != 0 )
+        {
+            os << "return_code = rdx->verify(ERR_CODE_PRINT, os); return_code = " << return_code << " verification error\n";
+        }
+        else
+        {
+            os << "return_code = rdx->verify(ERR_CODE_PRINT, os); return_code = " << return_code << " verification success\n\n";
+        }
+
+        os.close();
+    }
+
+    { // TEST 11
+        int return_code;
+        int tot_errs = 0;
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int id;
+            double d;
+            float f;
+        };
+
+        app_data *app_datap;
+
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES = 2;
+
+        // number of rdx search keys
+        const int NUM_KEYS = 8;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES = 16;
+
+        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+
+        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
+        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS ; k++ )
+            {
+                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+            }
+        }
+
+        ofstream os;
+        os.open("MKRdxPat.TEST11.results");
+
+        os << endl;
+        os << "TEST 11: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n";
+        os << "         Expected Results:\n";
+        os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
+        os << "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
+        os << "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
+        os << "            d. Print entire trie - allocated node and root node\n";
+        os << "            e. No verification error\n\n";
+
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << endl;
+        os << "NUM_KEYS = " << NUM_KEYS << endl;
+        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
 
-        os << "g. No verification error\n";
+        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
+        for ( int n = 0,id = 10,d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++,id++,d++ )
+        {
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
+
+            os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
+
+            if ( return_code == 0 )
+            {
+                app_datap->id = id;
+                os << "set app_datap->id = " << id << "\n";
+                os << "get app_datap->id = " << app_datap->id << "\n";
+                app_datap->d = d;
+                os << "set app_datap->d = " << d << "\n";
+                os << "get app_datap->d = " << app_datap->d << "\n\n";
+            }
+        }
+
+
+        os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+
+        os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        {
+            app_datap = rdx->search((unsigned char *)rdx_key[n]);
+
+            if (app_datap == NULL)
+            {
+                os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); app_datap = NULL - search fail\n";
+                tot_errs++;
+            }
+            else
+            {
+                os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
+            }
+        }
+        os << endl;
+
+        os << "Total errors detected " << tot_errs << "\n\n";
+
+
+        os << "d. Print entire trie - allocated node and root node\n";
+        return_code = rdx->print(NULL, os);
+
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+
+
+        os << "e. No verification error\n";
+        return_code = rdx->verify(ERR_CODE_PRINT, os);
+        if ( return_code != 0 )
+        {
+            os << "return_code = rdx->verify(ERR_CODE_PRINT, os); return_code = " << return_code << " verification error\n";
+        }
+        else
+        {
+            os << "return_code = rdx->verify(ERR_CODE_PRINT, os); return_code = " << return_code << " verification success\n\n";
+        }
+
+        os.close();
+    }
+
+    { // TEST 12
+        int return_code;
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int id;
+            double d;
+            float f;
+        };
+
+        app_data *app_datap;
+
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES = 4;
+
+        // number of rdx search keys
+        const int NUM_KEYS = 4;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES = 2;
+
+        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+
+        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
+        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++,sum++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS ; k++ )
+            {
+                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][NUM_KEY_BYTES] = sum;
+            }
+        }
+
+        ofstream os;
+        os.open("MKRdxPat.TEST12.results");
+
+        os << endl;
+        os << "TEST 12: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n";
+        os << "         key values the same for each key but unique within a key\n";
+        os << "         Expected Results:\n";
+        os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
+        os << "            b. Print entire trie - allocated node and root node\n";
+        os << "            c. No verification error\n\n";
+
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << endl;
+        os << "NUM_KEYS = " << NUM_KEYS << endl;
+        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+
+        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
+        for ( int n = 0,id = 10,d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++,id++,d++ )
+        {
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
+
+            os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
+        }
+
+
+        os << "b. Print entire trie - allocated node and root node\n";
+        return_code = rdx->print(NULL, os);
+
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+
+
+        os << "c. No verification error\n";
         return_code = rdx->verify(ERR_CODE_PRINT, os);
         if ( return_code != 0 )
         {

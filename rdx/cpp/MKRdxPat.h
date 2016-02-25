@@ -111,7 +111,12 @@
  * Description:
  *     The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes of
  *     an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA (Practical
- *     Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
+ *     Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.  MKRdxPat is particularly
+ *     suited to applications the require complex data structures be contiguously stored and accessed with an algoithm
+ *     of known fast character with any of several possible keys, either singly of several simultaniously.
+ *
+ *     For example, a data structure that required either of an IPv4, IPv6 or MAC address key(s) to access data nodes.
+ *     In this case NUM_KEYS would be 3 and NUM_KEY_BYTES would be 16(the longest - see below).
  *
  *     The MKRdxPat class supports a data structure of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per data node
  *     with keys of NUM_KEY_BYTES bytes.  The class constructor:
@@ -138,34 +143,38 @@
  *
  *     and then only keys to be used copied in with the key boolean(set to 1) prepended.
  *
+ *     In most cases the necessary keys will be of different lengths.  The NUM_KEY_BYTES constructor argument would be
+ *     set to the longest of these.  All other shorter keys would be left justified in the key[][] array, that is,
+ *     start just after the key boolean.  Thus, for the example above, the IPv6 key would use the full 16 bytes, the
+ *     IPv4 key would use the first four bytes after the key boolean(with the rest(12) set to 0) and the MAC key would
+ *     use the first 6 bytes after the key boolean(with the rest(10) set to 0).  This was done to make the specification
+ *     of the key[][] array and the code associated with processing it simpler.  Example:
  *
- *     For a trie of N keys each data node will have N branch nodes associated with it, each of
- *     the N branch nodes is associated with one of the N keys.  Again, see reference 1 on the PATRICIA algorithm for a
- *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
- *     data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which
- *     has one data node and N branch nodes within it.  The user would define an arbitrarily complex data structure
- *     in the app_data typedef in app_data.h and then specify in MKRdxPat.h the values of the three defines
- *     noted above.  The number of actual nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for
- *     the initial branch node and the initial data node with the impossible key of all 0xff's.  The number of user
- *     storable nodes is MAX_NUM_RDX_NODES.   The user declares PNODEs, each of which contains a radix PATRICIA trie of
- *     MAX_NUM_RDX_NODES nodes with NUM_KEYS keys of NUM_KEY_BYTES bytes length.
+ *                 kb key bytes
+ *         IPv4 :  01 aa bb cc dd 00 00 00 00 00 00 00 00 00 00 00 00
+ *         IPv6 :  01 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
+ *         MAC  :  01 aa bb cc dd ee ff 00 00 00 00 00 00 00 00 00 00
  *
- *     Each data node of N keys with key index numbers from 0 to N-1 must have keys that are unique for a given key
- *     index, e.g. for N=2 and key index numbers 0 and 1 we can insert a data node with keys (2,2)(Notation: (n,m)
- *     means key index 0 = n and key index 1 = m) successfully, however if we now try to insert a new data node with
- *     keys (2,3) this fails since the key at key index 0 - 2 - is the same as the previously inserted node key index
- *     0 key value of 2.  
+ *     See the member function summary above or a detailed member function usage comment before each function's code.
+ *     A verify() member function is provided that does extensive data structure memory analysis and a print() member
+ *     function is provided that prints the structural details of all the branch and data nodes.
  *
- *     These routines are a modification of the algorithm cited in reference 1 below.  Specifically, the upward
- *     pointers used to terminate search are not used, and are instead used to point to data nodes as trie leaves.  In
- *     multi-key search with PATRICIA the upward pointer scheme will not work since each key would have pointed to a
- *     different branch node with it's associated data structure.  In multi-key PATRICIA search all keys must lead to
- *     the same data node.  The viability of multi-key radix PATRICIA search depends on the fact that each data node
- *     insertion requires only one new branch node for each key, thus the initial allocation of N branch nodes with
- *     each data node.  This implementation has several branch and data node members not used in the reference 1
- *     PATRICIA search algorithm description.  These are for various purposes; related to changes in the original
- *     algorithm for multi-key search, related to changes in the original algorithm for leaf data nodes instead of
- *     upward pointers to data structures stored in branch nodes, related to printing, sorting and debugging.
+ *     For a trie of NUM_KEYS keys, each data node will have NUM_KEYS branch nodes associated with it.  The number of
+ *     actual data nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for the initial branch nodes
+ *     and initial data node with the impossible key of all 0xff's(1,2,3).  The number of user storable nodes is
+ *     MAX_NUM_RDX_NODES.   The user, through the constructor, declares PNODEs, each of which contains a radix PATRICIA
+ *     trie of MAX_NUM_RDX_NODES nodes with NUM_KEYS keys of NUM_KEY_BYTES bytes length.
+ *
+ *     These routines are a modification of the algorithm cited.  Specifically, the upward pointers used to terminate
+ *     search are not used, and are instead used to point to data nodes as trie leaves.  In multi-key search with
+ *     PATRICIA the upward pointer scheme will not work since each key would have pointed to a different branch node
+ *     with it's associated data structure.  In multi-key PATRICIA search all keys must lead to the same data node.
+ *     The viability of multi-key radix PATRICIA search depends on the fact that each data node insertion requires
+ *     only one new branch node for each key, thus the initial allocation of NUM_KEYS branch nodes with each data node.
+ *     This implementation has several additional branch and data node members not used in the original PATRICIA search
+ *     algorithm.  These are for various purposes; related to changes in the original algorithm for multi-key search,
+ *     related to changes in the original algorithm for leaf data nodes instead of upward pointers to data structures
+ *     stored in branch nodes, related to printing, sorting and debugging.
  *
  *======================================================================================================================
  *

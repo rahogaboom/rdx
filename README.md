@@ -20,5 +20,7 @@ Multi-key Radix PATRICIA Fast Search C/OO C++
          4. Testing
          5. Performance
 
+add C++ and C Description sections
+
 ```
 

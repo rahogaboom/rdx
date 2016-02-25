@@ -16,7 +16,7 @@
  *     struct app_data
  *     {
  *         int data;  // user specified application data structure
- *     }
+ *     };
  *
  *     MKRdxPat<app_data>
  *         (
@@ -34,7 +34,7 @@
  *     struct app_data
  *     {
  *         int data;  // user specified application data structure
- *     }
+ *     };
  *
  *         int
  *     insert
@@ -48,7 +48,7 @@
  *     struct app_data
  *     {
  *         int data;  // user specified application data structure
- *     }
+ *     };
  *
  *         app_data *
  *     search
@@ -109,11 +109,37 @@
  *======================================================================================================================
  *
  * Description:
- *     Routines to support multi-key radix PATRICIA(Practical Algorithm To Retrieve Information Coded In Alphanumeric)
- *     fast search(see ref. 1).  A data structure is supported of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
- *     data node with keys of NUM_KEY_BYTES bytes length.  Each of these three may be set to any arbitrary
- *     integer value of one or higher in MKRdxPat.h(a trie of one node with one key of one byte will work, but might
- *     not be very useful).  For a trie of N keys each data node will have N branch nodes associated with it, each of
+ *     The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes of
+ *     an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA (Practical
+ *     Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
+ *
+ *     The MKRdxPat class supports a data structure of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per data node
+ *     with keys of NUM_KEY_BYTES bytes.  The class constructor:
+ *
+ *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+ *
+ *     along with a:
+ *
+ *         struct app_data
+ *         {
+ *             // user data
+ *         };
+ *
+ *     class constructor typename specifies the data structure.  A data node may be accessed with a single key or any
+ *     number of keys simultaniously.  Keys must be unique within their key index(0 - NUM_KEYS-1), but not over
+ *     different key indexes.  Member functions that require keys are passed the array:
+ *
+ *         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *
+ *     One extra prefix byte, a key boolean - required to be 0(ignore) or 1(search), is set with each key to specify
+ *     if the key is to be used in the data node search.  It is suggested that the array be first memset() to 0:
+ *
+ *         memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+ *
+ *     and then only keys to be used copied in with the key boolean(set to 1) prepended.
+ *
+ *
+ *     For a trie of N keys each data node will have N branch nodes associated with it, each of
  *     the N branch nodes is associated with one of the N keys.  Again, see reference 1 on the PATRICIA algorithm for a
  *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
  *     data node.  I sometimes refer to "nodes" which are the MAX_NUM_RDX_NODES data structure nodes, each of which

@@ -112,8 +112,8 @@
  *     The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes of
  *     an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA (Practical
  *     Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.  MKRdxPat is particularly
- *     suited to applications the require complex data structures be contiguously stored and accessed with an algoithm
- *     of known fast character with any of several possible keys, either singly of several simultaniously.
+ *     suited to applications the require complex data structures be contiguously stored and accessed with an algorithm
+ *     of known fast character with any of several possible keys, either singly of several simultaneously.
  *
  *     For example, a data structure that required either of an IPv4, IPv6 or MAC address key(s) to access data nodes.
  *     In this case NUM_KEYS would be 3 and NUM_KEY_BYTES would be 16(the longest - see below).
@@ -131,7 +131,7 @@
  *         };
  *
  *     class constructor typename specifies the data structure.  A data node may be accessed with a single key or any
- *     number of keys simultaniously.  Keys must be unique within their key index(0 - NUM_KEYS-1), but not over
+ *     number of keys simultaneously.  Keys must be unique within their key index(0 - NUM_KEYS-1), but not over
  *     different key indexes.  Member functions that require keys are passed the array:
  *
  *         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]

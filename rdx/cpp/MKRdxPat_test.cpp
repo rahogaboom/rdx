@@ -1,9 +1,9 @@
 
 /*
  * MKRdxPat.h:
- * . update Description
  * . investigate removing 0xff... 0 node from sort() to avoid collision
  * . enhance project README.md
+ * . add member function to return the trie size
  *
  * MKRdxPat_test.cpp:
  * . tell user to try variations on nodes, keys, key length of existing tests - much more flexible this way

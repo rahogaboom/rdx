@@ -3,6 +3,7 @@
  * MKRdxPat.h:
  * . update Description
  * . investigate removing 0xff... 0 node from sort() to avoid collision
+ * . enhance project README.md
  *
  * MKRdxPat_test.cpp:
  * . tell user to try variations on nodes, keys, key length of existing tests - much more flexible this way
@@ -10,6 +11,7 @@
  * . scrub test descriptions very well
  * . use test description labled sections as os << "" << endl; test requirements
  * . open source Copyright
+ * . find out what using-declarations are
  */
 
 /*
@@ -22,6 +24,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "MKRdxPat.h"
 
@@ -72,7 +75,7 @@ print_key
    int
 main()
 {
-    { // TEST 0
+    {  // TEST 0
         int return_code;
 
         // application data of type app_data defined here
@@ -119,7 +122,7 @@ main()
         os.close();
     }
 
-    { // TEST 1
+    {  // TEST 1
         int return_code;
 
         // application data of type app_data defined here
@@ -144,11 +147,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -250,7 +253,7 @@ main()
         os.close();
     }
 
-    { // TEST 2
+    {  // TEST 2
         int return_code;
 
         // application data of type app_data defined here
@@ -276,11 +279,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -321,7 +324,7 @@ main()
         os.close();
     }
 
-    { // TEST 3
+    {  // TEST 3
         int return_code;
 
         // application data of type app_data defined here
@@ -350,11 +353,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -379,7 +382,7 @@ main()
 
 
         os << "a. Four data node insertions with return code 0\n";
-        for ( int n = 0,id = 10,d = 2.0 ; n < 4 ; n++,id++,d++ )
+        for ( int n = 0, id = 10, d = 2.0 ; n < 4 ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
@@ -418,7 +421,7 @@ main()
         os.close();
     }
 
-    { // TEST 4
+    {  // TEST 4
         int return_code;
 
         // application data of type app_data defined here
@@ -448,11 +451,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -509,7 +512,7 @@ main()
         os.close();
     }
 
-    { // TEST 5
+    {  // TEST 5
         int return_code;
 
         const size_t MSG_BUF_SIZE = 256;
@@ -545,11 +548,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = MAX_NUM_RDX_NODES*NUM_KEYS ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = MAX_NUM_RDX_NODES*NUM_KEYS ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum--;
             }
         }
@@ -605,7 +608,7 @@ main()
 
         os << "d. For each key the return code will equal the number of sorted nodes and the\n";
         os << "   nodes array will hold the array of node pointers to nodes in sorted order\n";
-        for ( int n = 1,sum = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 1, sum = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
@@ -652,7 +655,7 @@ main()
         os.close();
     }
 
-    { // TEST 6
+    {  // TEST 6
         int return_code;
 
         // application data of type app_data defined here
@@ -684,11 +687,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -710,7 +713,7 @@ main()
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
-        for ( int n = 0,sum = 0 ; n < 5 ; n++ )
+        for ( int n = 0, sum = 0 ; n < 5 ; n++ )
         {
             const size_t MSG_BUF_SIZE = 256;
             char string[MSG_BUF_SIZE];
@@ -761,7 +764,7 @@ main()
         os.close();
     }
 
-    { // TEST 7
+    {  // TEST 7
         int return_code;
 
         // application data of type app_data defined here
@@ -819,7 +822,7 @@ main()
         int tot_errs;
         int test_num;
 
-        for ( test_num = 0,tot_errs = 0 ; test_num < 32 ; test_num++ )
+        for ( test_num = 0, tot_errs = 0 ; test_num < 32 ; test_num++ )
         {
             // in rdx_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS keys each of NUM_KEY_BYTES in length
             srand(time(NULL));
@@ -827,7 +830,7 @@ main()
             {
                 for ( int k = 0 ; k < NUM_KEYS ; k++ )
                 {
-                    rdx_key[n][k][0] = 1; // set key boolean to 1
+                    rdx_key[n][k][0] = 1;  // set key boolean to 1
                     for ( int b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
                     {
                         rdx_key[n][k][b] = rand() & 0x000000ff;
@@ -892,7 +895,7 @@ main()
         os.close();
     }
 
-    { // TEST 8
+    {  // TEST 8
         int return_code;
 
         int n = 0;
@@ -920,11 +923,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 3 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0, sum = 3 ; n < MAX_NUM_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -1126,7 +1129,7 @@ main()
         os.close();
     }
 
-    { // TEST 9
+    {  // TEST 9
         int return_code;
 
         // application data of type app_data defined here
@@ -1152,11 +1155,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -1211,7 +1214,7 @@ main()
         os.close();
     }
 
-    { // TEST 10
+    {  // TEST 10
         int return_code;
         int tot_errs = 0;
 
@@ -1240,11 +1243,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -1273,7 +1276,7 @@ main()
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0,id = 10,d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++,id++,d++ )
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
@@ -1361,7 +1364,7 @@ main()
         os.close();
     }
 
-    { // TEST 11
+    {  // TEST 11
         int return_code;
         int tot_errs = 0;
 
@@ -1389,11 +1392,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum++;
             }
         }
@@ -1420,7 +1423,7 @@ main()
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0,id = 10,d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++,id++,d++ )
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
@@ -1483,7 +1486,7 @@ main()
         os.close();
     }
 
-    { // TEST 12
+    {  // TEST 12
         int return_code;
 
         // application data of type app_data defined here
@@ -1510,11 +1513,11 @@ main()
         unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
 
         memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0,sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++,sum++ )
+        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++, sum++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
-                rdx_key[n][k][0] = 1; // set key boolean to 1
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
                 rdx_key[n][k][NUM_KEY_BYTES] = sum;
             }
         }
@@ -1540,7 +1543,7 @@ main()
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0,id = 10,d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++,id++,d++ )
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);

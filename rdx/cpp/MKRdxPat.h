@@ -111,8 +111,8 @@
  * Description:
  *     Routines to support multi-key radix PATRICIA(Practical Algorithm To Retrieve Information Coded In Alphanumeric)
  *     fast search(see ref. 1).  A data structure is supported of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
- *     data node with keys of NUM_KEY_BYTES bytes length.  Each of these three defines may be set to any arbitrary
- *     integer value one or higher in MKRdxPat.h(a trie of one node with one key of one byte will work, but might
+ *     data node with keys of NUM_KEY_BYTES bytes length.  Each of these three may be set to any arbitrary
+ *     integer value of one or higher in MKRdxPat.h(a trie of one node with one key of one byte will work, but might
  *     not be very useful).  For a trie of N keys each data node will have N branch nodes associated with it, each of
  *     the N branch nodes is associated with one of the N keys.  Again, see reference 1 on the PATRICIA algorithm for a
  *     description of what goes into the branch nodes and how traversal of a series of branch nodes leads to a unique
@@ -277,7 +277,7 @@ namespace MultiKeyRdxPat
                 BNODE **p;           // ptr to Parent node - p[num_keys_]
                 unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
                 void *nnfp;          // Next Node Free Ptr
-                unsigned int alloc;  // 1 - ALLOCated in rdx trie, 0 - on free queue
+                unsigned int alloc;  // 1 - allocated in rdx trie, 0 - on free queue
                 unsigned char *key;  // search KEY(s) - key[num_keys_][1+num_key_bytes_]
                 app_data data;       // user defined data structure
             } DNODE;
@@ -1816,9 +1816,6 @@ namespace MultiKeyRdxPat
              *     all error messages have the verify() file name and line number included
              */
 
-            const unsigned int FREE = 0;
-            const unsigned int ALLOC = 1;
-
                 int
             verify
                 (
@@ -1826,6 +1823,9 @@ namespace MultiKeyRdxPat
                     ofstream& os
                 )
             {
+                const unsigned int FREE = 0;
+                const unsigned int ALLOC = 1;
+
                 const size_t MSG_BUF_SIZE = 256;
                 char msg[MSG_BUF_SIZE];
 

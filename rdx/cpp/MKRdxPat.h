@@ -1,7 +1,8 @@
 #ifndef RDX_CPP_MKRDXPAT_H_
 #define RDX_CPP_MKRDXPAT_H_
 
-// Copyright 2015-2016 Richard A Hogaboom  [legal/copyright]
+// Copyright (c) 1997-2016, Richard A Hogaboom
+// All rights reserved.
 
 /*
  *======================================================================================================================
@@ -1473,6 +1474,8 @@ namespace MultiKeyRdxPat
              *     None
              *
              * Comments:
+             *     rdx trie size - includes all data and branch nodes including the root node
+             *     - does not include one time calloc()'s in member functions(small)
              */
 
                 int

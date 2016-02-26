@@ -1,23 +1,16 @@
-
 /*
- * MKRdxPat.h:
- * . investigate removing 0xff... 0 node from sort() to avoid collision
- * . enhance project README.md
- *
- * MKRdxPat_test.cpp:
- * . tell user to try variations on nodes, keys, key length of existing tests - much more flexible this way
- * . cpplint everything - get latest version
- * . scrub test descriptions very well
- * . use test description labled sections as os << "" << endl; test requirements
  * . open source Copyright
- * . find out what using-declarations are
  */
 
 /*
- * test cases and example code for MKRdxPat.h class member functions
+ * test cases and example code for the MKRdxPat class(in MKRdxPat.h)
  *
  * NOTES:
- *
+ *     1. all tests are independent.  any test may be deleted; it will affect no other test.
+ *     2. try the tests with different values for MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES.
+ *     3. each test outputs to it's own file of filename format: MKRdxPat.TESTn.results
+ *     4. use the './MKRdxPat.mk' script to compile and execute the tests
+ *     5. use './MKRdxPat.mk clean' to clean the directory
  */
 
 
@@ -28,8 +21,6 @@
 #include "MKRdxPat.h"
 
 using namespace MultiKeyRdxPat;
-namespace std {}
-
 
     void
 print_key

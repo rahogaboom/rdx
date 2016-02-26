@@ -88,6 +88,13 @@
  *
  *
  *         int
+ *     size 
+ *         (
+ *         );
+ *         e.g. size = rdx->size();
+ *
+ *
+ *         int
  *     print
  *         (
  *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
@@ -148,7 +155,9 @@
  *     start just after the key boolean.  Thus, for the example above, the IPv6 key would use the full 16 bytes, the
  *     IPv4 key would use the first four bytes after the key boolean(with the rest(12) set to 0) and the MAC key would
  *     use the first 6 bytes after the key boolean(with the rest(10) set to 0).  This was done to make the specification
- *     of the key[][] array and the code associated with processing it simpler.  Example:
+ *     of the key[][] array and the code associated with processing it simpler.  Actually, the IPv4 and MAC addresses
+ *     could be right justified, just so long as all the keys are always right justified and the other bytes are 0; you
+ *     just have to be consistent.  Example:
  *
  *                 kb key bytes
  *         IPv4 :  01 aa bb cc dd 00 00 00 00 00 00 00 00 00 00 00 00
@@ -292,6 +301,12 @@ namespace MultiKeyRdxPat
             const int num_keys_;
             const int num_key_bytes_;
 
+            // rdx trie size - includes all data and branch nodes including the root node
+            int calloc_size_;
+
+            // total number of nodes alloc(does not include root(0xff key) node)
+            unsigned int tot_nodes;
+
             // branch node typedef
             typedef struct bnode
             {
@@ -320,9 +335,6 @@ namespace MultiKeyRdxPat
             // typedef of struct for PATRICIA node holding max_num_rdx_nodes_ data nodes with num_keys_ keys of length num_key_bytes_
             typedef struct pnode
             {
-                // total number of nodes alloc(does not include root(0xff key) node)
-                unsigned int tot_nodes;
-
                 // head of rdx search node trie for each key
                 BNODE **head;  // BNODE *head[num_keys_]
 
@@ -469,7 +481,7 @@ namespace MultiKeyRdxPat
                 rdx_.dnodes[0].alloc = 1;  // root impossible key(0xff) node
 
                 // reset total allocated nodes
-                rdx_.tot_nodes = 0;
+                tot_nodes = 0;
 
                 // for each key set various branch/data/head fields and pointers
                 for ( int k = 0 ; k < num_keys_ ; k++ )
@@ -558,23 +570,25 @@ namespace MultiKeyRdxPat
                     throw "num_key_bytes_ < 1(must be > 0)";
                 }
 
+                calloc_size_ = 0;
+
                 // total calloc() segments =  5(in PNODE_) + ( max_num_rdx_nodes_+1 ) * 3(in DNODE)
-                size_t calloc_size =
-                                     (num_keys_) * sizeof(BNODE *) +                         // BNODE *head[num_keys_]
-                                     (max_num_rdx_nodes_+1) * sizeof(app_data *) +           // app_data *app_data_ptrs[max_num_rdx_nodes_+1]
-                                     ((max_num_rdx_nodes_+1) * num_keys_) * sizeof(BNODE) +  // BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]
-                                     (num_keys_) * sizeof(BNODE *) +                         // BNODE *bfree_head[num_keys_]
-                                     (max_num_rdx_nodes_+1) * sizeof(DNODE);                 // DNODE dnodes[max_num_rdx_nodes_+1]
+                calloc_size_ +=
+                               (num_keys_) * sizeof(BNODE *) +                         // BNODE *head[num_keys_]
+                               (max_num_rdx_nodes_+1) * sizeof(app_data *) +           // app_data *app_data_ptrs[max_num_rdx_nodes_+1]
+                               ((max_num_rdx_nodes_+1) * num_keys_) * sizeof(BNODE) +  // BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]
+                               (num_keys_) * sizeof(BNODE *) +                         // BNODE *bfree_head[num_keys_]
+                               (max_num_rdx_nodes_+1) * sizeof(DNODE);                 // DNODE dnodes[max_num_rdx_nodes_+1]
 
                 for ( int i = 0 ; i < max_num_rdx_nodes_+1 ; i++ )
                 {
-                    calloc_size +=
-                                  (num_keys_) * sizeof(unsigned int) +                       // unsigned int br[num_keys_]
-                                  (num_keys_) * sizeof(BNODE *) +                            // BNODE *p[num_keys_]
-                                  (num_keys_ * (1+num_key_bytes_)) * sizeof(unsigned char);  // unsigned char key[num_keys_][1+num_key_bytes_]
+                    calloc_size_ +=
+                                   (num_keys_) * sizeof(unsigned int) +                       // unsigned int br[num_keys_]
+                                   (num_keys_) * sizeof(BNODE *) +                            // BNODE *p[num_keys_]
+                                   (num_keys_ * (1+num_key_bytes_)) * sizeof(unsigned char);  // unsigned char key[num_keys_][1+num_key_bytes_]
                 }
 
-                fptr = (unsigned char *)calloc( calloc_size, sizeof(unsigned char) );
+                fptr = (unsigned char *)calloc( calloc_size_, sizeof(unsigned char) );
 
                 // dynamic allocation for PNODE_
                 rdx_.head = (BNODE **)(fptr);
@@ -797,7 +811,7 @@ namespace MultiKeyRdxPat
 
                 dna = rdx_.dfree_head;
                 rdx_.dfree_head = (DNODE *)(rdx_.dfree_head->nnfp);
-                rdx_.tot_nodes++;
+                tot_nodes++;
 
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
@@ -1352,7 +1366,7 @@ namespace MultiKeyRdxPat
                 rdx_.dfree_head = (DNODE *)c;
 
                 // decrement total allocated nodes
-                rdx_.tot_nodes--;
+                tot_nodes--;
 
                 // set return pointer to removed node app_data
                 return &( ((DNODE *)(c))->data );
@@ -1439,8 +1453,37 @@ namespace MultiKeyRdxPat
                 (
                 )
             {
-               return rdx_.tot_nodes;
+               return tot_nodes;
             }  // nodes()
+
+            /*
+             *======================================================================================================================
+             *     size()
+             *
+             * Purpose: 
+             *     return the size of the trie.
+             *
+             * Usage:
+             *     int size;
+             *
+             *     size = rdx->size();
+             *
+             * Returns:
+             *     int size - the size of the trie
+             *
+             * Parameters:
+             *     None
+             *
+             * Comments:
+             */
+
+                int
+            size
+                (
+                )
+            {
+               return calloc_size_;
+            }  // size()
 
             /*
              *======================================================================================================================
@@ -1537,16 +1580,12 @@ namespace MultiKeyRdxPat
 
                 if ( key == NULL )
                 {
-                    int tot_nodes;
-
                     os << "==========\n\n";
                     os << "print(NULL, os) called with NULL first arg.\n\n";
                     os << "print all the data in branch and data nodes for the entire trie.  for each data node allocated there\n"
                           "will be num_keys_ new branch nodes allocated.  thus, for n data nodes allocated, there will be n*num_keys_\n"
                           "branch nodes printed and n data nodes printed.  the path along branch nodes to data nodes is not\n"
                           "demonstrated.  useful only for small tries for debugging purposes.\n\n";
-
-                    tot_nodes = nodes();
 
                     os << "Total nodes allocated: " << tot_nodes << "  Number of keys: " << num_keys_ << "  Key length: " << num_key_bytes_ << "\n\n\n";
                     os << "NODE n\n\n";
@@ -2179,13 +2218,13 @@ namespace MultiKeyRdxPat
                 }
 
                 // verify that the tot_alloc_nodes equals tot_nodes
-                if ( (unsigned int)tot_alloc_nodes != (rdx_.tot_nodes+1) )
+                if ( (unsigned int)tot_alloc_nodes != (tot_nodes+1) )
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
                         snprintf(msg, MSG_BUF_SIZE, "rdx->verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
-                                    " not equal rdx_.tot_nodes(%d)\n",
-                            __FILE__, __LINE__, tot_alloc_nodes, rdx_.tot_nodes);
+                                    " not equal tot_nodes(%d)\n",
+                            __FILE__, __LINE__, tot_alloc_nodes, tot_nodes);
                         os << msg;
                     }
                     return 12;

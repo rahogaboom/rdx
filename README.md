@@ -27,6 +27,110 @@ rdx
 
  OO C++ version:
 
+   Member Functions:
+  
+       struct app_data
+       {
+           int data;  // user specified application data structure
+       };
+  
+       MKRdxPat<app_data>
+           (
+               int MAX_NUM_RDX_NODES,
+               int NUM_KEYS,
+               int NUM_KEY_BYTES
+           );
+           e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
+  
+  
+       ~MKRdxPat()
+           e.g. delete rdx;
+  
+  
+       struct app_data
+       {
+           int data;  // user specified application data structure
+       };
+  
+           int
+       insert
+           (
+               unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+               app_data **app_datapp
+           );
+           e.g. return_code = rdx->insert((unsigned char *)key, &app_datap);
+  
+  
+       struct app_data
+       {
+           int data;  // user specified application data structure
+       };
+  
+           app_data *
+       search
+           (
+               unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+           );
+           e.g. app_datap = rdx->search((unsigned char *)key);
+  
+  
+       struct app_data
+       {
+           int data;  // user specified application data structure
+       }
+  
+           app_data *
+       remove
+           (
+               unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+           );
+           e.g. app_datap = rdx->remove((unsigned char *)key);
+  
+  
+           int
+       sort
+           (
+               app_data ***app_datappp,
+               int k
+           );
+           e.g. return_code = rdx->sort(&app_datapp, k);
+  
+  
+           int
+       nodes
+           (
+           );
+           e.g. nodes = rdx->nodes();
+  
+  
+           int
+       size 
+           (
+           );
+           e.g. size = rdx->size();
+  
+  
+           int
+       print
+           (
+               unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+               ofstream& os
+           );
+           e.g. return_code = rdx->print(NULL, os);
+           e.g. return_code = rdx->print((unsigned char *)key, os);
+  
+  
+           int
+       verify
+           (
+               VERIFY_MODE vm,
+               ofstream& os
+           );
+           e.g. return_code = rdx->verify(ERR_CODE, os);
+           e.g. return_code = rdx->verify(ERR_CODE_PRINT, os);
+  
+  ======================================================================================================================
+  
    Description:
        The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes of
        an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA (Practical
@@ -67,7 +171,9 @@ rdx
        start just after the key boolean.  Thus, for the example above, the IPv6 key would use the full 16 bytes, the
        IPv4 key would use the first four bytes after the key boolean(with the rest(12) set to 0) and the MAC key would
        use the first 6 bytes after the key boolean(with the rest(10) set to 0).  This was done to make the specification
-       of the key[][] array and the code associated with processing it simpler.  Example:
+       of the key[][] array and the code associated with processing it simpler.  Actually, the IPv4 and MAC addresses
+       could be right justified, just so long as all the keys are always right justified and the other bytes are 0; you
+       just have to be consistent.  Example:
   
                    kb key bytes
            IPv4 :  01 aa bb cc dd 00 00 00 00 00 00 00 00 00 00 00 00

@@ -7,14 +7,16 @@ rdx
 
      - C and OO C++ versions
 
-     - allows the allocation of a fixed sized contiguous data store that holds data nodes of an arbitrary structure
-       that may be accessed with any number of keys of any size with the PATRICIA (Practical Algorithm To Retrieve
-       Information Coded In Alphanumeric)(1,2,3) fast search algorithm
+     - allows the allocation of a fixed sized contiguous data store that holds data nodes of an
+       arbitrary structure that may be accessed with any number of keys of any size with the
+       PATRICIA (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast
+       search algorithm
 
-     - see article in Embedded Systems Programming, Mar. 1997, "Highly dynamic Radix fast search algorithm with easy
-       sort/deletion"(included)
+     - see article in Embedded Systems Programming, Mar. 1997, "Highly dynamic Radix fast search
+       algorithm with easy sort/deletion"(included)
 
-     - see article in Embedded Systems Design, Jun. 2007, "Using multi-key radix PATRICIA fast search"(included)
+     - see article in Embedded Systems Design, Jun. 2007, "Using multi-key radix PATRICIA fast
+       search"(included)
 
      - many verification tests that show complex code usage examples
 

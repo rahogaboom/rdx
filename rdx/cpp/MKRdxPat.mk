@@ -17,7 +17,7 @@ fi
 CC="clang"
 #CC="g++"
 
-# compile test program - using MKRdxPat.h
+# compile test program - using MKRdxPat.hpp
 $CC -std=c++14 -g -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 # $CC -std=c++14 -O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 
@@ -25,5 +25,5 @@ $CC -std=c++14 -g -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 ./MKRdxPat_test
 
 # compile perf program - future release
-#$CC -std=c++14 -g -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lm
+$CC -std=c++14 -g -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
 

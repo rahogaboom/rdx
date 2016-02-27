@@ -3,7 +3,7 @@
 // All rights reserved.
 
 /*
- * test cases and example code for the MKRdxPat class(in MKRdxPat.h)
+ * test cases and example code for the MKRdxPat class(in MKRdxPat.hpp)
  *
  * NOTES:
  *     1. all tests are independent.  any test may be deleted; it will affect no other test
@@ -25,7 +25,7 @@
 #include <fstream>
 #include <string>
 
-#include "MKRdxPat.h"
+#include "MKRdxPat.hpp"
 
 using namespace MultiKeyRdxPat;
 

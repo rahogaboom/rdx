@@ -27,6 +27,13 @@ rdx
 
  OO C++ version:
 
+  ======================================================================================================================
+  
+   File Names:
+       MKRdxPat.h
+  
+  ======================================================================================================================
+  
    Member Functions:
   
        struct app_data
@@ -162,7 +169,7 @@ rdx
        One extra prefix byte, a key boolean - required to be 0(ignore) or 1(search), is set with each key to specify
        if the key is to be used in the data node search.  It is suggested that the array be first memset() to 0:
   
-           memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+           memset(key, 0, NUM_KEYS   (1+NUM_KEY_BYTES));
   
        and then only keys to be used copied in with the key boolean(set to 1) prepended.
   
@@ -173,16 +180,27 @@ rdx
        use the first 6 bytes after the key boolean(with the rest(10) set to 0).  This was done to make the specification
        of the key[][] array and the code associated with processing it simpler.  Actually, the IPv4 and MAC addresses
        could be right justified, just so long as all the keys are always right justified and the other bytes are 0; you
-       just have to be consistent.  Example:
+       just have to be consistent.  From the way that PATRICIA works the keys are examined from left to right.  Thus
+       it makes sense to left justify.  The actual key bits are examined instead of examining irrelevent 0 bits first.
+       The suffixed 0 bits are not a factor in the data node search since the key bits on the left will find a data
+       node if all inserts were made with the same number of key bits on the left e.g. 32 for an IPv4 address.  Example:
   
                    kb key bytes
-           IPv4 :  01 aa bb cc dd 00 00 00 00 00 00 00 00 00 00 00 00
-           IPv6 :  01 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
-           MAC  :  01 aa bb cc dd ee ff 00 00 00 00 00 00 00 00 00 00
+           IPv4 :  01 c0 a8 00 01 00 00 00 00 00 00 00 00 00 00 00 00 - 192.168.0.1
+           IPv6 :  01 fe 80 00 00 00 00 00 00 02 21 2f ff fe b5 6e 10 - fe80::221:2fff:feb5:6e10
+           MAC  :  01 00 21 2f b5 6e 10 00 00 00 00 00 00 00 00 00 00 - 00:21:2f:b5:6e:10
   
        See the member function summary above or a detailed member function usage comment before each function's code.
        A verify() member function is provided that does extensive data structure memory analysis and a print() member
        function is provided that prints the structural details of all the branch and data nodes.
+  
+       Let's suppose that we wanted to find a data node with just the IPv6 address.  We first memset() the keys to 0.
+       We then add the IPv6 address with it's key boolean set to 1.  Thus:
+  
+                   kb key bytes
+           IPv4 :  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - 0
+           IPv6 :  01 fe 80 00 00 00 00 00 00 02 21 2f ff fe b5 6e 10 - fe80::221:2fff:feb5:6e10
+           MAC  :  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - 0
   
        For a trie of NUM_KEYS keys, each data node will have NUM_KEYS branch nodes associated with it.  The number of
        actual data nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for the initial branch nodes
@@ -200,6 +218,8 @@ rdx
        algorithm.  These are for various purposes; related to changes in the original algorithm for multi-key search,
        related to changes in the original algorithm for leaf data nodes instead of upward pointers to data structures
        stored in branch nodes, related to printing, sorting and debugging.
+  
+  ======================================================================================================================
 
 ```
 

@@ -13,6 +13,14 @@
  *     5. use './MKRdxPat.mk clean' to clean the directory
  */
 
+/*
+ * scrub sort() description and investigate sort()'ing node data
+ * investigate if app_datap sort() return should be NULL if error condition
+ * update References from Sedgewick books
+ * read Google C++ Style Guide
+ * do performance executable - do IPv4/IPv6 example
+ */
+
 #include <iostream>
 #include <fstream>
 #include <string>

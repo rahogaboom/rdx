@@ -158,16 +158,27 @@
  *     use the first 6 bytes after the key boolean(with the rest(10) set to 0).  This was done to make the specification
  *     of the key[][] array and the code associated with processing it simpler.  Actually, the IPv4 and MAC addresses
  *     could be right justified, just so long as all the keys are always right justified and the other bytes are 0; you
- *     just have to be consistent.  Example:
+ *     just have to be consistent.  From the way that PATRICIA works the keys are examined from left to right.  Thus
+ *     it makes sense to left justify.  The actual key bits are examined instead of examining irrelevent 0 bits first.
+ *     The suffixed 0 bits are not a factor in the data node search since the key bits on the left will find a data
+ *     node if all inserts were made with the same number of key bits on the left e.g. 32 for an IPv4 address.  Example:
  *
  *                 kb key bytes
- *         IPv4 :  01 aa bb cc dd 00 00 00 00 00 00 00 00 00 00 00 00
- *         IPv6 :  01 aa bb cc dd ee ff gg hh ii jj kk ll mm nn oo pp
- *         MAC  :  01 aa bb cc dd ee ff 00 00 00 00 00 00 00 00 00 00
+ *         IPv4 :  01 c0 a8 00 01 00 00 00 00 00 00 00 00 00 00 00 00 - 192.168.0.1
+ *         IPv6 :  01 fe 80 00 00 00 00 00 00 02 21 2f ff fe b5 6e 10 - fe80::221:2fff:feb5:6e10
+ *         MAC  :  01 00 21 2f b5 6e 10 00 00 00 00 00 00 00 00 00 00 - 00:21:2f:b5:6e:10
  *
  *     See the member function summary above or a detailed member function usage comment before each function's code.
  *     A verify() member function is provided that does extensive data structure memory analysis and a print() member
  *     function is provided that prints the structural details of all the branch and data nodes.
+ *
+ *     Let's suppose that we wanted to find a data node with just the IPv6 address.  We first memset() the keys to 0.
+ *     We then add the IPv6 address with it's key boolean set to 1.  Thus:
+ *
+ *                 kb key bytes
+ *         IPv4 :  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - 0
+ *         IPv6 :  01 fe 80 00 00 00 00 00 00 02 21 2f ff fe b5 6e 10 - fe80::221:2fff:feb5:6e10
+ *         MAC  :  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - 0
  *
  *     For a trie of NUM_KEYS keys, each data node will have NUM_KEYS branch nodes associated with it.  The number of
  *     actual data nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for the initial branch nodes
@@ -331,7 +342,7 @@ namespace MultiKeyRdxPat
             {
                 // rdx trie size - includes all data and branch nodes including the root node
                 // - does not include one time calloc()'s in member functions(small)
-                int calloc_size;
+                unsigned int calloc_size;
 
                 // total number of nodes allocated(does not include root(0xff key) node)
                 unsigned int tot_nodes;
@@ -1386,8 +1397,10 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->sort(&app_datapp, k);
              *
              * Returns:
-             *     int return_code - the number of sorted nodes.  if no keys return 0.  if k outside 0 to NUM_KEYS-1 return -1.
-             *     app_data **app_datapp - pointer to array of pointers to app_data
+             *     1. return_code set to the number of sorted nodes
+             *     2. if there are no data nodes(no keys to sort) return 0
+             *     3. if k, the key index, is out of range(0 - NUM_KEYS-1) return -1
+             *     4. app_data **app_datapp - pointer to array of pointers to app_data
              *
              * Parameters:
              *     app_data ***app_data - pointer to pointer to pointer to app_data
@@ -1436,7 +1449,7 @@ namespace MultiKeyRdxPat
              *     n = rdx->nodes();
              *
              * Returns:
-             *     int n - number of allocated nodes in the trie(0 - NAX_NUM_RDX_NODES)
+             *     1. int n - number of allocated nodes in the trie(0 - NAX_NUM_RDX_NODES)
              *
              * Parameters:
              *     None
@@ -1468,7 +1481,7 @@ namespace MultiKeyRdxPat
              *     size = rdx->size();
              *
              * Returns:
-             *     int size - the size of the trie
+             *     1. int size - the size of the trie
              *
              * Parameters:
              *     None

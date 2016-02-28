@@ -1,5 +1,8 @@
 
-// performance measurements for rdx->insert()/rdx->remove()/rdx->search() library routines
+// Copyright (c) 1997-2016, Richard A Hogaboom
+// All rights reserved.
+
+// MKRdxPat.hpp class performance measurements for rdx->insert()/rdx->remove()/rdx->search() member functions
 
 #include <iostream>
 #include <fstream>
@@ -36,10 +39,6 @@ timespec_diff
     return temp;
 }
 
-/*
- * Notes:
- */
-
     int
 main
     (
@@ -52,32 +51,29 @@ main
 
     unsigned int rdx_size = 0;
 
-    const int max_num_rdx_nodes = 512;
-    const int num_keys = 4;
-    const int num_key_bytes = 8;
+    const int max_num_rdx_nodes = 100000;
+    const int num_keys          = 2;
+    const int num_key_bytes     = 16;
 
+    // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
+    // num_key_bytes length with all key booleans set to 1
+    unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
+
+    // application data of type app_data defined here
     struct app_data
     {
         int i;
     };
 
-    MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
-
-
-    /*
-     * holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
-     * num_key_bytes length with all key booleans set to 1
-     */
-    unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
-
     app_data *app_datap;
 
     ofstream os;
-    os.open("MKRdxPat_perf.results");
+    os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
 
-    int pmode_opt = 1; // performance test case option
-    double rtime_opt = 60.; // run time option
-    int block_multiply_opt = 500; // block multiply option
+    // cmd line option defaults
+    int pmode_opt = 1;  // performance test case option
+    double rtime_opt = 60.;  // run time option
+    int block_multiply_opt = 500;  // block multiply option
 
     opterr = 0;
     int opt;
@@ -122,22 +118,22 @@ main
         }
     }
 
-    /*
-     * in rdx_key[][][] generate max_num_rdx_nodes sets of num_keys random keys each of
-     * num_key_bytes in length and set all key booleans to 1
-     */
+    // in rdx_key[][][] generate max_num_rdx_nodes sets of num_keys random keys each of
+    // num_key_bytes in length and set all key booleans to 1
     srand(time(NULL));
     for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
     {
         for ( int k = 0 ; k < num_keys ; k++ )
         {
-            rdx_key[n][k][0] = 1; // set key boolean to 1
+            rdx_key[n][k][0] = 1;  // set key boolean to 1
             for ( int b = 1 ; b < 1+num_key_bytes ; b++ )
             {
-                rdx_key[n][k][b] = rand() & 0x000000ff; // not crypto random - will produce some duplicates - ok
+                rdx_key[n][k][b] = rand() & 0x000000ff;  // not crypto random - will produce some duplicates - ok
             }
         }
     }
+
+    MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
 
     switch ( pmode_opt )
     {
@@ -147,11 +143,13 @@ main
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
+                rdx_size = rdx->size();
+
                 os << "####################################################################################################\n";
                 os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie)/rdx->remove()(empty trie) - random keys\n";
                 snprintf(string, MSG_BUF_SIZE, "max_num_rdx_nodes = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n", max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
+                snprintf(string, MSG_BUF_SIZE, "                  Modify MKRdxPat_perf.cpp with new parameters and re-compile.\n");
                 os << string;
                 snprintf(string, MSG_BUF_SIZE, "                  Minimum run time(sec): %f\n", rtime_opt);
                 os << string;
@@ -189,6 +187,7 @@ main
                         break;
                     }
                 }
+
                 snprintf(string, MSG_BUF_SIZE, "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
                 os << string;
             }
@@ -201,12 +200,13 @@ main
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
+                rdx_size = rdx->size();
 
                 os << "####################################################################################################\n";
                 os << "PERFORMANCE TEST: Do repeated rdx->search() - random keys\n";
                 snprintf(string, MSG_BUF_SIZE, "  max_num_rdx_nodes = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n", max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                      Modify rdx_pat_search_perf.h with new parameters and re-compile.\n");
+                snprintf(string, MSG_BUF_SIZE, "                  Modify MKRdxPat_perf.cpp with new parameters and re-compile.\n");
                 os << string;
                 snprintf(string, MSG_BUF_SIZE, "                  Minimum run time(sec): %f\n", rtime_opt);
                 os << string;
@@ -219,7 +219,7 @@ main
                 for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                 {
                     rdx->insert((unsigned char *)rdx_key[n], &app_datap);
-                    random[n] = rand() % max_num_rdx_nodes; // not crypto random - will produce some duplicates - ok
+                    random[n] = rand() % max_num_rdx_nodes;  // not crypto random - will produce some duplicates - ok
                 }
 
                 clock_gettime(CLOCK_MONOTONIC, &tstart);
@@ -244,6 +244,7 @@ main
                         break;
                     }
                 }
+
                 snprintf(string, MSG_BUF_SIZE, "seconds = %f  total searches = %ld\n\n", sec, total_searches);
                 os << string;
             }

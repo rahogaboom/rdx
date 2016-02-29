@@ -25,6 +25,6 @@ CC="clang"
 # run test program
 ./MKRdxPat_test
 
-# compile perf program - future release
+# compile perf program
 $CC -std=c++14 -O -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
 

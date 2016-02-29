@@ -2,11 +2,12 @@
 // Copyright (c) 1997-2016, Richard A Hogaboom
 // All rights reserved.
 
-// MKRdxPat.hpp class performance measurements for rdx->insert()/rdx->remove()/rdx->search() member functions
+// MKRdxPat.hpp class performance measurements for rdx->insert() / rdx->remove() / rdx->search() member functions
 
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 
 #include <unistd.h>
 
@@ -46,18 +47,20 @@ main
         char **argv
     )
 {
-    const size_t MSG_BUF_SIZE = 256;
+    const int MSG_BUF_SIZE = 256;
     char string[MSG_BUF_SIZE];
 
     unsigned int rdx_size = 0;
 
-    const int max_num_rdx_nodes = 100000;
+    const int max_num_rdx_nodes = 2000000;
     const int num_keys          = 2;
     const int num_key_bytes     = 16;
 
     // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
     // num_key_bytes length with all key booleans set to 1
-    unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
+    // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
+    //       arrays do no blow the stack
+    static unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
 
     // application data of type app_data defined here
     struct app_data
@@ -72,8 +75,8 @@ main
 
     // cmd line option defaults
     int pmode_opt = 1;  // performance test case option
-    double rtime_opt = 60.;  // run time option
-    int block_multiply_opt = 500;  // block multiply option
+    double rtime_opt = 30.;  // run time option
+    int block_multiply_opt = 10;  // block multiply option
 
     opterr = 0;
     int opt;
@@ -118,22 +121,20 @@ main
         }
     }
 
-    // in rdx_key[][][] generate max_num_rdx_nodes sets of num_keys random keys each of
-    // num_key_bytes in length and set all key booleans to 1
-    srand(time(NULL));
-    for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
+    // rdx_key[][][] - generate max_num_rdx_nodes nodes of num_keys keys of
+    // num_key_bytes bytes and set all key booleans to 1
+    for ( int n = 0, sum = 0 ; n < max_num_rdx_nodes ; n++, sum++ )
     {
         for ( int k = 0 ; k < num_keys ; k++ )
         {
             rdx_key[n][k][0] = 1;  // set key boolean to 1
-            for ( int b = 1 ; b < 1+num_key_bytes ; b++ )
-            {
-                rdx_key[n][k][b] = rand() & 0x000000ff;  // not crypto random - will produce some duplicates - ok
-            }
+            memmove(&rdx_key[n][k][1], &sum, sizeof(sum));  // keys monatonically increase
         }
     }
 
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
+
+    system("lscpu > cmd.lscpu");
 
     switch ( pmode_opt )
     {
@@ -142,20 +143,23 @@ main
                 long total_inserts_removes = 0;
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
+                int return_code;
 
                 rdx_size = rdx->size();
 
                 os << "####################################################################################################\n";
-                os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie)/rdx->remove()(empty trie) - random keys\n";
-                snprintf(string, MSG_BUF_SIZE, "max_num_rdx_nodes = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n", max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
+                os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys\n";
+                snprintf(string, sizeof(string), "max_num_rdx_nodes = %d\nnum_keys = %d\nnum_key_bytes = %d\ntrie size = %db\n",
+                    max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Modify MKRdxPat_perf.cpp with new parameters and re-compile.\n");
+                snprintf(string, sizeof(string), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n");
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Minimum run time(sec): %f\n", rtime_opt);
+                snprintf(string, sizeof(string), "Minimum run time(sec): %f\n", rtime_opt);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Block Muliplier: %d\n", block_multiply_opt);
+                snprintf(string, sizeof(string), "Block Muliplier: %d\n", block_multiply_opt);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Insert/Delete increments: %d(%d*2*max_num_rdx_nodes)\n\n", block_multiply_opt*2*max_num_rdx_nodes, block_multiply_opt);
+                snprintf(string, sizeof(string), "insert()/remove() increments: %d(%d*2*max_num_rdx_nodes)\n\n",
+                    block_multiply_opt*2*max_num_rdx_nodes, block_multiply_opt);
                 os << string;
 
                 clock_gettime(CLOCK_MONOTONIC, &tstart);
@@ -166,12 +170,22 @@ main
                     {
                         for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                         {
-                            rdx->insert((unsigned char *)rdx_key[n], &app_datap);
+                            return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
+
+                            if ( return_code != 0 )
+                            {
+                                os << "insert(): data node = " << n << " return_code = " << return_code << endl;
+                            }
                         }
 
                         for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                         {
-                            rdx->remove((unsigned char *)rdx_key[n]);
+                            app_datap = rdx->remove((unsigned char *)rdx_key[n]);
+
+                            if ( app_datap == NULL )
+                            {
+                                os << "remove(): data node = " << n << " return = NULL" << endl;
+                            }
                         }
                     }
 
@@ -188,7 +202,7 @@ main
                     }
                 }
 
-                snprintf(string, MSG_BUF_SIZE, "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
+                snprintf(string, sizeof(string), "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
                 os << string;
             }
             break;
@@ -204,15 +218,17 @@ main
 
                 os << "####################################################################################################\n";
                 os << "PERFORMANCE TEST: Do repeated rdx->search() - random keys\n";
-                snprintf(string, MSG_BUF_SIZE, "  max_num_rdx_nodes = %d  num_keys = %d  num_key_bytes = %d  trie size = %db\n", max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
+                snprintf(string, sizeof(string), "max_num_rdx_nodes = %d\nnum_keys = %d\nnum_key_bytes = %d\ntrie size = %db\n",
+                    max_num_rdx_nodes, num_keys, num_key_bytes, rdx_size);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Modify MKRdxPat_perf.cpp with new parameters and re-compile.\n");
+                snprintf(string, sizeof(string), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n");
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Minimum run time(sec): %f\n", rtime_opt);
+                snprintf(string, sizeof(string), "Minimum run time(sec): %f\n", rtime_opt);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Block Muliplier: %d\n", block_multiply_opt);
+                snprintf(string, sizeof(string), "Block Muliplier: %d\n", block_multiply_opt);
                 os << string;
-                snprintf(string, MSG_BUF_SIZE, "                  Search increments: %d(%d*max_num_rdx_nodes)\n\n", block_multiply_opt*max_num_rdx_nodes, block_multiply_opt);
+                snprintf(string, sizeof(string), "search() increments: %d(%d*max_num_rdx_nodes)\n\n",
+                    block_multiply_opt*max_num_rdx_nodes, block_multiply_opt);
                 os << string;
 
                 srand(time(NULL));
@@ -234,6 +250,7 @@ main
                             total_searches++;
                         }
                     }
+
                     clock_gettime(CLOCK_MONOTONIC, &tend);
 
                     tdiff = timespec_diff(tstart, tend);
@@ -245,7 +262,7 @@ main
                     }
                 }
 
-                snprintf(string, MSG_BUF_SIZE, "seconds = %f  total searches = %ld\n\n", sec, total_searches);
+                snprintf(string, sizeof(string), "seconds = %f  total searches = %ld\n\n", sec, total_searches);
                 os << string;
             }
             break;

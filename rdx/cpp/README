@@ -1,7 +1,9 @@
 
  1. adjust $CC in ./MKRdxPat.mk to use clang or g++
 
- 2. do "./MKRdxPat.mk" to build and run the tests
+ 2. do "./MKRdxPat.mk" to build and run the functional tests
 
  3. do "./MKRdxPat.mk clean" to clean the directory
+
+ 4. do "./MKRdxPat_perf [options]" to run performance tests
 

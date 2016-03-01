@@ -50,6 +50,7 @@ main
     const int MSG_BUF_SIZE = 256;
     char string[MSG_BUF_SIZE];
 
+    // rdx trie parameters
     const int max_num_rdx_nodes = 200000;
     const int num_keys          = 2;
     const int num_key_bytes     = 16;
@@ -146,6 +147,7 @@ main
         }
     }
 
+    // MKRdxPat class trie constructor
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
 
     snprintf(string, sizeof(string), "\nmax_num_rdx_nodes = %d\nnum_keys = %d\nnum_key_bytes = %d\n",
@@ -244,7 +246,13 @@ main
                     {
                         for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
                         {
-                            rdx->search((unsigned char *)rdx_key[random[n]]);
+                            app_datap = rdx->search((unsigned char *)rdx_key[random[n]]);
+
+                            if ( app_datap == NULL )
+                            {
+                                os << "search(): data node = " << n << " return = NULL" << endl;
+                            }
+
                             total_searches++;
                         }
                     }

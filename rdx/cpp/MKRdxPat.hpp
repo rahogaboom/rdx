@@ -209,23 +209,25 @@
  *
  * Operational Notes:
  *
- *     1. the first member of BNODE and DNODE typedefs, id, should not be moved.  when doing operations on the trie, a
- *        search will reference the id from a BNODE type initially and then terminate at a DNODE type.
+ *     1. the first member of BNODE and DNODE typedefs, id, should not be moved.  when doing operations on the
+ *        trie, a search will reference the id from a BNODE type initially and then terminate at a DNODE type.
  *
- *     2. the maximum number of key bits is MAX_KEY_BITS.  the impossible key in the initially allocated data node must
- *        be at least one bit longer.  this requires the data node storage for the keys to have one extra byte.
+ *     2. the maximum number of key bits is MAX_KEY_BITS.  the impossible key in the initially allocated data
+ *        node must be at least one bit longer.  this requires the data node storage for the keys to have one
+ *        extra byte.
  *
- *     3. all keys are the same length - NUM_KEY_BYTES bytes.  the performance hit, the small memory savings and the
- *        added code complexity of having individually sized keys did not seem worth it.  thus, the longest required key
- *        will determine NUM_KEY_BYTES.  shorter keys may be left justified in the NUM_KEY_BYTES bytes.
+ *     3. all keys are the same length - NUM_KEY_BYTES bytes.  the performance hit, the small memory savings
+ *        and the added code complexity of having individually sized keys did not seem worth it.  thus, the
+ *        longest required key will determine NUM_KEY_BYTES.  shorter keys may be left justified in the
+ *        NUM_KEY_BYTES bytes.
  *
- *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to 0 and then
- *        all the keys to be used with key boolean 1 added in one operation(keys with key boolean 0 are never needed).
- *        e.g. memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+ *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to
+ *        0 and then all the keys to be used with key boolean 1 added in one operation(keys with key boolean
+ *        0 are never needed) e.g. memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));.
  *
- *     5. multidemensional arrays in C++ are implemented by subscripting calloc()'ed memory with parameterized values
- *        calculated from the static C array versions.  One, two and three dimensional arrays are illustrated as
- *        follows(see verify() for actual usage):
+ *     5. multidemensional arrays in C++ are implemented by subscripting calloc()'ed memory with parameterized
+ *        values calculated from the static C array versions.  One, two and three dimensional arrays are
+ *        illustrated as follows(see verify() for actual usage):
  *
  *        n -> subscripts max_num_rdx_nodes_
  *        k -> subscripts num_keys_
@@ -247,27 +249,28 @@
  *
  * Theoretic Notes:
  *
- *     1. depending on the key structure it is possible for the trie to be very unbalanced.  for a three byte key, for
- *        example, if 24 keys are inserted, each with only one different bit set, then the resulting trie would be a
- *        string of branch nodes extending to the left, each with a data node on its right branch.  the maximum trie
- *        depth would be 24 with the key of all zeros.
+ *     1. depending on the key structure it is possible for the trie to be very unbalanced.  for a three byte
+ *        key, for example, if 24 keys are inserted, each with only one different bit set, then the resulting
+ *        trie would be a string of branch nodes extending to the left, each with a data node on its right
+ *        branch.  the maximum trie depth would be 24 with the key of all zeros.
  *
- *     2. for the N node trie with b bit keys, even for very long keys, the average search requires log2(N) bit
- *        comparisons, and the average trie depth is log2(N).  see reference 1.  for a full key space, N = 2**b,
- *        log2(2**b) = b, and the average trie depth approaches b.
+ *     2. for the N node trie with b bit keys, even for very long keys, the average search requires log2(N)
+ *        bit comparisons, and the average trie depth is log2(N).  see reference 1.  for a full key space,
+ *        N = 2**b, log2(2**b) = b, and the average trie depth approaches b.
  *
- *     3. note that insertion requires two traversals of the trie - one to find if the key(s) already exists and the
- *        other to do the actual insertion.  the user may think that there must be a way to traverse down the trie only
- *        once to do an insertion.  the answer is YES! But.  in order to know where to stop you need to know all the
- *        key bits that intervene between the two b bit parameters of each branch node.  thus you would have to store
- *        these bits in each branch node or you could store any full key from any data node below a branch node in that
- *        branch node, which, by the property of a PATRICIA trie, will all have prefix bits identical for all data
- *        nodes below that branch node.  if, on insertion, the insertion key had bits differing between the two b bit
- *        parameters of two branch nodes then an insertion would be done at that point.  all this key storage and bit
- *        comparison in each traversed branch node is inefficient.  the first search traversal finds the key that does
- *        not match, but this key has all the key bits needed to find the first key bit of the new key that is
- *        different from the nearest key already in the trie.  this first differing bit then tells the second traversal
- *        where to stop and insert the new key.  thus, dual traversal is more efficient and simpler.
+ *     3. note that insertion requires two traversals of the trie - one to find if the key(s) already exists
+ *        and the other to do the actual insertion.  the user may think that there must be a way to traverse
+ *        down the trie only once to do an insertion.  the answer is YES! But.  in order to know where to
+ *        stop you need to know all the key bits that intervene between the two b bit parameters of each
+ *        branch node.  thus you would have to store these bits in each branch node or you could store any
+ *        full key from any data node below a branch node in that branch node, which, by the property of a
+ *        PATRICIA trie, will all have prefix bits identical for all data nodes below that branch node.  if,
+ *        on insertion, the insertion key had bits differing between the two b bit parameters of two branch
+ *        nodes then an insertion would be done at that point.  all this key storage and bit comparison in
+ *        each traversed branch node is inefficient.  the first search traversal finds the key that does not
+ *        match, but this key has all the key bits needed to find the first key bit of the new key that is
+ *        different from the nearest key already in the trie.  this first differing bit then tells the second
+ *        traversal where to stop and insert the new key.  thus, dual traversal is more efficient and simpler.
  *
  *======================================================================================================================
  *
@@ -345,7 +348,8 @@ namespace MultiKeyRdxPat
                 app_data data;       // user defined data structure
             } DNODE;
 
-            // typedef of struct for PATRICIA node holding max_num_rdx_nodes_ data nodes with num_keys_ keys of length num_key_bytes_
+            // typedef of struct for PATRICIA node holding max_num_rdx_nodes_ data
+            // nodes with num_keys_ keys of length num_key_bytes_
             typedef struct pnode
             {
                 // rdx trie size - includes all data and branch nodes including the root node
@@ -395,10 +399,11 @@ namespace MultiKeyRdxPat
                 unsigned int bit;
                 unsigned char mask;
 
-                // the byte index set here assumes one extra prefix byte in the input parameter key(for the 0xff of the root
-                // node impossible key). thus, data nodes with keys of num_key_bytes_ will have a 0 byte prefix added, and the
-                // byte index set here is not 0 to num_key_bytes_ but 1 to num_key_bytes_+1. e.g. if num_key_bytes_=1 and bit_num=0
-                // then byte is set to 1 not 0.  if num_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
+                // the byte index set here assumes one extra prefix byte in the input parameter key(for the
+                // 0xff of the root node impossible key). thus, data nodes with keys of num_key_bytes_ will
+                // have a 0 byte prefix added, and the byte index set here is not 0 to num_key_bytes_ but 1
+                // to num_key_bytes_+1. e.g. if num_key_bytes_=1 and bit_num=0 then byte is set to 1 not 0.
+                // if num_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
                 mask = 1;
                 byte = num_key_bytes_ - bit_num/8;
                 mask <<= bit_num%8;
@@ -460,9 +465,9 @@ namespace MultiKeyRdxPat
              *     initialize()
              *
              * Purpose: 
-             *     Initialize the defined PNODE_ data structure.  This includes setting the data and branch node sequence numbers
-             *     and data node allocated status(to 0).  Set total allocated nodes to 0, and allocated status of root node to 1.
-             *     Set the branch node free list up for each key and the data node free list.
+             *     Initialize the defined PNODE_ data structure.  This includes setting the data and branch node sequence
+             *     numbers and data node allocated status(to 0).  Set total allocated nodes to 0, and allocated status of
+             *     root node to 1.  Set the branch node free list up for each key and the data node free list.
              *
              * Usage:
              *     initialize();
@@ -474,12 +479,12 @@ namespace MultiKeyRdxPat
              *     None
              *
              * Comments:
-             *     1. remember that the data structure has 1+max_num_rdx_nodes_ nodes(each of which has one data and num_keys_
-             *        branch nodes).  the first is the always allocated impossible key root node.  the rest are the
-             *        max_num_rdx_nodes_ user usable nodes.
+             *     1. remember that the data structure has 1+max_num_rdx_nodes_ nodes(each of which has one data and
+             *        num_keys_ branch nodes).  the first is the always allocated impossible key root node.  the rest
+             *        are the max_num_rdx_nodes_ user usable nodes.
              *
-             *     2. certain pointers in the root node, such as parent pointers, are set to zero and permanently remain so since
-             *        they have nothing to point to.  in root node printouts they should be zero.
+             *     2. certain pointers in the root node, such as parent pointers, are set to zero and permanently
+             *        remain so since they have nothing to point to.  in root node printouts they should be zero.
              */
 
                 void
@@ -1200,7 +1205,7 @@ namespace MultiKeyRdxPat
              *             1           01 ee ee ee ee
              *             2           00 ff ff ff ff
              *
-             *             use only key 1 in the search
+             *             use only one key(1) in the search
              */
 
                 app_data *
@@ -1568,7 +1573,7 @@ namespace MultiKeyRdxPat
              *             1           01 ee ee ee ee
              *             2           00 ff ff ff ff
              *
-             *             use only key 1 in the search
+             *             use only one key(1) in the search
              */
 
                 int

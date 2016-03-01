@@ -1401,7 +1401,7 @@ namespace MultiKeyRdxPat
              *     sort()
              *
              * Purpose: 
-             *     sort pointers to app_data by key index k in PNODE_ data structure in key ascending order.
+             *     sort pointers to app_data (app_data *app_data_ptrs[max_num_rdx_nodes_+1]) by key index k in key ascending order
              *
              * Usage:
              *     app_data **app_datapp;
@@ -1411,18 +1411,20 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->sort(&app_datapp, k);
              *
              * Returns:
-             *     1. return_code set to the number of sorted nodes
-             *     2. if there are no data nodes(no keys to sort) return 0
-             *     3. if k, the key index, is out of range(0 - NUM_KEYS-1) return -1
-             *     4. app_data **app_datapp - pointer to array of pointers to app_data
+             *     1. return_code set to the number of sorted nodes and app_data **app_datapp pointer
+             *        set to array of pointers to app_data
+             *     2. if there are no data nodes(no keys to sort) return 0 and set
+             *        app_data **app_datapp to NULL
+             *     3. if k, the key index, is out of range(0 - NUM_KEYS-1) return -1 and set
+             *        app_data **app_datapp to NULL
              *
              * Parameters:
              *     app_data ***app_data - pointer to pointer to pointer to app_data
              *     int k                - key index(0 - NUM_KEYS-1)
              *
              * Comments:
-             *     (app_data *)app_data[0 to return_code-1]     - array of pointers to app_data
-             *     (app_data *)app_data[0 to return_code-1]->id - to access app_data data
+             *     ((app_data *)app_datapp[0 to return_code-1])->(app_data struct fields) - to access app_data data
+             *
              */
 
                 int
@@ -1434,6 +1436,7 @@ namespace MultiKeyRdxPat
             {
                 if ( k < 0 || k > num_keys_-1 )
                 {
+                    *app_datappp = NULL;
                     return -1;
                 }
 
@@ -1446,6 +1449,11 @@ namespace MultiKeyRdxPat
                 recursive( rdx_.head[k] );
 
                 *app_datappp = rdx_.app_data_ptrs;
+
+                if ( rdx_.app_data_ptrs_cnt-1 == 0 )
+                {
+                    *app_datappp = NULL;
+                }
 
                 return rdx_.app_data_ptrs_cnt-1;
             }  // sort()

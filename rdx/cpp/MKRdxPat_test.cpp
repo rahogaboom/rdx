@@ -547,9 +547,9 @@ main()
         os << "\n";
         os << "TEST 5: Sort data nodes by successive keys in rdx trie\n";
         os << "        Expected Results:\n";
-        os << "           a. Sort rdx with no nodes inserted and key index set to 3 - should return -1\n";
-        os << "           b. Sort rdx with no nodes inserted and key index set to 0 - should return 0\n";
-        os << "           c. Sort rdx with one node inserted and key index set to 0 - should return 1\n";
+        os << "           a. Sort rdx with no nodes inserted and key index set to 3 - return_code=-1, app_datapp= NULL\n";
+        os << "           b. Sort rdx with no nodes inserted and key index set to 0 - return_code= 0, app_datapp= NULL\n";
+        os << "           c. Sort rdx with one node inserted and key index set to 0 - return_code= 1, app_datapp=!NULL\n";
         os << "           d. For each key the return code will equal the number of sorted nodes and the\n";
         os << "              nodes array will hold the array of node pointers to nodes in sorted order\n\n";
 
@@ -566,13 +566,13 @@ main()
         os << "a. Sort rdx with no nodes inserted and key index set to 3 - should return -1\n";
         return_code = rdx->sort(&app_datapp, 3);
 
-        os << "return_code = rdx->sort(&nodes, " << 3 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&app_datapp, " << 3 << "); return_code = " << return_code << "  app_datapp = " << app_datapp << "\n\n\n";
 
 
         os << "b. Sort rdx with no nodes inserted and key index set to 0 - should return 0\n";
         return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&nodes, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_datapp << "\n\n\n";
 
 
         os << "c. Sort rdx with one node inserted and key index set to 0 - should return 1\n";
@@ -583,12 +583,12 @@ main()
 
         app_datap->id = 0;
 
-        snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n\n", 0, app_datap->id);
+        snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %d\n\n", 0, app_datap->id);
         os << string;
 
         return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&nodes, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_datapp << "\n\n\n";
 
 
         os << "d. For each key the return code will equal the number of sorted nodes and the\n";
@@ -602,7 +602,7 @@ main()
 
             app_datap->id = sum++;
 
-            snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n\n", n, app_datap->id);
+            snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %d\n\n", n, app_datap->id);
             os << string;
         }
 
@@ -614,7 +614,7 @@ main()
 
             return_code = rdx->sort(&app_datapp, k);
 
-            os << "return_code = rdx->sort(&nodes, " << k << "); return_code = " << return_code << "\n";
+            os << "return_code = rdx->sort(&app_datapp, " << k << "); return_code = " << return_code << "\n";
 
             for ( int n = 0 ; n < return_code ; n++ )
             {
@@ -627,7 +627,7 @@ main()
                     const size_t MSG_BUF_SIZE = 256;
                     char string[MSG_BUF_SIZE];
 
-                    snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n", n, ((app_data *)app_datapp[n])->id);
+                    snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %d\n", n, ((app_data *)app_datapp[n])->id);
                     os << string;
                 }
             }
@@ -712,7 +712,7 @@ main()
 
             app_datap->id = sum++;
 
-            snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %08x\n\n", n, app_datap->id);
+            snprintf(string, MSG_BUF_SIZE, "n = %d  data.id = %d\n\n", n, app_datap->id);
             os << string;
         }
 
@@ -1292,7 +1292,7 @@ main()
         os << "d. Sort rdx - should return 255\n";
         return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&nodes, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "\n\n";
 
 
         os << "e. Remove all data nodes - should return 0\n";

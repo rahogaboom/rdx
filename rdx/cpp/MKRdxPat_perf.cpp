@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <ctime>
 
 #include <unistd.h>
 
@@ -120,10 +121,20 @@ main
         }
     }
 
+    // set gm time string
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time(&rawtime);
+    timeinfo = gmtime(&rawtime);
+    strftime(string, MSG_BUF_SIZE, "%c", timeinfo);
+
     os << "####################################################################################################\n";
+    os << string << "\n\n";
+
     if ( pmode_opt == 1 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys\n\nlscpu:\n\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys\n\nlscpu:\n";
     }
     if ( pmode_opt == 2 )
     {
@@ -150,6 +161,7 @@ main
     // MKRdxPat class trie constructor
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
 
+    os << "\n";
     snprintf(string, sizeof(string), "\nmax_num_rdx_nodes = %d\nnum_keys = %d\nnum_key_bytes = %d\n",
         max_num_rdx_nodes, num_keys, num_key_bytes);
     os << string;

@@ -174,7 +174,7 @@ main()
         print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
-        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n\n";
 
 
         os << "b. Total nodes allocated(not including root node) 1\n";
@@ -187,13 +187,13 @@ main()
         os << "set app_datap->d = 2.0\n";
         os << "get app_datap->d = " << app_datap->d << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "c. No verification error\n";
         return_code = rdx->verify(ERR_CODE_PRINT, os);
 
-        os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n\n";
 
 
         os << "d. Print entire trie - allocated node and root node\n";
@@ -201,7 +201,7 @@ main()
 
         os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "e. Same keys node insertion should return code 1\n";
@@ -210,7 +210,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "f. Different keys node insertion into full rdx should return code 2\n";
@@ -224,7 +224,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "g. Same keys node insertion with a key boolean set to 0 should return code 3\n";
@@ -388,10 +388,11 @@ main()
                 os << "get app_datap->d = " << app_datap->d << "\n\n";
             }
         }
+        os << "\n";
 
 
         os << "b. Total nodes allocated(not including root node) 4\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "c. No verification error\n\n";
@@ -471,7 +472,7 @@ main()
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
         }
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "b. fail to find 4 nodes who's keys were not inserted\n\n";
@@ -950,7 +951,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "b. search on the inserted data node - should succeed\n";
@@ -969,7 +970,7 @@ main()
         {
             os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "c. search using only one correct key - should succeed\n";
@@ -988,7 +989,7 @@ main()
         {
             os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "d. search using only one incorrect key - should fail\n";
@@ -1008,7 +1009,7 @@ main()
         {
             os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "e. search using a key boolean that is not 0 or 1 - should fail\n";
@@ -1028,7 +1029,7 @@ main()
         {
             os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "f. search using using all key booleans 0 - should fail\n";
@@ -1047,7 +1048,7 @@ main()
         {
             os << "app_datap = rdx->search((unsigned char *)rdx_key[" << n << "]); search success\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "g. print using only one key - should succeed\n";
@@ -1059,7 +1060,7 @@ main()
         return_code = rdx->print((unsigned char *)rdx_key[0], os);
 
         os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n";
-        os << "\n";
+        os << "\n\n";
 
 
         os << "h. remove using only one incorrect key - should fail\n";
@@ -1079,7 +1080,7 @@ main()
         {
             os << "app_datap = rdx->remove((unsigned char *)rdx_key[" << n << "]); remove successful\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "i. remove using only one correct key - should succeed\n";
@@ -1172,7 +1173,7 @@ main()
 
             os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "d. No verification error\n";
@@ -1263,10 +1264,11 @@ main()
                 os << "get app_datap->d = " << app_datap->d << "\n\n";
             }
         }
+        os << "\n";
 
 
         os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
@@ -1286,13 +1288,13 @@ main()
         }
         os << "\n";
 
-        os << "Total errors detected " << tot_errs << "\n\n";
+        os << "Total errors detected " << tot_errs << "\n\n\n";
 
 
         os << "d. Sort rdx - should return 255\n";
         return_code = rdx->sort(&app_datapp, 0);
 
-        os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "\n\n\n";
 
 
         os << "e. Remove all data nodes - should return 0\n";
@@ -1310,14 +1312,14 @@ main()
                 os << "app_datap = rdx->remove((unsigned char *)rdx_key[" << n << "]); remove successful\n";
             }
         }
-        os << "\n";
+        os << "\n\n";
 
 
         os << "f. Only the impossible pre-allocated root node should be printed since\n";
         os << "   all data nodes have been removed\n\n";
         return_code = rdx->print(NULL, os);
 
-        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n\n";
 
 
         os << "g. No verification error\n";
@@ -1405,10 +1407,11 @@ main()
                 os << "get app_datap->d = " << app_datap->d << "\n\n";
             }
         }
+        os << "\n";
 
 
         os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
 
 
         os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
@@ -1428,13 +1431,13 @@ main()
         }
         os << "\n";
 
-        os << "Total errors detected " << tot_errs << "\n\n";
+        os << "Total errors detected " << tot_errs << "\n\n\n";
 
 
         os << "d. Print entire trie - allocated node and root node\n";
         return_code = rdx->print(NULL, os);
 
-        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n\n";
 
 
         os << "e. No verification error\n";
@@ -1510,12 +1513,13 @@ main()
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
         }
+        os << "\n";
 
 
         os << "b. Print entire trie - allocated node and root node\n";
         return_code = rdx->print(NULL, os);
 
-        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n\n";
 
 
         os << "c. No verification error\n";

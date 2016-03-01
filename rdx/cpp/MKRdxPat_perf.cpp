@@ -70,6 +70,9 @@ main
 
     app_data *app_datap;
 
+    // enable printf("%'d", n); for commas in large numbers
+    setlocale(LC_NUMERIC, "");
+
     ofstream os;
     os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
 
@@ -162,12 +165,12 @@ main
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
 
     os << "\n";
-    snprintf(string, sizeof(string), "\nmax_num_rdx_nodes = %d\nnum_keys = %d\nnum_key_bytes = %d\n",
+    snprintf(string, sizeof(string), "\nmax_num_rdx_nodes = %'d\nnum_keys = %d\nnum_key_bytes = %d\n",
         max_num_rdx_nodes, num_keys, num_key_bytes);
     os << string;
     snprintf(string, sizeof(string), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
     os << string;
-    snprintf(string, sizeof(string), "trie size = %db\n\n", rdx->size());
+    snprintf(string, sizeof(string), "trie size = %'db\n\n", rdx->size());
     os << string;
     snprintf(string, sizeof(string), "Minimum run time(sec): %f\n", rtime_opt);
     os << string;
@@ -183,7 +186,7 @@ main
                 double sec;
                 int return_code;
 
-                snprintf(string, sizeof(string), "insert()/remove() increments: %d(%d*2*max_num_rdx_nodes)\n\n",
+                snprintf(string, sizeof(string), "insert()/remove() increments: %'d(%d*2*max_num_rdx_nodes)\n\n",
                     block_multiply_opt*2*max_num_rdx_nodes, block_multiply_opt);
                 os << string;
 
@@ -227,7 +230,7 @@ main
                     }
                 }
 
-                snprintf(string, sizeof(string), "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
+                snprintf(string, sizeof(string), "seconds = %f  total inserts/removes = %'ld\n\n", sec, total_inserts_removes);
                 os << string;
             }
             break;
@@ -239,7 +242,7 @@ main
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
-                snprintf(string, sizeof(string), "search() increments: %d(%d*max_num_rdx_nodes)\n\n",
+                snprintf(string, sizeof(string), "search() increments: %'d(%d*max_num_rdx_nodes)\n\n",
                     block_multiply_opt*max_num_rdx_nodes, block_multiply_opt);
                 os << string;
 
@@ -280,7 +283,7 @@ main
                     }
                 }
 
-                snprintf(string, sizeof(string), "seconds = %f  total searches = %ld\n\n", sec, total_searches);
+                snprintf(string, sizeof(string), "seconds = %f  total searches = %'ld\n\n", sec, total_searches);
                 os << string;
             }
             break;

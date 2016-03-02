@@ -574,8 +574,8 @@ namespace MultiKeyRdxPat
             {
                 unsigned char *fptr;
 
-                const int MSG_BUF_SIZE = 256;
-                char msg[MSG_BUF_SIZE];
+                const int TMPSTR_SIZE = 256;
+                char tmpstr[TMPSTR_SIZE];
 
 
                 if ( max_num_rdx_nodes_ < 1 )
@@ -617,40 +617,40 @@ namespace MultiKeyRdxPat
                 // dynamic allocation for PNODE_
                 rdx_.head = (BNODE **)(fptr);
                 fptr += (num_keys_) * sizeof(BNODE *);
-                snprintf(msg, sizeof(msg), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *head[num_keys_]",
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *head[num_keys_]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
-                free_msg_.push_back(msg);
+                free_msg_.push_back(tmpstr);
 
                 rdx_.app_data_ptrs = (app_data **)(fptr);
                 fptr += (max_num_rdx_nodes_+1) * sizeof(DNODE *);
-                snprintf(msg, sizeof(msg), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE *node_ptrs[max_num_rdx_nodes_+1]",
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE *node_ptrs[max_num_rdx_nodes_+1]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
-                free_msg_.push_back(msg);
+                free_msg_.push_back(tmpstr);
 
                 rdx_.bnodes = (BNODE *)(fptr);
                 fptr += ((max_num_rdx_nodes_+1) * num_keys_) * sizeof(BNODE);
-                snprintf(msg, sizeof(msg), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]",
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
-                free_msg_.push_back(msg);
+                free_msg_.push_back(tmpstr);
 
                 rdx_.bfree_head = (BNODE **)(fptr);
                 fptr += (num_keys_) * sizeof(BNODE *);
-                snprintf(msg, sizeof(msg), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *bfree_head[num_keys_]",
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *bfree_head[num_keys_]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
-                free_msg_.push_back(msg);
+                free_msg_.push_back(tmpstr);
 
                 rdx_.dnodes = (DNODE *)(fptr);
                 fptr += (max_num_rdx_nodes_+1) * sizeof(DNODE);
-                snprintf(msg, sizeof(msg), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE dnodes[max_num_rdx_nodes_+1]",
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE dnodes[max_num_rdx_nodes_+1]",
                     max_num_rdx_nodes_, num_keys_, num_key_bytes_);
-                free_msg_.push_back(msg);
+                free_msg_.push_back(tmpstr);
 
 
                 // dynamic allocation for DNODE
                 for ( int i = 0 ; i < max_num_rdx_nodes_+1 ; i++ )
                 {
-                    snprintf(msg, sizeof(msg), "DNODE(%d): MKRdxPat(): calloc(): br[num_keys_], p[num_keys_], key[num_keys_][1+num_key_bytes_]", i);
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "DNODE(%d): MKRdxPat(): calloc(): br[num_keys_], p[num_keys_], key[num_keys_][1+num_key_bytes_]", i);
+                    free_msg_.push_back(tmpstr);
 
                     rdx_.dnodes[i].br = (unsigned int *) fptr;
                     fptr += (num_keys_) * sizeof(unsigned int);
@@ -1591,8 +1591,8 @@ namespace MultiKeyRdxPat
                     ofstream& os
                 )
             {
-                const int MSG_BUF_SIZE = 256;
-                char msg[MSG_BUF_SIZE];
+                const int TMPSTR_SIZE = 256;
+                char tmpstr[TMPSTR_SIZE];
 
                 static unsigned char *ky;  // unsigned char ky[1+num_key_bytes_];
 
@@ -1659,102 +1659,102 @@ namespace MultiKeyRdxPat
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "  key =", k);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "  key =", k);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "  nsn =", rdx_.bnodes[n*num_keys_+k].nsn);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "  nsn =", rdx_.bnodes[n*num_keys_+k].nsn);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "   id =", rdx_.bnodes[n*num_keys_+k].id);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "   id =", rdx_.bnodes[n*num_keys_+k].id);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "  bna =", (void *)&rdx_.bnodes[n*num_keys_+k]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "  bna =", (void *)&rdx_.bnodes[n*num_keys_+k]);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "   br =", rdx_.bnodes[n*num_keys_+k].br);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "   br =", rdx_.bnodes[n*num_keys_+k].br);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "    p =", (void *)rdx_.bnodes[n*num_keys_+k].p);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "    p =", (void *)rdx_.bnodes[n*num_keys_+k].p);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "    b =", rdx_.bnodes[n*num_keys_+k].b);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "    b =", rdx_.bnodes[n*num_keys_+k].b);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "    l =", (void *)rdx_.bnodes[n*num_keys_+k].l);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "    l =", (void *)rdx_.bnodes[n*num_keys_+k].l);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "    r =", (void *)rdx_.bnodes[n*num_keys_+k].r);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "    r =", (void *)rdx_.bnodes[n*num_keys_+k].r);
+                            os << tmpstr;
                         }
                         os << "\n\n";
 
-                        snprintf(msg, sizeof(msg), "%7s %18d  ", "   id =", rdx_.dnodes[n].id);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "   id =", rdx_.dnodes[n].id);
+                        os << tmpstr;
                         os << endl;
-                        snprintf(msg, sizeof(msg), "%7s %18p  ", "  dna =", (void *)&rdx_.dnodes[n]);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "  dna =", (void *)&rdx_.dnodes[n]);
+                        os << tmpstr;
                         os << endl;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "   br =", rdx_.dnodes[n].br[k]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "   br =", rdx_.dnodes[n].br[k]);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "    p =", (void *)rdx_.dnodes[n].p[k]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "    p =", (void *)rdx_.dnodes[n].p[k]);
+                            os << tmpstr;
                         }
                         os << endl;
 
-                        snprintf(msg, sizeof(msg), "%7s %18d  ", "  nsn =", rdx_.dnodes[n].nsn);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "  nsn =", rdx_.dnodes[n].nsn);
+                        os << tmpstr;
                         os << endl;
-                        snprintf(msg, sizeof(msg), "%7s %18d  ", "alloc =", rdx_.dnodes[n].alloc);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "alloc =", rdx_.dnodes[n].alloc);
+                        os << tmpstr;
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "  key %2d = ", k);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
+                            os << tmpstr;
                             for ( int b = 0 ; b < num_key_bytes_ ; b++ )
                             {
-                                snprintf(msg, sizeof(msg), "%02x ", rdx_.dnodes[n].key[k*(1+num_key_bytes_)+b+1]);
-                                os << msg;
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", rdx_.dnodes[n].key[k*(1+num_key_bytes_)+b+1]);
+                                os << tmpstr;
                             }
                             os << endl;
                         }
@@ -1776,12 +1776,12 @@ namespace MultiKeyRdxPat
                     os << "Search for data node with key(s)(includes key boolean):\n";
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
-                        snprintf(msg, sizeof(msg), "  key %2d = ", k);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
+                        os << tmpstr;
                         for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
                         {
-                            snprintf(msg, sizeof(msg), "%02x ", key[k*(1+num_key_bytes_)+b]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                            os << tmpstr;
                         }
                         os << endl;
                     }
@@ -1811,8 +1811,8 @@ namespace MultiKeyRdxPat
 
                     if ( (app_datap = search(key)) == NULL )
                     {
-                        snprintf(msg, sizeof(msg), "print():(file %s  line %d): Key not found.\n", __FILE__, __LINE__);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "print():(file %s  line %d): Key not found.\n", __FILE__, __LINE__);
+                        os << tmpstr;
                         return 1;
                     }
 
@@ -1823,69 +1823,69 @@ namespace MultiKeyRdxPat
                         memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
 
                         os << "==========\n";
-                        snprintf(msg, sizeof(msg), "  key %2d = ", k);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
+                        os << tmpstr;
                         for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
                         {
-                            snprintf(msg, sizeof(msg), "%02x ", key[k*(1+num_key_bytes_)+b]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                            os << tmpstr;
                         }
                         os << "\n\n";
 
                         c = (BNODE *)rdx_.head[k];
                         while ( c->id == 0 )
                         {
-                            snprintf(msg, sizeof(msg), "  nsn = %d\n", c->nsn);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "   id = %d\n", c->id);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "  bna = %p\n", (void *)c);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "   br = %d\n", c->br);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "    p = %p\n", (void *)c->p);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "    b = %-3d\n", c->b);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "    l = %p\n", (void *)c->l);
-                            os << msg;
-                            snprintf(msg, sizeof(msg), "    r = %p\n", (void *)c->r);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "  nsn = %d\n", c->nsn);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "   id = %d\n", c->id);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "  bna = %p\n", (void *)c);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "   br = %d\n", c->br);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "    p = %p\n", (void *)c->p);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "    b = %-3d\n", c->b);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "    l = %p\n", (void *)c->l);
+                            os << tmpstr;
+                            snprintf(tmpstr, sizeof(tmpstr), "    r = %p\n", (void *)c->r);
+                            os << tmpstr;
                             os << endl;
 
                             c = ( gbit( ky, c->b ) ) ? (BNODE *)c->r : (BNODE *)c->l;
                         }
 
-                        snprintf(msg, sizeof(msg), "   id = %d\n", ((DNODE *)c)->id);
-                        os << msg;
-                        snprintf(msg, sizeof(msg), "%7s %18p\n", "  dna =", (void *)c);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "   id = %d\n", ((DNODE *)c)->id);
+                        os << tmpstr;
+                        snprintf(tmpstr, sizeof(tmpstr), "%7s %18p\n", "  dna =", (void *)c);
+                        os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18d  ", "   br =", ((DNODE *)c)->br[k]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18d  ", "   br =", ((DNODE *)c)->br[k]);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "%7s %18p  ", "    p =", (void *)((DNODE *)c)->p[k]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "%7s %18p  ", "    p =", (void *)((DNODE *)c)->p[k]);
+                            os << tmpstr;
                         }
                         os << endl;
 
-                        snprintf(msg, sizeof(msg), "  nsn = %d\n", ((DNODE *)c)->nsn);
-                        os << msg;
-                        snprintf(msg, sizeof(msg), "alloc = %d\n", ((DNODE *)c)->alloc);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "  nsn = %d\n", ((DNODE *)c)->nsn);
+                        os << tmpstr;
+                        snprintf(tmpstr, sizeof(tmpstr), "alloc = %d\n", ((DNODE *)c)->alloc);
+                        os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "  key %2d = ", k);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
+                            os << tmpstr;
                             for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
                             {
-                                snprintf(msg, sizeof(msg), "%02x ", key[k*(1+num_key_bytes_)+b]);
-                                os << msg;
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                                os << tmpstr;
                             }
                             os << endl;
                         }
@@ -1936,8 +1936,8 @@ namespace MultiKeyRdxPat
                 const unsigned int FREE = 0;
                 const unsigned int ALLOC = 1;
 
-                const int MSG_BUF_SIZE = 256;
-                char msg[MSG_BUF_SIZE];
+                const int TMPSTR_SIZE = 256;
+                char tmpstr[TMPSTR_SIZE];
 
                 int tot_free_nodes;
                 int tot_alloc_nodes;
@@ -1983,38 +1983,38 @@ namespace MultiKeyRdxPat
                     fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1), sizeof(unsigned long));
                     bnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1]");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1]");
+                    free_msg_.push_back(tmpstr);
 
                     fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1), sizeof(unsigned long));
                     free_bnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned long free_bnode_addrs[num_keys_][max_num_rdx_nodes_+1];");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_bnode_addrs[num_keys_][max_num_rdx_nodes_+1];");
+                    free_msg_.push_back(tmpstr);
 
                     fptr = calloc( max_num_rdx_nodes_+1, sizeof(unsigned long));
                     dnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned long dnode_addrs[max_num_rdx_nodes_+1];");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long dnode_addrs[max_num_rdx_nodes_+1];");
+                    free_msg_.push_back(tmpstr);
 
                     fptr = calloc( max_num_rdx_nodes_+1, sizeof(unsigned long));
                     free_dnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned long free_dnode_addrs[max_num_rdx_nodes_+1];");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_dnode_addrs[max_num_rdx_nodes_+1];");
+                    free_msg_.push_back(tmpstr);
 
                     fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1) * num_key_bytes_ , sizeof(unsigned char));
                     dnode_keys = (unsigned char *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_];");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_];");
+                    free_msg_.push_back(tmpstr);
 
                     fptr = calloc( 2 * (max_num_rdx_nodes_+1) , sizeof(unsigned long));
                     node_index = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(msg, sizeof(msg), "verify(): calloc(): unsigned long node_index[2][max_num_rdx_nodes_+1];");
-                    free_msg_.push_back(msg);
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long node_index[2][max_num_rdx_nodes_+1];");
+                    free_msg_.push_back(tmpstr);
                 }
 
                 // accumulate all the free and allocated branch and data node addresses, the node indexes on
@@ -2057,19 +2057,19 @@ namespace MultiKeyRdxPat
                     os << "node  DNA         BNA(s)  ";
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
-                        snprintf(msg, sizeof(msg), "key = %-2d  ", k);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "key = %-2d  ", k);
+                        os << tmpstr;
                     }
                     os << endl;
 
                     for ( int n = 0 ; n < tot_free_nodes ; n++ )
                     {
-                        snprintf(msg, sizeof(msg), "%4ld  %08lx          ", node_index[FREE*(max_num_rdx_nodes_+1)+n], free_dnode_addrs[n]);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[FREE*(max_num_rdx_nodes_+1)+n], free_dnode_addrs[n]);
+                        os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                           snprintf(msg, sizeof(msg), "  %08lx", free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
-                            os << msg;
+                           snprintf(tmpstr, sizeof(tmpstr), "  %08lx", free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
+                            os << tmpstr;
                         }
                         os << endl;
                     }
@@ -2079,30 +2079,30 @@ namespace MultiKeyRdxPat
                     os << "node  DNA         BNA(s)  ";
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
-                        snprintf(msg, sizeof(msg), "key = %-2d  ", k);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "key = %-2d  ", k);
+                        os << tmpstr;
                     }
                     os << endl;
 
                     for ( int n = 0 ; n < tot_alloc_nodes ; n++ )
                     {
-                        snprintf(msg, sizeof(msg), "%4ld  %08lx          ", node_index[ALLOC*(max_num_rdx_nodes_+1)+n], dnode_addrs[n]);
-                        os << msg;
+                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[ALLOC*(max_num_rdx_nodes_+1)+n], dnode_addrs[n]);
+                        os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "  %08lx", bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "  %08lx", bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
+                            os << tmpstr;
                         }
                         os << endl;
 
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(msg, sizeof(msg), "      key %-2d = ", k);
-                            os << msg;
+                            snprintf(tmpstr, sizeof(tmpstr), "      key %-2d = ", k);
+                            os << tmpstr;
                             for ( int b = 0 ; b < num_key_bytes_ ; b++ )
                             {
-                                snprintf(msg, sizeof(msg), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
-                                os << msg;
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
+                                os << tmpstr;
                             }
                             os << endl;
                         }
@@ -2119,9 +2119,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 1): Root branch node with non-zero id - %d\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 1): Root branch node with non-zero id - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].id);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 1;
                     }
@@ -2130,9 +2130,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 2): Root branch node with non-zero br - %d\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 2): Root branch node with non-zero br - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].br);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 2;
                     }
@@ -2141,9 +2141,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 3): Root branch node with non-zero p - 0x%08lx\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 3): Root branch node with non-zero p - 0x%08lx\n",
                                 __FILE__, __LINE__, (unsigned long)rdx_.bnodes[0*num_keys_+k].p);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 3;
                     }
@@ -2152,10 +2152,10 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 4): Root branch node with b not equal to"
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 4): Root branch node with b not equal to"
                                         " num_key_bytes_*8 - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].b);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 4;
                     }
@@ -2164,9 +2164,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 5): Root branch node with non-zero r - 0x%08lx\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 5): Root branch node with non-zero r - 0x%08lx\n",
                                 __FILE__, __LINE__, (unsigned long)rdx_.bnodes[0*num_keys_+k].r);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 5;
                     }
@@ -2177,9 +2177,9 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 6): Root data node keys not all 0xff\n",
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 6): Root data node keys not all 0xff\n",
                                     __FILE__, __LINE__);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 6;
                         }
@@ -2194,9 +2194,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 7): Data node id not 1 in node sequence number %d\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 7): Data node id not 1 in node sequence number %d\n",
                                 __FILE__, __LINE__, n);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 7;
                     }
@@ -2207,10 +2207,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 8): Branch node sequence number of key index %d"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 8): Branch node sequence number of key index %d"
                                             " not valid - %d\n",
                                     __FILE__, __LINE__, k, rdx_.bnodes[n*num_keys_+k].nsn);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 8;
                         }
@@ -2220,9 +2220,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 9): Data node sequence number not valid - %d\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 9): Data node sequence number not valid - %d\n",
                                 __FILE__, __LINE__, rdx_.dnodes[n].nsn);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 9;
                     }
@@ -2231,10 +2231,10 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 10): Data node allocated boolean not 0/1"
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 10): Data node allocated boolean not 0/1"
                                         " in node sequence number %d\n",
                                 __FILE__, __LINE__, rdx_.dnodes[n].nsn);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 10;
                     }
@@ -2245,10 +2245,10 @@ namespace MultiKeyRdxPat
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
-                        snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 11): Total allocated nodes(%d) + free nodes(%d)"
+                        snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 11): Total allocated nodes(%d) + free nodes(%d)"
                                     " not equal max_num_rdx_nodes_+1(%d)\n",
                             __FILE__, __LINE__, tot_alloc_nodes, tot_free_nodes, max_num_rdx_nodes_+1);
-                        os << msg;
+                        os << tmpstr;
                     }
                     return 11;
                 }
@@ -2258,10 +2258,10 @@ namespace MultiKeyRdxPat
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
-                        snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
+                        snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
                                     " not equal rdx_.tot_nodes(%d)\n",
                             __FILE__, __LINE__, tot_alloc_nodes, rdx_.tot_nodes);
-                        os << msg;
+                        os << tmpstr;
                     }
                     return 12;
                 }
@@ -2389,14 +2389,14 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 13): Multiple nodes with same key of key index %d"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 13): Multiple nodes with same key of key index %d"
                                             " and key value\n   ",
                                     __FILE__, __LINE__, k);
-                                os << msg;
+                                os << tmpstr;
                                 for ( int b = 0 ; b < num_key_bytes_ ; b++ )
                                 {
-                                    snprintf(msg, sizeof(msg), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
-                                    os << msg;
+                                    snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
+                                    os << tmpstr;
                                 }
                                 os << endl;
                             }
@@ -2428,10 +2428,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 14): Pointer in branch node free list"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 14): Pointer in branch node free list"
                                             " with key index %d corrupted\n",
                                     __FILE__, __LINE__, k);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 14;
                         }
@@ -2460,9 +2460,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 15): Pointer in data node free list corrupted\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 15): Pointer in data node free list corrupted\n",
                                 __FILE__, __LINE__);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 15;
                     }
@@ -2483,10 +2483,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 16): Branch node id at key index %d and node %d not"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 16): Branch node id at key index %d and node %d not"
                                             " valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].id);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 16;
                         }
@@ -2496,10 +2496,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 17): Branch node parent branch boolean of key index %d"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 17): Branch node parent branch boolean of key index %d"
                                             " and node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].br);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 17;
                         }
@@ -2519,10 +2519,10 @@ namespace MultiKeyRdxPat
                             {
                                 if ( vm == ERR_CODE_PRINT )
                                 {
-                                    snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 18): Branch node parent pointer of key index %d"
+                                    snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 18): Branch node parent pointer of key index %d"
                                                 " and node %d corrupted\n",
                                         __FILE__, __LINE__, k, n);
-                                    os << msg;
+                                    os << tmpstr;
                                 }
                                 return 18;
                             }
@@ -2533,10 +2533,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 19): Branch node bit number branch test value of"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 19): Branch node bit number branch test value of"
                                             " key index %d and node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.bnodes[n*num_keys_+k].b);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 19;
                         }
@@ -2561,10 +2561,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 20): Branch node left pointer of key index %d"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 20): Branch node left pointer of key index %d"
                                             " and node %d corrupted\n",
                                     __FILE__, __LINE__, k, n);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 20;
                         }
@@ -2592,10 +2592,10 @@ namespace MultiKeyRdxPat
                             {
                                 if ( vm == ERR_CODE_PRINT )
                                 {
-                                    snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 21): Branch node right pointer of key index %d"
+                                    snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 21): Branch node right pointer of key index %d"
                                                 " and node %d corrupted\n",
                                         __FILE__, __LINE__, k, n);
-                                    os << msg;
+                                    os << tmpstr;
                                 }
                                 return 21;
                             }
@@ -2614,10 +2614,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 22): Data node parent pointer of key index %d"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 22): Data node parent pointer of key index %d"
                                             " and node %d corrupted\n",
                                     __FILE__, __LINE__, k, n);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 22;
                         }
@@ -2627,10 +2627,10 @@ namespace MultiKeyRdxPat
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
-                                snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 23): Data node parent branch boolean of key index %d and"
+                                snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 23): Data node parent branch boolean of key index %d and"
                                             " node %d not valid - %d\n",
                                     __FILE__, __LINE__, k, n, rdx_.dnodes[n].br[k]);
-                                os << msg;
+                                os << tmpstr;
                             }
                             return 23;
                         }
@@ -2662,9 +2662,9 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 24): Data node %d searched for with it's keys not found\n",
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 24): Data node %d searched for with it's keys not found\n",
                                 __FILE__, __LINE__, n);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 24;
                     }
@@ -2675,10 +2675,10 @@ namespace MultiKeyRdxPat
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
-                            snprintf(msg, sizeof(msg), "rdx->verify():(file %s  line %d  ERR_CODE 25): compare of 'app_data data;' obtained from rdx->search() and"
+                            snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 25): compare of 'app_data data;' obtained from rdx->search() and"
                                         " the same data obtained from rdx_.dnodes[%d].data do not match",
                                 __FILE__, __LINE__, n);
-                            os << msg;
+                            os << tmpstr;
                         }
                         return 25;
                     }

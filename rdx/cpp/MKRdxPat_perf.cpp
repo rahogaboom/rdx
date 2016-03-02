@@ -2,27 +2,48 @@
 /*
  * NAME
  *
+ *     MKRdxPat_perf
+ *
  * USAGE
+ *
+ *     ./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]
  *
  * ARGUMENTS
  *
+ *     None
+ *
  * OPTIONS
+ *
+ *     -c{1-2}      - 
+ *     -s{1-86400}  -
+ *     -b{1-100000} -
  *
  * DESCRIPTION
  *
+ *
+ *
  * DEPENDENCIES
  *
- * FILES
+ *     MKRdxPat.hpp class
  *
  * NOTES
  *
- * DIAGNOSTICS
+ *
  *
  * BUGS AND LIMITATIONS
  *
- *     None Known
+ *     1. Limitation: the three constructor arguments:
+ *            const int max_num_rdx_nodes = 200000;
+ *            const int num_keys          = 2;
+ *            const int num_key_bytes     = 16;
+ *        are hard coded.  This makes it simpler to initialize key[][][].
+ *        Just change these for your needs and re-compile.  Then run with
+ *        the various options to get the performance measurements you need.
+ *        Performance measurements are not something done on a regular basis.
  *
  * SEE ALSO
+ *
+ *     MKRdxPat_test - the MKRdxPat.hpp class test suite
  *
  * AUTHOR
  *
@@ -107,8 +128,8 @@ main
         char **argv
     )
 {
-    const int MSG_BUF_SIZE = 256;
-    char string[MSG_BUF_SIZE];
+    const int TMPSTR_SIZE = 256;
+    char tmpstr[TMPSTR_SIZE];
 
     // rdx trie parameters
     const int max_num_rdx_nodes = 200000;
@@ -174,11 +195,11 @@ main
                 break;
 
             case '?':
-                os << "./MKRdxPat_perf [-c] [-s]\n";
+                os << "./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n";
                 return 1;
 
             default:
-                os << "abort(): " << opt << "\n";
+                os << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
                 abort();
         }
     }
@@ -189,10 +210,10 @@ main
 
     time(&rawtime);
     timeinfo = gmtime(&rawtime);
-    strftime(string, MSG_BUF_SIZE, "%c", timeinfo);
+    strftime(tmpstr, TMPSTR_SIZE, "%c", timeinfo);
 
     os << "####################################################################################################\n";
-    os << string << "\n\n";
+    os << tmpstr << "\n\n";
 
     if ( pmode_opt == 1 )
     {
@@ -224,17 +245,17 @@ main
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
 
     os << "\n";
-    snprintf(string, sizeof(string), "\nmax_num_rdx_nodes = %'d\nnum_keys = %d\nnum_key_bytes = %d\n",
+    snprintf(tmpstr, sizeof(tmpstr), "\nmax_num_rdx_nodes = %'d\nnum_keys = %d\nnum_key_bytes = %d\n",
         max_num_rdx_nodes, num_keys, num_key_bytes);
-    os << string;
-    snprintf(string, sizeof(string), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
-    os << string;
-    snprintf(string, sizeof(string), "trie size = %'db\n\n", rdx->size());
-    os << string;
-    snprintf(string, sizeof(string), "Minimum run time(sec): %f\n", rtime_opt);
-    os << string;
-    snprintf(string, sizeof(string), "Block Muliplier: %d\n", block_multiply_opt);
-    os << string;
+    os << tmpstr;
+    snprintf(tmpstr, sizeof(tmpstr), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
+    os << tmpstr;
+    snprintf(tmpstr, sizeof(tmpstr), "trie size = %'db\n\n", rdx->size());
+    os << tmpstr;
+    snprintf(tmpstr, sizeof(tmpstr), "Minimum run time(sec): %f\n", rtime_opt);
+    os << tmpstr;
+    snprintf(tmpstr, sizeof(tmpstr), "Block Muliplier: %d\n", block_multiply_opt);
+    os << tmpstr;
 
     switch ( pmode_opt )
     {
@@ -245,9 +266,9 @@ main
                 double sec;
                 int return_code;
 
-                snprintf(string, sizeof(string), "insert()/remove() increments: %'d(%d*2*max_num_rdx_nodes)\n\n",
+                snprintf(tmpstr, sizeof(tmpstr), "insert()/remove() increments: %'d(%d*2*max_num_rdx_nodes)\n\n",
                     block_multiply_opt*2*max_num_rdx_nodes, block_multiply_opt);
-                os << string;
+                os << tmpstr;
 
                 clock_gettime(CLOCK_MONOTONIC, &tstart);
 
@@ -289,8 +310,8 @@ main
                     }
                 }
 
-                snprintf(string, sizeof(string), "seconds = %f  total inserts/removes = %'ld\n\n", sec, total_inserts_removes);
-                os << string;
+                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total inserts/removes = %'ld\n\n", sec, total_inserts_removes);
+                os << tmpstr;
             }
             break;
 
@@ -301,9 +322,9 @@ main
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
-                snprintf(string, sizeof(string), "search() increments: %'d(%d*max_num_rdx_nodes)\n\n",
+                snprintf(tmpstr, sizeof(tmpstr), "search() increments: %'d(%d*max_num_rdx_nodes)\n\n",
                     block_multiply_opt*max_num_rdx_nodes, block_multiply_opt);
-                os << string;
+                os << tmpstr;
 
                 srand(time(NULL));
                 for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
@@ -342,8 +363,8 @@ main
                     }
                 }
 
-                snprintf(string, sizeof(string), "seconds = %f  total searches = %'ld\n\n", sec, total_searches);
-                os << string;
+                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total searches = %'ld\n\n", sec, total_searches);
+                os << tmpstr;
             }
             break;
 

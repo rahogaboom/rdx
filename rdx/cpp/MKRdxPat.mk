@@ -20,7 +20,7 @@ CC="clang"
 
 # compile test program - using MKRdxPat.hpp
 $CC -std=c++14 -g -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
-# $CC -std=c++14 -O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
+#$CC -std=c++14 -O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 
 # run test program
 ./MKRdxPat_test

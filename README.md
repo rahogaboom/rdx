@@ -20,6 +20,8 @@ rdx
 
      - many verification tests that show complex code usage examples
 
+     - performance measurement executable
+
      - DESIGN GOALS:
            1. Flexibility
            2. Originality

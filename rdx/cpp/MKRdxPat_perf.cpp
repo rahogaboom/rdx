@@ -14,32 +14,92 @@
  *
  * OPTIONS
  *
- *     -c{1-2}      - 
- *     -s{1-86400}  -
- *     -b{1-100000} -
+ *     -c{1-2}      - option 1: repeatedly fill/empty trie(default)
+ *                    option 2: fill trie then do searches
+ *
+ *     -s{1-86400}  - run will last as least this secs long(30 default)
+ *
+ *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
+ *                    c option 2: every key of full trie will be searched for this many times
+ *                    100 default
  *
  * DESCRIPTION
  *
- *
+ *     MKRdxPat_perf is used to evaluate the performance of the MKRdxPat class
+ *     (Multi-Key Radix Fast Search) algorithm implementation.  first change
+ *     the three arguments:
+ *         const int max_num_rdx_nodes = 200000;
+ *         const int num_keys          = 2;
+ *         const int num_key_bytes     = 16;
+ *     to match your application.  then insert in 'struct app_data{}' your application data
+ *     node.  Re-compile.  run ./MKRdxPat_perf.  examine the MKRdxPat_perf.results file.
+ *     see EXAMPLE OUTPUT below.  the file begins with a data/time and which -c option was
+ *     run.  an lscpu cmd is run.  this provides some context on the hardware that was used
+ *     to run the performance test.  the constructor arguments, the trie size, the option
+ *     parameters used are given.  the incremental number of operations(insert(),remove(),
+ *     serach()) in one iteration of the -b option is given.  finally, the time(secs) the
+ *     run took and the number of operations performed in that time is output.  subsequent
+ *     runs will append new data.
  *
  * DEPENDENCIES
  *
  *     MKRdxPat.hpp class
  *
- * NOTES
- *
- *
- *
  * BUGS AND LIMITATIONS
  *
- *     1. Limitation: the three constructor arguments:
+ *     1. Limitation: insert your own application data node structure and change
+ *        the three constructor arguments:
  *            const int max_num_rdx_nodes = 200000;
  *            const int num_keys          = 2;
  *            const int num_key_bytes     = 16;
- *        are hard coded.  This makes it simpler to initialize key[][][].
- *        Just change these for your needs and re-compile.  Then run with
- *        the various options to get the performance measurements you need.
- *        Performance measurements are not something done on a regular basis.
+ *        run with the various options to get the performance measurements you
+ *        need.
+ *
+ *     No bugs known
+ *
+ * EXAMPLE OUTPUT
+ *
+ *     ####################################################################################################
+ *     Wed Mar  2 16:28:19 2016
+ *
+ *     PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys
+ *
+ *     lscpu:
+ *     Architecture:          x86_64
+ *     CPU op-mode(s):        32-bit, 64-bit
+ *     Byte Order:            Little Endian
+ *     CPU(s):                2
+ *     On-line CPU(s) list:   0,1
+ *     Thread(s) per core:    1
+ *     Core(s) per socket:    2
+ *     Socket(s):             1
+ *     NUMA node(s):          1
+ *     Vendor ID:             AuthenticAMD
+ *     CPU family:            15
+ *     Model:                 107
+ *     Model name:            AMD Athlon(tm) 64 X2 Dual Core Processor 4000+
+ *     Stepping:              1
+ *     CPU MHz:               2109.639
+ *     BogoMIPS:              4218.83
+ *     Virtualization:        AMD-V
+ *     L1d cache:             64K
+ *     L1i cache:             64K
+ *     L2 cache:              512K
+ *     NUMA node0 CPU(s):     0,1
+ *     Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt rdtscp lm 3dnowext 3dnow rep_good nopl pni cx16 lahf_lm cmp_legacy svm extapic cr8_legacy 3dnowprefetch lbrv vmmcall
+ *
+ *     max_num_rdx_nodes = 200,000
+ *     num_keys = 2
+ *     num_key_bytes = 16
+ *         (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)
+ *
+ *     trie size = 42,000,242b
+ *
+ *     Minimum run time(sec): 30.000000
+ *     Block Muliplier: 100
+ *     insert()/remove() increments: 40,000,000(100*2*max_num_rdx_nodes)
+ *
+ *     seconds = 56.462147  total inserts/removes = 40,000,000
  *
  * SEE ALSO
  *
@@ -81,8 +141,6 @@
  *     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. :-)
  * 
  */
-
-// MKRdxPat.hpp class performance measurements for rdx->insert() / rdx->remove() / rdx->search() member functions
 
 #include <iostream>
 #include <fstream>
@@ -158,8 +216,8 @@ main
 
     // cmd line option defaults
     int pmode_opt = 1;  // performance test case option
-    double rtime_opt = 10.;  // run time option
-    int block_multiply_opt = 10;  // block multiply option
+    double rtime_opt = 30.;  // run time option
+    int block_multiply_opt = 100;  // block multiply option
 
     opterr = 0;
     int opt;

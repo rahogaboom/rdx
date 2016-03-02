@@ -1,18 +1,17 @@
 
  rdx-1.0.10.tar.gz - 
-
-    a. an OO C++ release.  the test suite has been much improved for the OO C++ release.  the next release will
-       further improve on the test suite.  an OO release allows multiply defined data structures in the same compilation unit:
-           MKRdxPat *rdx0 = new MKRdxPat( 512 /* MAX_NUM_RDX_NODES */, 3 /* NUM_KEYS */, 4 /* NUM_KEY_BYTES */ );
-           MKRdxPat *rdx1 = new MKRdxPat( 1024 /* MAX_NUM_RDX_NODES */, 2 /* NUM_KEYS */, 16 /* NUM_KEY_BYTES */ );
+    a. an OO C++ release
+    b. a new performance measurement executable
+    c. minor code and documentation updates
 
 
  rdx-1.0.9.tar.gz - 
-
-    a. an OO C++ release.  the test suite has been much improved for the OO C++ release.  the next release will
-       further improve on the test suite.  an OO release allows multiply defined data structures in the same compilation unit:
-           MKRdxPat *rdx0 = new MKRdxPat( 512 /* MAX_NUM_RDX_NODES */, 3 /* NUM_KEYS */, 4 /* NUM_KEY_BYTES */ );
-           MKRdxPat *rdx1 = new MKRdxPat( 1024 /* MAX_NUM_RDX_NODES */, 2 /* NUM_KEYS */, 16 /* NUM_KEY_BYTES */ );
+    a. this is an update to the OO C++ version
+    b. no bugs were found
+    c. the APP_DATA.h file is gone. the constructor now is templetized to take a struct typename for the trie
+       data nodes. this allows fully customized tries to be created in the same code block
+    d. the test suite has been re-written, extended and each test is now fully independent of any other test
+    e. the Documentation has been updated and substantially improved
 
 
  rdx-1.0.8.tar.gz - 

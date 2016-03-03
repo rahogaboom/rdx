@@ -5,5 +5,31 @@
 
  3. do "./MKRdxPat.mk clean" to clean the directory
 
- 4. do "./MKRdxPat_perf [options]" to run performance tests
+ 4. edit MKRdxPat_perf.cpp and install your application struct app_data{}
+    and set the MKRdxPat.hpp class constructor arguments:
+
+
+    //
+    // set these application specific data
+    //
+    // ================================================
+
+    // MKRdxPat.hpp class constructor arguments
+    const int max_num_rdx_nodes = 200000;
+    const int num_keys          = 2;
+    const int num_key_bytes     = 16;
+
+    // application data of type app_data defined here
+    struct app_data
+    {
+        int i;
+    };
+
+    // ================================================
+
+
+    do "./MKRdxPat.mk" to build
+
+    do "./MKRdxPat_perf [options]" to run performance tests with
+    your application specific data
 

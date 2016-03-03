@@ -53,6 +53,13 @@
  *        many cases key arrays are filled starting with this.  also, some processing of
  *        node data might be done that is commonly application specific.
  *
+ *     3. the default coded constructor arguments in the Description above were selected
+ *        based on an application that accessed data nodes by IPv4 and IPv6 addresses, the
+ *        two keys.  the longest is the IPv6 address at 16 bytes.  the number of data nodes
+ *        was an arbitrary selection.  i've run tests at 2,000,000.  if, for example, the
+ *        MAC address was added then the number of keys would be three, but with the MAC
+ *        address length at 6 bytes, the IPv6 address would still be the longest.
+ *
  * DEPENDENCIES
  *
  *     MKRdxPat.hpp class
@@ -197,6 +204,7 @@ main
     //
     // set these application specific data
     //
+    // ================================================
 
     // MKRdxPat.hpp class constructor arguments
     const int max_num_rdx_nodes = 200000;
@@ -208,6 +216,8 @@ main
     {
         int i;
     };
+
+    // ================================================
 
 
     // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of

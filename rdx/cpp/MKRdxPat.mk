@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# CPP build script
+# C++ build script
 
 set -v
 

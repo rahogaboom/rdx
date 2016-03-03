@@ -14,10 +14,10 @@
  *
  * OPTIONS
  *
- *     -c{1-2}      - option 1: repeatedly fill/empty trie(default)
- *                    option 2: fill trie then do searches
+ *     -c{1-2}      - option 1: repeatedly insert()(fill)/remove()(empty) trie(default)
+ *                    option 2: fill trie then do search()'s
  *
- *     -s{1-86400}  - run will last as least this secs long(30 default)
+ *     -s{1-86400}  - minimum run time(secs)(30 default)
  *
  *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
  *                    c option 2: every key of full trie will be searched for this many times
@@ -41,19 +41,23 @@
  *     run took and the number of operations performed in that time is output.  subsequent
  *     runs will append new data.
  *
+ * NOTES
+ *
+ *     1. you need to select the three constructor arguments based on your application.
+ *        remember that num_key_bytes is set to the longest key length.  see the MKRdxPat.hpp
+ *        Description section for a detailed explanation of setting key arrays.
+ *
+ *     2. a more realistic performance evaluation my be had by modifying the code here to
+ *        add additional steps always or typically used in your application.  for example,
+ *        a call to memset() might be made before an insert()/remove()/search() since n
+ *        many cases key arrays are filled starting with this.  also, some processing of
+ *        node data might be done that is commonly application specific.
+ *
  * DEPENDENCIES
  *
  *     MKRdxPat.hpp class
  *
  * BUGS AND LIMITATIONS
- *
- *     1. Limitation: insert your own application data node structure and change
- *        the three constructor arguments:
- *            const int max_num_rdx_nodes = 200000;
- *            const int num_keys          = 2;
- *            const int num_key_bytes     = 16;
- *        run with the various options to get the performance measurements you
- *        need.
  *
  *     No bugs known
  *
@@ -189,22 +193,28 @@ main
     const int TMPSTR_SIZE = 256;
     char tmpstr[TMPSTR_SIZE];
 
-    // rdx trie parameters
+
+    //
+    // set these application specific data
+    //
+
+    // MKRdxPat.hpp class constructor arguments
     const int max_num_rdx_nodes = 200000;
     const int num_keys          = 2;
     const int num_key_bytes     = 16;
-
-    // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
-    // num_key_bytes length with all key booleans set to 1
-    // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
-    //       arrays do no blow the stack
-    static unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
 
     // application data of type app_data defined here
     struct app_data
     {
         int i;
     };
+
+
+    // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
+    // num_key_bytes length with all key booleans set to 1
+    // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
+    //       arrays do no blow the stack
+    static unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
 
     app_data *app_datap;
 

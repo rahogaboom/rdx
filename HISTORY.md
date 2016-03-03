@@ -3,6 +3,7 @@
     a. an OO C++ release
     b. a new performance measurement executable
     c. minor code and documentation updates
+    d. no bugs were found
 
 
  rdx-1.0.9.tar.gz - 

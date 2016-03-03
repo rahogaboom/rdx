@@ -73,7 +73,7 @@
  *     ####################################################################################################
  *     Wed Mar  2 16:28:19 2016
  *
- *     PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys
+ *     PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)
  *
  *     lscpu:
  *     Architecture:          x86_64
@@ -207,7 +207,7 @@ main
     // ================================================
 
     // MKRdxPat.hpp class constructor arguments
-    const int max_num_rdx_nodes = 200000;
+    const int max_num_rdx_nodes = 100000;
     const int num_keys          = 2;
     const int num_key_bytes     = 16;
 
@@ -220,7 +220,7 @@ main
     // ================================================
 
 
-    // holds sets of random keys for max_num_rdx_nodes sets with num_keys keys of
+    // holds sets of keys for max_num_rdx_nodes sets with num_keys keys of
     // num_key_bytes length with all key booleans set to 1
     // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
     //       arrays do no blow the stack
@@ -295,11 +295,11 @@ main
 
     if ( pmode_opt == 1 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - random keys\n\nlscpu:\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - monatonic keys\n\nlscpu:\n";
     }
     if ( pmode_opt == 2 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->search() - random keys\n\nlscpu:\n\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->search() - monatonic keys\n\nlscpu:\n\n";
     }
 
     os.close();
@@ -396,7 +396,7 @@ main
         case 2:
             {
                 long total_searches = 0;
-                int random[max_num_rdx_nodes];
+                int random[max_num_rdx_nodes];  // for random key search()
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 

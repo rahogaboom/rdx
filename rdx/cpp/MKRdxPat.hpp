@@ -306,8 +306,8 @@
  *
  * References:
  *
- *     1. Algorithms in C, Robert Sedgewick, Addison-Wesley, 1998,
- *        Patricia Tries, pp. 623-631.
+ *     1. Algorithms in C++ Third Edition Parts 1-4, Robert Sedgewick with Christopher J. Van Wyk,
+ *        Addison-Wesley, 1998, Chapter 15.3 Patricia Tries, pp. 637.
  *
  *     2. PATRICIA - Practical Algorithm To Retrieve Information Coded in Alphanumeric, Donald R. Morrison,
  *        Journal of the Association for Computing Machinery, Vol. 15, No. 4, Oct. 1968, pp. 514-534.

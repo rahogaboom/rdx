@@ -295,11 +295,13 @@ main
 
     if ( pmode_opt == 1 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie) - monatonic keys\n\nlscpu:\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)\n";
+        os << "                  monatonic keys\n\nlscpu:\n\n";
     }
     if ( pmode_opt == 2 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->search() - monatonic keys\n\nlscpu:\n\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->search()\n";
+        os << "                  monatonic keys/random search\n\nlscpu:\n";
     }
 
     os.close();

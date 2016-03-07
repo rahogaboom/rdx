@@ -45,13 +45,15 @@
  *
  * OPTIONS
  *
- *     -c{1-2}      - option 1: repeatedly insert()(fill)/remove()(empty) trie(default)
- *                    option 2: fill trie then do search()'s
+ *     -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty) trie(default)
+ *                    option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s with
+ *                              random keys
  *
  *     -s{1-86400}  - minimum run time(secs)(30 default)
  *
  *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
- *                    c option 2: every key of full trie will be searched for this many times
+ *                    c option 2: the random key set generated on filling the trie will be
+ *                      searched for this many times
  *                    100 default
  *
  * DESCRIPTION

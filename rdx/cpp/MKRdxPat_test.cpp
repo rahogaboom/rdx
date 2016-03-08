@@ -1557,5 +1557,169 @@ main()
 
         os.close();
     }
+
+    {  // TEST 13
+        int return_code;
+        int sum = 0;
+
+
+        ofstream os;
+        os.open("MKRdxPat.TEST13.results");
+
+        os << "\n";
+        os << "TEST 13: Demonstrate that MKRdxPat.hpp class works with multiple different structs allocated in the same code block\n";
+        os << "         Expected Results:\n";
+        os << "            a. First trie filled with data\n";
+        os << "            b. No verification error in first trie\n";
+        os << "            c. Second trie filled with data\n";
+        os << "            d. No verification error in second trie\n\n";
+
+
+        //
+        // define app_data1, MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1, rdx_key1[][][]
+        //
+
+        // application data of type app_data1 defined here
+        struct app_data1
+        {
+            int id[25];
+            double d[25];
+            float f[5];
+        };
+
+        app_data1 *app_data1p;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES1 = 25;
+
+        // number of rdx search keys
+        const int NUM_KEYS1 = 5;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES1 = 10;
+
+        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key1[MAX_NUM_RDX_NODES1+1][NUM_KEYS1][1+NUM_KEY_BYTES1];
+
+        memset(rdx_key1, 0, (MAX_NUM_RDX_NODES1+1) * NUM_KEYS1 * (1+NUM_KEY_BYTES1));
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES1+1 ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS1 ; k++ )
+            {
+                rdx_key1[n][k][0] = 1;  // set key boolean to 1
+                rdx_key1[n][k][NUM_KEY_BYTES1] = sum++;
+            }
+        }
+
+        os << "a. First trie filled with data\n";
+        os << "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n";
+        os << "NUM_KEYS1 = " << NUM_KEYS1 << "\n";
+        os << "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
+
+        MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
+
+        os << "rdx1 - Nodes allocated = " << rdx1->nodes() << "\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->size() << "\n\n";
+
+        for ( int n = 0, id = 0, d = 0. ; n < MAX_NUM_RDX_NODES1 ; n++, id++, d++ )
+        {
+            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, NUM_KEY_BYTES1);
+            return_code = rdx1->insert((unsigned char *)rdx_key1[n], &app_data1p);
+
+            os << "return_code = rdx1->insert((unsigned char *)rdx_key1[" << n << "], &app_data1p); return_code = " << return_code << "\n\n";
+
+            if ( return_code == 0 )
+            {
+                app_data1p->id[n] = id;
+                os << "set app_data1p->id[" << n << "] = " << id << "\n";
+                os << "get app_data1p->id[" << n << "] = " << app_data1p->id[n] << "\n";
+                app_data1p->d[n] = d;
+                os << "set app_data1p->d[" << n << "] = " << d << "\n";
+                os << "get app_data1p->d[" << n << "] = " << app_data1p->d[n] << "\n\n";
+            }
+        }
+        os << "\n";
+
+        os << "rdx1 - Nodes allocated = " << rdx1->nodes() << "\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->size() << "\n\n";
+
+        os << "b. No verification error in first trie\n";
+        return_code = rdx1->verify(ERR_CODE_PRINT, os);
+        os << "\n";
+
+
+        //
+        // define app_data2, MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2, rdx_key2[][][]
+        //
+
+        // application data of type app_data2 defined here
+        struct app_data2
+        {
+            int id[50];
+            double d[50];
+        };
+
+        app_data2 *app_data2p;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES2 = 50;
+
+        // number of rdx search keys
+        const int NUM_KEYS2 = 7;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES2 = 16;
+
+        // 1+MAX_NUM_RDX_NODES2 nodes of NUM_KEYS2 keys of NUM_KEY_BYTES2 bytes - set all key booleans to 1
+        unsigned char rdx_key2[MAX_NUM_RDX_NODES2+1][NUM_KEYS2][1+NUM_KEY_BYTES2];
+
+        memset(rdx_key2, 0, (MAX_NUM_RDX_NODES2+1) * NUM_KEYS2 * (1+NUM_KEY_BYTES2));
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES2+1 ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS2 ; k++ )
+            {
+                rdx_key2[n][k][0] = 1;  // set key boolean to 1
+                rdx_key2[n][k][NUM_KEY_BYTES2] = sum++;
+            }
+        }
+
+        os << "c. Second trie filled with data\n";
+        os << "MAX_NUM_RDX_NODES2 = " << MAX_NUM_RDX_NODES2 << "\n";
+        os << "NUM_KEYS2 = " << NUM_KEYS2 << "\n";
+        os << "NUM_KEY_BYTES2 = " << NUM_KEY_BYTES2 << "\n\n";
+
+        MKRdxPat<app_data2> *rdx2 = new MKRdxPat<app_data2>(MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2);
+
+        os << "rdx2 - Nodes allocated = " << rdx2->nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->size() << "\n\n";
+
+        for ( int n = 0, id = 100, d = 200.0 ; n < MAX_NUM_RDX_NODES2 ; n++, id++, d++ )
+        {
+            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, NUM_KEY_BYTES2);
+            return_code = rdx2->insert((unsigned char *)rdx_key2[n], &app_data2p);
+
+            os << "return_code = rdx2->insert((unsigned char *)rdx_key2[" << n << "], &app_data2p); return_code = " << return_code << "\n\n";
+
+            if ( return_code == 0 )
+            {
+                app_data2p->id[n] = id;
+                os << "set app_data2p->id[" << n << "] = " << id << "\n";
+                os << "get app_data2p->id[" << n << "] = " << app_data2p->id[n] << "\n";
+                app_data2p->d[n] = d;
+                os << "set app_data2p->d[" << n << "] = " << d << "\n";
+                os << "get app_data2p->d[" << n << "] = " << app_data2p->d[n] << "\n\n";
+            }
+        }
+        os << "\n";
+
+        os << "rdx2 - Nodes allocated = " << rdx2->nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->size() << "\n\n";
+
+        os << "d. No verification error in second trie\n";
+        return_code = rdx2->verify(ERR_CODE_PRINT, os);
+        os << "\n";
+
+        os.close();
+    }
 }
 

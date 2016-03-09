@@ -1229,7 +1229,7 @@ main()
 
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 255;
+        const int MAX_NUM_RDX_NODES = 256;
 
         // number of rdx search keys
         const int NUM_KEYS = 1;
@@ -1254,12 +1254,12 @@ main()
         os.open("MKRdxPat.TEST10.results");
 
         os << "\n";
-        os << "TEST 10: Create rdx trie with 1 key of 1 byte and 255 data nodes\n";
+        os << "TEST 10: Create rdx trie with 1 key of 1 byte and 256 data nodes\n";
         os << "         Expected Results:\n";
         os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
         os << "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
         os << "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
-        os << "            d. Sort rdx - should return 255\n";
+        os << "            d. Sort rdx - should return 256\n";
         os << "            e. Remove all data nodes - should return 0\n";
         os << "            f. Only the impossible pre-allocated root node should be printed since\n";
         os << "            g. No verification error\n\n";
@@ -1319,7 +1319,7 @@ main()
         os << "Total errors detected " << tot_errs << "\n\n\n";
 
 
-        os << "d. Sort rdx - should return 255\n";
+        os << "d. Sort rdx - should return 256\n";
         return_code = rdx->sort(&app_datapp, 0);
 
         os << "return_code = rdx->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "\n\n\n";

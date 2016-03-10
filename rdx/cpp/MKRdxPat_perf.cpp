@@ -45,34 +45,35 @@
  *
  * OPTIONS
  *
- *     -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty) trie(default)
- *                    option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s with
- *                              random keys
+ *     -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty)
+ *                              trie(1 default)
+ *                    option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s
+ *                              with random keys
  *
  *     -s{1-86400}  - minimum run time(secs)(30 default)
  *
  *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
  *                    c option 2: the random key set generated on filling the trie will be
  *                                searched for this many times
- *                    100 default
+ *                    (100 default)
  *
  * DESCRIPTION
  *
  *     MKRdxPat_perf is used to evaluate the performance of the MKRdxPat class
- *     (Multi-Key Radix Fast Search) algorithm implementation.  first change
+ *     (Multi-Key Radix Fast Search) algorithm implementation.  first, change
  *     the three arguments:
  *         const int max_num_rdx_nodes = 200000;
  *         const int num_keys          = 2;
  *         const int num_key_bytes     = 16;
  *     to match your application.  then insert in 'struct app_data{}' your application data
  *     node.  Re-compile.  run ./MKRdxPat_perf.  examine the MKRdxPat_perf.results file.
- *     see EXAMPLE OUTPUT below.  the file begins with a data/time and which -c option was
- *     run.  an lscpu cmd is run.  this provides some context on the hardware that was used
- *     to run the performance test.  the constructor arguments, the trie size, the option
- *     parameters used are given.  the incremental number of operations(insert(),remove(),
- *     serach()) in one iteration of the -b option is given.  finally, the time(secs) the
- *     run took and the number of operations performed in that time is output.  subsequent
- *     runs will append new data.
+ *     see EXAMPLE OUTPUT below.  the file begins with a data/time and the -c option
+ *     description.  an lscpu cmd is run.  this provides some context on the hardware that
+ *     was used to run the performance test.  the constructor arguments, the trie size and
+ *     the option parameters used are given.  the incremental number of operations(insert(),
+ *     remove(), search()) for whatever the -b option is set to is given.  finally, the
+ *     time(secs) the run took and the number of operations performed in that time is
+ *     output.  subsequent runs will append new data.
  *
  * NOTES
  *
@@ -82,16 +83,17 @@
  *
  *     2. a more realistic performance evaluation my be had by modifying the code here to
  *        add additional steps always or typically used in your application.  for example,
- *        a call to memset() might be made before an insert()/remove()/search() since n
- *        many cases key arrays are filled starting with this.  also, some processing of
- *        node data might be done that is commonly application specific.
+ *        a call to memset() might be made before an insert()/remove()/search() since in
+ *        many cases key arrays are zero filled starting with this.  also, some processing
+ *        of node data might be done that is commonly application specific.
  *
  *     3. the default coded constructor arguments in the Description above were selected
- *        based on an application that accessed data nodes by IPv4 and IPv6 addresses, the
+ *        based on an application that accessed data nodes by IPv4 and IPv6 addresses - the
  *        two keys.  the longest is the IPv6 address at 16 bytes.  the number of data nodes
- *        was an arbitrary selection.  i've run tests at 2,000,000.  if, for example, the
- *        MAC address was added then the number of keys would be three, but with the MAC
- *        address length at 6 bytes, the IPv6 address would still be the longest.
+ *        was an arbitrary selection.  i've run tests with 2,000,000 data nodes.  if, for
+ *        example, the MAC address was added as a third key then the number of keys would
+ *        be three but, with the MAC address length at 6 bytes, the IPv6 address would
+ *        still be the longest and thus num_key_bytes would still be 16.
  *
  * DEPENDENCIES
  *
@@ -203,6 +205,22 @@ main
     const int TMPSTR_SIZE = 256;
     char tmpstr[TMPSTR_SIZE];
 
+    extern int optind;
+
+    string usage =
+        "usage: ./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n"
+        "\n"
+        "    -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty)\n"
+        "                             trie(1 default)\n"
+        "                   option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s\n"
+        "                             with random keys\n"
+        "\n"
+        "    -s{1-86400}  - minimum run time(secs)(30 default)\n"
+        "\n"
+        "    -b{1-100000} - c option 1: trie will be filled/emptied this many times\n"
+        "                   c option 2: the random key set generated on filling the trie will be\n"
+        "                               searched for this many times\n"
+        "                   (100 default)\n";
 
     //
     // set these application specific data
@@ -210,7 +228,7 @@ main
     // ================================================
 
     // MKRdxPat.hpp class constructor arguments
-    const int max_num_rdx_nodes = 2000000;
+    const int max_num_rdx_nodes = 200000;
     const int num_keys          = 3;
     const int num_key_bytes     = 16;
 
@@ -244,7 +262,7 @@ main
 
     opterr = 0;
     int opt;
-    while ( (opt = getopt(argc, argv, "c:s:b:")) != -1)
+    while ( (opt = getopt(argc, argv, "c:s:b:")) != -1 )
     {
         switch (opt)
         {
@@ -252,8 +270,8 @@ main
                 pmode_opt = atoi(optarg);
                 if ( pmode_opt < 1 || pmode_opt > 2 )
                 {
-                    cout << "-c option out of range(1 or 2): " << pmode_opt << "\n";
-                    exit(0);
+                    cout << usage << "-c option out of range(1 or 2): " << pmode_opt << "\n";
+                    exit(1);
                 }
                 break;
 
@@ -261,8 +279,8 @@ main
                 rtime_opt = atof(optarg);
                 if ( rtime_opt < 1 || pmode_opt > 86400 )
                 {
-                    cout << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
-                    exit(0);
+                    cout << usage << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
+                    exit(1);
                 }
                 break;
 
@@ -270,31 +288,25 @@ main
                 block_multiply_opt = atoi(optarg);
                 if ( block_multiply_opt < 1 || block_multiply_opt > 100000 )
                 {
-                    cout << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
-                    exit(0);
+                    cout << usage << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
+                    exit(1);
                 }
                 break;
 
             case '?':
-                cout << "\n";
-                cout << "./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n";
-                cout << "\n";
-                cout << "    -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty) trie(default)\n";
-                cout << "                   option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s with\n";
-                cout << "                             random keys\n";
-                cout << "\n";
-                cout << "    -s{1-86400}  - minimum run time(secs)(30 default)\n";
-                cout << "\n";
-                cout << "    -b{1-100000} - c option 1: trie will be filled/emptied this many times\n";
-                cout << "                   c option 2: the random key set generated on filling the trie will be\n";
-                cout << "                               searched for this many times\n";
-                cout << "                   100 default\n";
+                cout << usage << "\n";
                 return 1;
 
             default:
                 cout << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
                 abort();
         }
+    }
+
+    if ( optind < argc )
+    {
+        cout << usage << "No arguments allowed\n";
+        exit(0);
     }
 
     // set gm time string
@@ -305,18 +317,18 @@ main
     timeinfo = gmtime(&rawtime);
     strftime(tmpstr, TMPSTR_SIZE, "%c", timeinfo);
 
-    os << "####################################################################################################\n";
-    os << tmpstr << "\n\n";
+    os << "####################################################################################################\n"
+       << tmpstr << "\n\n";
 
     if ( pmode_opt == 1 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)\n";
-        os << "                  monatonic keys\n\nlscpu:\n\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)\n"
+              "                  monatonic keys\n\nlscpu:\n\n";
     }
     if ( pmode_opt == 2 )
     {
-        os << "PERFORMANCE TEST: Do repeated rdx->search()\n";
-        os << "                  monatonic keys/random search\n\nlscpu:\n";
+        os << "PERFORMANCE TEST: Do repeated rdx->search()\n"
+              "                  monatonic keys/random search\n\nlscpu:\n";
     }
 
     os.close();

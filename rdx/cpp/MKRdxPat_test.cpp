@@ -113,15 +113,15 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST0.results");
 
-        os << "\n";
-        os << "TEST 0: Print rdx trie before inserting any data nodes\n";
-        os << "        Expected Results:\n";
-        os << "           a. Only the impossible pre-allocated root node should be printed since\n";
-        os << "              no other nodes have been inserted\n\n";
+        os << "\n"
+              "TEST 0: Print rdx trie before inserting any data nodes\n"
+              "        Expected Results:\n"
+              "           a. Only the impossible pre-allocated root node should be printed since\n"
+              "              no other nodes have been inserted\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -177,20 +177,20 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST1.results");
 
-        os << "\n";
-        os << "TEST 1: Insert one data node in rdx trie, then insert node with same keys again\n";
-        os << "        Expected Results:\n";
-        os << "           a. One node insertion with return code 0\n";
-        os << "           b. Total nodes allocated(not including root node) 1\n";
-        os << "           c. No verification error\n";
-        os << "           d. Print entire trie - allocated node and root node\n";
-        os << "           e. Same keys node insertion should return code 1\n";
-        os << "           f. Different keys node insertion into full rdx should return code 2\n";
-        os << "           g. Same keys node insertion with a key boolean set to 0 should return code 3\n\n";
+        os << "\n"
+              "TEST 1: Insert one data node in rdx trie, then insert node with same keys again\n"
+              "        Expected Results:\n"
+              "           a. One node insertion with return code 0\n"
+              "           b. Total nodes allocated(not including root node) 1\n"
+              "           c. No verification error\n"
+              "           d. Print entire trie - allocated node and root node\n"
+              "           e. Same keys node insertion should return code 1\n"
+              "           f. Different keys node insertion into full rdx should return code 2\n"
+              "           g. Same keys node insertion with a key boolean set to 0 should return code 3\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -305,16 +305,16 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST2.results");
 
-        os << "\n";
-        os << "TEST 2: Insert one data node - rdx->print(key, os) for rdx trie\n";
-        os << "        Expected Results:\n";
-        os << "           a. Should print only the data node with the passed in keys and all of the branch\n";
-        os << "              nodes leading to that data node.  If there are N keys in that data node then\n";
-        os << "              there will be N branch node sequences that lead to the same data node\n\n";
+        os << "\n"
+              "TEST 2: Insert one data node - rdx->print(key, os) for rdx trie\n"
+              "        Expected Results:\n"
+              "           a. Should print only the data node with the passed in keys and all of the branch\n"
+              "              nodes leading to that data node.  If there are N keys in that data node then\n"
+              "              there will be N branch node sequences that lead to the same data node\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -381,16 +381,16 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST3.results");
 
-        os << "\n";
-        os << "TEST 3: Insert four data nodes each with NUM_KEYS keys in rdx trie\n";
-        os << "        Expected Results:\n";
-        os << "           a. Four data node insertions with return code 0\n";
-        os << "           b. Total nodes allocated(not including root node) 4\n";
-        os << "           c. No verification error\n\n";
+        os << "\n"
+              "TEST 3: Insert four data nodes each with NUM_KEYS keys in rdx trie\n"
+              "        Expected Results:\n"
+              "           a. Four data node insertions with return code 0\n"
+              "           b. Total nodes allocated(not including root node) 4\n"
+              "           c. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -475,15 +475,15 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST4.results");
 
-        os << "\n";
-        os << "TEST 4: Search for all MAX_NUM_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n";
-        os << "        Expected Results:\n";
-        os << "           a. insert 4 data nodes and search/find them\n";
-        os << "           b. fail to find 4 nodes who's keys were not inserted\n\n";
+        os << "\n"
+              "TEST 4: Search for all MAX_NUM_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n"
+              "        Expected Results:\n"
+              "           a. insert 4 data nodes and search/find them\n"
+              "           b. fail to find 4 nodes who's keys were not inserted\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -573,18 +573,18 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST5.results");
 
-        os << "\n";
-        os << "TEST 5: Sort data nodes by successive keys in rdx trie\n";
-        os << "        Expected Results:\n";
-        os << "           a. Sort rdx with no nodes inserted and key index set to 3 - return_code=-1, app_datapp= NULL\n";
-        os << "           b. Sort rdx with no nodes inserted and key index set to 0 - return_code= 0, app_datapp= NULL\n";
-        os << "           c. Sort rdx with one node inserted and key index set to 0 - return_code= 1, app_datapp=!NULL\n";
-        os << "           d. For each key the return code will equal the number of sorted nodes and the\n";
-        os << "              nodes array will hold the array of node pointers to nodes in sorted order\n\n";
+        os << "\n"
+              "TEST 5: Sort data nodes by successive keys in rdx trie\n"
+              "        Expected Results:\n"
+              "           a. Sort rdx with no nodes inserted and key index set to 3 - return_code=-1, app_datapp= NULL\n"
+              "           b. Sort rdx with no nodes inserted and key index set to 0 - return_code= 0, app_datapp= NULL\n"
+              "           c. Sort rdx with one node inserted and key index set to 0 - return_code= 1, app_datapp=!NULL\n"
+              "           d. For each key the return code will equal the number of sorted nodes and the\n"
+              "              nodes array will hold the array of node pointers to nodes in sorted order\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -713,15 +713,15 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST6.results");
 
-        os << "\n";
-        os << "TEST 6: Insert 5 data nodes in rdx trie - remove all nodes in rdx trie\n";
-        os << "        Expected Results:\n";
-        os << "           a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n";
-        os << "              allocated and zero allocated nodes upon completion\n\n";
+        os << "\n"
+              "TEST 6: Insert 5 data nodes in rdx trie - remove all nodes in rdx trie\n"
+              "        Expected Results:\n"
+              "           a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n"
+              "              allocated and zero allocated nodes upon completion\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -813,14 +813,14 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST7.results");
 
-        os << "\n";
-        os << "TEST 7: Insert/Search/Remove MAX_NUM_RDX_NODES nodes with random keys repeatedly\n";
-        os << "        Expected Results:\n";
-        os << "           a. Do not report success - report only errors in insert/search/remove operations\n\n";
+        os << "\n"
+              "TEST 7: Insert/Search/Remove MAX_NUM_RDX_NODES nodes with random keys repeatedly\n"
+              "        Expected Results:\n"
+              "           a. Do not report success - report only errors in insert/search/remove operations\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -945,23 +945,23 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST8.results");
 
-        os << "\n";
-        os << "TEST 8: Insert one data node in rdx with specific keys - key 0 = 3, key 1 = 4, key 2 = 5\n";
-        os << "        Do, using only a single key, searches/removes with correct/incorrect keys\n";
-        os << "        Expected Results:\n";
-        os << "           a. insert one data node - should succeed\n";
-        os << "           b. search on the inserted data node - should succeed\n";
-        os << "           c. search using only one correct key - should succeed\n";
-        os << "           d. search using only one incorrect key - should fail\n";
-        os << "           e. search using a key boolean that is not 0 or 1 - should fail\n";
-        os << "           f. search using using all key booleans 0 - should fail\n";
-        os << "           g. print using only one key - should succeed\n";
-        os << "           h. remove using only one incorrect key - should fail\n";
-        os << "           i. remove using only one correct key - should succeed\n\n";
+        os << "\n"
+              "TEST 8: Insert one data node in rdx with specific keys - key 0 = 3, key 1 = 4, key 2 = 5\n"
+              "        Do, using only a single key, searches/removes with correct/incorrect keys\n"
+              "        Expected Results:\n"
+              "           a. insert one data node - should succeed\n"
+              "           b. search on the inserted data node - should succeed\n"
+              "           c. search using only one correct key - should succeed\n"
+              "           d. search using only one incorrect key - should fail\n"
+              "           e. search using a key boolean that is not 0 or 1 - should fail\n"
+              "           f. search using using all key booleans 0 - should fail\n"
+              "           g. print using only one key - should succeed\n"
+              "           h. remove using only one incorrect key - should fail\n"
+              "           i. remove using only one correct key - should succeed\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -1171,17 +1171,17 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST9.results");
 
-        os << "\n";
-        os << "TEST 9: Insert MAX_NUM_RDX_NODES+1 data nodes in a rdx trie of only MAX_NUM_RDX_NODES nodes\n";
-        os << "        Expected Results:\n";
-        os << "           a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        os << "           b. 1 node insertion with return code 2(no free nodes)\n";
-        os << "           c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "           d. No verification error\n\n";
+        os << "\n"
+              "TEST 9: Insert MAX_NUM_RDX_NODES+1 data nodes in a rdx trie of only MAX_NUM_RDX_NODES nodes\n"
+              "        Expected Results:\n"
+              "           a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "           b. 1 node insertion with return code 2(no free nodes)\n"
+              "           c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
+              "           d. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -1253,20 +1253,20 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST10.results");
 
-        os << "\n";
-        os << "TEST 10: Create rdx trie with 1 key of 1 byte and 256 data nodes\n";
-        os << "         Expected Results:\n";
-        os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        os << "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
-        os << "            d. Sort rdx - should return 256\n";
-        os << "            e. Remove all data nodes - should return 0\n";
-        os << "            f. Only the impossible pre-allocated root node should be printed since\n";
-        os << "            g. No verification error\n\n";
+        os << "\n"
+              "TEST 10: Create rdx trie with 1 key of 1 byte and 256 data nodes\n"
+              "         Expected Results:\n"
+              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
+              "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n"
+              "            d. Sort rdx - should return 256\n"
+              "            e. Remove all data nodes - should return 0\n"
+              "            f. Only the impossible pre-allocated root node should be printed since\n"
+              "            g. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -1398,18 +1398,18 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST11.results");
 
-        os << "\n";
-        os << "TEST 11: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n";
-        os << "         Expected Results:\n";
-        os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        os << "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
-        os << "            d. Print entire trie - allocated node and root node\n";
-        os << "            e. No verification error\n\n";
+        os << "\n"
+              "TEST 11: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n"
+              "         Expected Results:\n"
+              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
+              "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n"
+              "            d. Print entire trie - allocated node and root node\n"
+              "            e. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -1515,17 +1515,17 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST12.results");
 
-        os << "\n";
-        os << "TEST 12: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n";
-        os << "         key values the same for each key but unique within a key\n";
-        os << "         Expected Results:\n";
-        os << "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        os << "            b. Print entire trie - allocated node and root node\n";
-        os << "            c. No verification error\n\n";
+        os << "\n"
+              "TEST 12: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n"
+              "         key values the same for each key but unique within a key\n"
+              "         Expected Results:\n"
+              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "            b. Print entire trie - allocated node and root node\n"
+              "            c. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n";
-        os << "NUM_KEYS = " << NUM_KEYS << "\n";
-        os << "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
@@ -1566,13 +1566,13 @@ main()
         ofstream os;
         os.open("MKRdxPat.TEST13.results");
 
-        os << "\n";
-        os << "TEST 13: Demonstrate that MKRdxPat.hpp class works with multiple different structs allocated in the same code block\n";
-        os << "         Expected Results:\n";
-        os << "            a. First trie filled with data\n";
-        os << "            b. No verification error in first trie\n";
-        os << "            c. Second trie filled with data\n";
-        os << "            d. No verification error in second trie\n\n";
+        os << "\n"
+              "TEST 13: Demonstrate that MKRdxPat.hpp class works with multiple different structs allocated in the same code block\n"
+              "         Expected Results:\n"
+              "            a. First trie filled with data\n"
+              "            b. No verification error in first trie\n"
+              "            c. Second trie filled with data\n"
+              "            d. No verification error in second trie\n\n";
 
 
         //
@@ -1611,10 +1611,10 @@ main()
             }
         }
 
-        os << "a. First trie filled with data\n";
-        os << "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n";
-        os << "NUM_KEYS1 = " << NUM_KEYS1 << "\n";
-        os << "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
+        os << "a. First trie filled with data\n"
+              "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n"
+              "NUM_KEYS1 = " << NUM_KEYS1 << "\n"
+              "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
 
         MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
 
@@ -1683,10 +1683,10 @@ main()
             }
         }
 
-        os << "c. Second trie filled with data\n";
-        os << "MAX_NUM_RDX_NODES2 = " << MAX_NUM_RDX_NODES2 << "\n";
-        os << "NUM_KEYS2 = " << NUM_KEYS2 << "\n";
-        os << "NUM_KEY_BYTES2 = " << NUM_KEY_BYTES2 << "\n\n";
+        os << "c. Second trie filled with data\n"
+              "MAX_NUM_RDX_NODES2 = " << MAX_NUM_RDX_NODES2 << "\n"
+              "NUM_KEYS2 = " << NUM_KEYS2 << "\n"
+              "NUM_KEY_BYTES2 = " << NUM_KEY_BYTES2 << "\n\n";
 
         MKRdxPat<app_data2> *rdx2 = new MKRdxPat<app_data2>(MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2);
 

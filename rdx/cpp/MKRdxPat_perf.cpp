@@ -170,6 +170,8 @@
 
 using namespace MultiKeyRdxPat;
 
+using std::cerr;
+
 
 // take the difference of two timespec structs and return this in a timespec struct
     struct timespec
@@ -270,7 +272,7 @@ main
                 pmode_opt = atoi(optarg);
                 if ( pmode_opt < 1 || pmode_opt > 2 )
                 {
-                    cout << usage << "-c option out of range(1 or 2): " << pmode_opt << "\n";
+                    cerr << usage << "-c option out of range(1 or 2): " << pmode_opt << "\n";
                     exit(1);
                 }
                 break;
@@ -279,7 +281,7 @@ main
                 rtime_opt = atof(optarg);
                 if ( rtime_opt < 1 || pmode_opt > 86400 )
                 {
-                    cout << usage << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
+                    cerr << usage << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
                     exit(1);
                 }
                 break;
@@ -288,24 +290,24 @@ main
                 block_multiply_opt = atoi(optarg);
                 if ( block_multiply_opt < 1 || block_multiply_opt > 100000 )
                 {
-                    cout << usage << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
+                    cerr << usage << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
                     exit(1);
                 }
                 break;
 
             case '?':
-                cout << usage << "\n";
+                cerr << usage << "\n";
                 return 1;
 
             default:
-                cout << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
+                cerr << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
                 abort();
         }
     }
 
     if ( optind < argc )
     {
-        cout << usage << "No arguments allowed\n";
+        cerr << usage << "No arguments allowed\n";
         exit(0);
     }
 
@@ -389,7 +391,7 @@ main
 
                             if ( return_code != 0 )
                             {
-                                os << "insert(): data node = " << n << " return_code = " << return_code << endl;
+                                os << "insert(): data node = " << n << " return_code = " << return_code << "\n";
                             }
                         }
 
@@ -399,7 +401,7 @@ main
 
                             if ( app_datap == NULL )
                             {
-                                os << "remove(): data node = " << n << " return = NULL" << endl;
+                                os << "remove(): data node = " << n << " return = NULL" << "\n";
                             }
                         }
                     }
@@ -452,7 +454,7 @@ main
 
                             if ( app_datap == NULL )
                             {
-                                os << "search(): data node = " << n << " return = NULL" << endl;
+                                os << "search(): data node = " << n << " return = NULL" << "\n";
                             }
 
                             total_searches++;

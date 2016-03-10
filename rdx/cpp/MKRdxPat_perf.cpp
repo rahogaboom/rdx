@@ -53,7 +53,7 @@
  *
  *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
  *                    c option 2: the random key set generated on filling the trie will be
- *                      searched for this many times
+ *                                searched for this many times
  *                    100 default
  *
  * DESCRIPTION
@@ -210,8 +210,8 @@ main
     // ================================================
 
     // MKRdxPat.hpp class constructor arguments
-    const int max_num_rdx_nodes = 100000;
-    const int num_keys          = 2;
+    const int max_num_rdx_nodes = 2000000;
+    const int num_keys          = 3;
     const int num_key_bytes     = 16;
 
     // application data of type app_data defined here
@@ -252,7 +252,7 @@ main
                 pmode_opt = atoi(optarg);
                 if ( pmode_opt < 1 || pmode_opt > 2 )
                 {
-                    os << "-c option out of range(1 or 2): " << pmode_opt << "\n";
+                    cout << "-c option out of range(1 or 2): " << pmode_opt << "\n";
                     exit(0);
                 }
                 break;
@@ -261,7 +261,7 @@ main
                 rtime_opt = atof(optarg);
                 if ( rtime_opt < 1 || pmode_opt > 86400 )
                 {
-                    os << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
+                    cout << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
                     exit(0);
                 }
                 break;
@@ -270,17 +270,29 @@ main
                 block_multiply_opt = atoi(optarg);
                 if ( block_multiply_opt < 1 || block_multiply_opt > 100000 )
                 {
-                    os << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
+                    cout << "-b option out of range(1 to 100000): " << block_multiply_opt << "\n";
                     exit(0);
                 }
                 break;
 
             case '?':
-                os << "./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n";
+                cout << "\n";
+                cout << "./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n";
+                cout << "\n";
+                cout << "    -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty) trie(default)\n";
+                cout << "                   option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s with\n";
+                cout << "                             random keys\n";
+                cout << "\n";
+                cout << "    -s{1-86400}  - minimum run time(secs)(30 default)\n";
+                cout << "\n";
+                cout << "    -b{1-100000} - c option 1: trie will be filled/emptied this many times\n";
+                cout << "                   c option 2: the random key set generated on filling the trie will be\n";
+                cout << "                               searched for this many times\n";
+                cout << "                   100 default\n";
                 return 1;
 
             default:
-                os << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
+                cout << "abort(): " << opt << " = getopt(argc, argv, \"c:s:b:\")" << "\n";
                 abort();
         }
     }

@@ -137,6 +137,8 @@ main()
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -264,6 +266,8 @@ main()
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -336,6 +340,8 @@ main()
         os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n";
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -430,6 +436,8 @@ main()
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -521,6 +529,8 @@ main()
         os << "\n";
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -666,6 +676,8 @@ main()
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -769,6 +781,8 @@ main()
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -901,6 +915,8 @@ main()
         os << " Total Insert/Search/Remove tests run " << test_num << "  Total errors detected " << tot_errs << "\n\n";
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -1130,6 +1146,8 @@ main()
         }
         os << "\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -1208,6 +1226,8 @@ main()
         return_code = rdx->verify(ERR_CODE_PRINT, os);
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -1355,6 +1375,8 @@ main()
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -1473,6 +1495,8 @@ main()
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
 
+        delete rdx;
+
         os.close();
     }
 
@@ -1554,6 +1578,8 @@ main()
         return_code = rdx->verify(ERR_CODE_PRINT, os);
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
+
+        delete rdx;
 
         os.close();
     }
@@ -1647,6 +1673,8 @@ main()
         return_code = rdx1->verify(ERR_CODE_PRINT, os);
         os << "\n";
 
+        delete rdx1;
+
 
         //
         // define app_data2, MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2, rdx_key2[][][]
@@ -1718,6 +1746,8 @@ main()
         os << "d. No verification error in second trie\n";
         return_code = rdx2->verify(ERR_CODE_PRINT, os);
         os << "\n";
+
+        delete rdx2;
 
         os.close();
     }

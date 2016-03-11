@@ -7,6 +7,8 @@ rdx
 
      - C and OO C++ versions
 
+     - Boost Software License - Version 1.0 - August 17th, 2003
+
      - allows the allocation of a fixed sized contiguous data store that holds data nodes of an
        arbitrary structure that may be accessed with any number of keys of any size with the
        PATRICIA (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast

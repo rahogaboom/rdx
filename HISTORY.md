@@ -1,4 +1,9 @@
 
+ rdx-1.0.12.tar.gz - 
+    a. minor code and documentation updates
+    b. added new test case
+
+
  rdx-1.0.11.tar.gz - 
     a. change the license to the Boost 1.0 license
 

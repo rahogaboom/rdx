@@ -417,7 +417,7 @@ namespace MultiKeyRdxPat
 
             // given a key and bit number (bits numbered 0 from right) will return that bit
             // used by: insert(), search(), remove(), print()
-                unsigned int
+                inline unsigned int
             gbit
                 (
                     unsigned char *key,

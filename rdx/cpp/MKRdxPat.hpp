@@ -156,7 +156,7 @@
  *     data nodes.  In this case NUM_KEYS would be 3 and NUM_KEY_BYTES would be 16(the longest - see below).
  *
  *     The MKRdxPat class supports a data structure of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
- *     data node with keys of NUM_KEY_BYTES bytes.  The class constructor:
+ *     data node with keys of NUM_KEY_BYTES bytes or less.  The class constructor:
  *
  *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
  *
@@ -219,7 +219,7 @@
  *     initial branch nodes and initial data node with the impossible key of all 0xff's(1,2,3).  The number
  *     of user storable nodes is MAX_NUM_RDX_NODES.   The user, through the constructor, declares PNODEs,
  *     each of which contains a radix PATRICIA trie of MAX_NUM_RDX_NODES nodes with NUM_KEYS keys of
- *     NUM_KEY_BYTES bytes length.
+ *     at most NUM_KEY_BYTES bytes length.
  *
  *     These routines are a modification of the algorithm cited.  Specifically, the upward pointers used to
  *     terminate search are not used, and are instead used to point to data nodes as trie leaves.  In
@@ -231,7 +231,7 @@
  *     additional branch and data node members not used in the original PATRICIA search algorithm.  These
  *     are for various purposes; related to changes in the original algorithm for multi-key search, related
  *     to changes in the original algorithm for leaf data nodes instead of upward pointers to data structures
- *     stored in branch nodes, related to printing, sorting and debugging.
+ *     stored in branch nodes, related to printing, related to sorting and debugging.
  *
  *======================================================================================================================
  *

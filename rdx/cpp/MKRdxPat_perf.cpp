@@ -230,7 +230,7 @@ main
     // ================================================
 
     // MKRdxPat.hpp class constructor arguments
-    const int max_num_rdx_nodes = 200000;
+    const int max_num_rdx_nodes = 2000000;
     const int num_keys          = 3;
     const int num_key_bytes     = 16;
 

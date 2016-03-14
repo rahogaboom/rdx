@@ -337,7 +337,7 @@ main()
         os << "   there will be N branch node sequences that lead to the same data node\n\n";
         return_code = rdx->print((unsigned char *)rdx_key[0], os);
 
-        os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n";
+        os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n\n";
 
         os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
 

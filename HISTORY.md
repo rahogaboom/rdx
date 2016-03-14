@@ -1,4 +1,8 @@
 
+ rdx-1.0.13.tar.gz - 
+    a. minor code and documentation updates
+
+
  rdx-1.0.12.tar.gz - 
     a. minor code and documentation updates
     b. added new test case

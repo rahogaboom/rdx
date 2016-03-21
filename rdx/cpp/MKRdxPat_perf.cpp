@@ -359,7 +359,7 @@ main
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
     os << tmpstr;
-    snprintf(tmpstr, sizeof(tmpstr), "trie size = %'db\n\n", rdx->size());
+    snprintf(tmpstr, sizeof(tmpstr), "trie size = %'db\n\n", rdx->bsize());
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "Minimum run time(sec): %f\n", rtime_opt);
     os << tmpstr;

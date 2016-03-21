@@ -49,9 +49,9 @@
  *
  *     MKRdxPat<app_data>
  *         (
- *             int MAX_NUM_RDX_NODES,
+ *             int MAX_RDX_NODES,
  *             int NUM_KEYS,
- *             int NUM_KEY_BYTES
+ *             int MAX_KEY_BYTES
  *         );
  *         e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
  *
@@ -68,10 +68,10 @@
  *         int
  *     insert
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             app_data **app_datapp
  *         );
- *         e.g. return_code = rdx->insert((unsigned char *)key, &app_datap);
+ *         e.g. int return_code = rdx->insert((unsigned char *)key, &app_datap);
  *
  *
  *     struct app_data
@@ -82,9 +82,9 @@
  *         app_data *
  *     search
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
- *         e.g. app_datap = rdx->search((unsigned char *)key);
+ *         e.g. app_data *app_datap = rdx->search((unsigned char *)key);
  *
  *
  *     struct app_data
@@ -95,9 +95,9 @@
  *         app_data *
  *     remove
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
- *         e.g. app_datap = rdx->remove((unsigned char *)key);
+ *         e.g. app_data *app_datap = rdx->remove((unsigned char *)key);
  *
  *
  *         int
@@ -106,31 +106,60 @@
  *             app_data ***app_datappp,
  *             int k
  *         );
- *         e.g. return_code = rdx->sort(&app_datapp, k);
+ *         e.g. int return_code = rdx->sort(&app_datapp, k);
  *
  *
  *         int
- *     nodes
+ *     alloc_nodes
  *         (
  *         );
- *         e.g. nodes = rdx->nodes();
+ *         e.g. int alloc_nodes = rdx->alloc_nodes();
  *
  *
  *         int
- *     size 
+ *     bsize
  *         (
  *         );
- *         e.g. size = rdx->size();
+ *         e.g. int bsize = rdx->bsize();
+ *
+ *
+ *         int
+ *     max_rdx_nodes
+ *         (
+ *         );
+ *         e.g. int max_rdx_nodes = rdx->max_rdx_nodes();
+ *
+ *
+ *         int
+ *     num_keys
+ *         (
+ *         );
+ *         e.g. int num_keys = rdx->num_keys();
+ *
+ *
+ *         int
+ *     max_key_bytes 
+ *         (
+ *         );
+ *         e.g. int max_key_bytes = rdx->max_key_bytes();
+ *
+ *
+ *         int
+ *     chg_max_rdx_nodes 
+ *         (
+ *             int new_max_rdx_nodes
+ *         );
+ *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
  *
  *         int
  *     print
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             ofstream& os
  *         );
- *         e.g. return_code = rdx->print(NULL, os);
- *         e.g. return_code = rdx->print((unsigned char *)key, os);
+ *         e.g. int return_code = rdx->print(NULL, os);
+ *         e.g. int return_code = rdx->print((unsigned char *)key, os);
  *
  *
  *         int
@@ -139,8 +168,8 @@
  *             VERIFY_MODE vm,
  *             ofstream& os
  *         );
- *         e.g. return_code = rdx->verify(ERR_CODE, os);
- *         e.g. return_code = rdx->verify(ERR_CODE_PRINT, os);
+ *         e.g. int return_code = rdx->verify(ERR_CODE, os);
+ *         e.g. int return_code = rdx->verify(ERR_CODE_PRINT, os);
  *
  *======================================================================================================================
  *
@@ -153,12 +182,12 @@
  *     either singly of several simultaneously.
  *
  *     For example, a data structure that required either of an IPv4, IPv6 or MAC address key(s) to access
- *     data nodes.  In this case NUM_KEYS would be 3 and NUM_KEY_BYTES would be 16(the longest - see below).
+ *     data nodes.  In this case NUM_KEYS would be 3 and MAX_KEY_BYTES would be 16(the longest - see below).
  *
- *     The MKRdxPat class supports a data structure of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
- *     data node with keys of NUM_KEY_BYTES bytes or less.  The class constructor:
+ *     The MKRdxPat class supports a data structure of MAX_RDX_NODES data nodes and NUM_KEYS keys per
+ *     data node with keys of MAX_KEY_BYTES bytes or less.  The class constructor:
  *
- *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+ *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
  *
  *     along with a:
  *
@@ -171,17 +200,17 @@
  *     key or any number of keys simultaneously.  Keys must be unique within their key index(0 - NUM_KEYS-1),
  *     but not over different key indexes.  Member functions that require keys are passed the array:
  *
- *         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *         unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *
  *     One extra prefix byte, a key boolean - required to be 0(ignore) or 1(search), is set with each key to
  *     specify if the key is to be used in the data node search.  It is suggested that the array be first
  *     memset() to 0:
  *
- *         memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+ *         memset(key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));
  *
  *     and then only keys to be used copied in with the key boolean(set to 1) prepended.
  *
- *     In most cases the necessary keys will be of different lengths.  The NUM_KEY_BYTES constructor argument
+ *     In most cases the necessary keys will be of different lengths.  The MAX_KEY_BYTES constructor argument
  *     would be set to the longest of these.  All other shorter keys would be left justified in the key[][]
  *     array, that is, start just after the key boolean.  Thus, for the example above, the IPv6 key would use
  *     the full 16 bytes, the IPv4 key would use the first four bytes after the key boolean(with the rest(12)
@@ -215,11 +244,11 @@
  *     branch and data nodes.
  *
  *     For a trie of NUM_KEYS keys, each data node will have NUM_KEYS branch nodes associated with it.  The
- *     number of actual data nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for the
+ *     number of actual data nodes in the data structure is MAX_RDX_NODES+1.  This extra node is for the
  *     initial branch nodes and initial data node with the impossible key of all 0xff's(1,2,3).  The number
- *     of user storable nodes is MAX_NUM_RDX_NODES.   The user, through the constructor, declares PNODEs,
- *     each of which contains a radix PATRICIA trie of MAX_NUM_RDX_NODES nodes with NUM_KEYS keys of
- *     at most NUM_KEY_BYTES bytes length.
+ *     of user storable nodes is MAX_RDX_NODES.   The user, through the constructor, declares PNODEs,
+ *     each of which contains a radix PATRICIA trie of MAX_RDX_NODES nodes with NUM_KEYS keys of
+ *     at most MAX_KEY_BYTES bytes length.
  *
  *     These routines are a modification of the algorithm cited.  Specifically, the upward pointers used to
  *     terminate search are not used, and are instead used to point to data nodes as trie leaves.  In
@@ -244,34 +273,34 @@
  *        node must be at least one bit longer.  this requires the data node storage for the keys to have one
  *        extra byte.
  *
- *     3. all keys are the same length - NUM_KEY_BYTES bytes.  the performance hit, the small memory savings
+ *     3. all keys are the same length - MAX_KEY_BYTES bytes.  the performance hit, the small memory savings
  *        and the added code complexity of having individually sized keys did not seem worth it.  thus, the
- *        longest required key will determine NUM_KEY_BYTES.  shorter keys may be left justified in the
- *        NUM_KEY_BYTES bytes.
+ *        longest required key will determine MAX_KEY_BYTES.  shorter keys may be left justified in the
+ *        MAX_KEY_BYTES bytes.
  *
- *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to
+ *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]' array be first memset() to
  *        0 and then all the keys to be used with key boolean 1 added in one operation(keys with key boolean
- *        0 are never needed) e.g. memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));.
+ *        0 are never needed) e.g. memset(key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));.
  *
  *     5. multidemensional arrays in C++ are implemented by subscripting calloc()'ed memory with parameterized
  *        values calculated from the static C array versions.  One, two and three dimensional arrays are
  *        illustrated as follows(see verify() for actual usage):
  *
- *        n -> subscripts max_num_rdx_nodes_
+ *        n -> subscripts max_rdx_nodes_
  *        k -> subscripts num_keys_
- *        b -> subscripts num_key_bytes_:
+ *        b -> subscripts max_key_bytes_:
  *
  *        a. one dimensional:
- *           unsigned long dnode_addrs[max_num_rdx_nodes_+1];
+ *           unsigned long dnode_addrs[max_rdx_nodes_+1];
  *               -> dnode_addrs[n]
  *
  *        b. two dimensional:
- *           unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1];
- *               -> bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
+ *           unsigned long bnode_addrs[num_keys_][max_rdx_nodes_+1];
+ *               -> bnode_addrs[k*(max_rdx_nodes_+1)+n]
  *
  *        c. three dimensional:
- *           unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_];
- *               -> dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]
+ *           unsigned char dnode_keys[num_keys_][max_rdx_nodes_+1][max_key_bytes_];
+ *               -> dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]
  *
  *======================================================================================================================
  *
@@ -348,61 +377,61 @@ namespace MultiKeyRdxPat
     template <typename app_data> class MKRdxPat
     {
         private:
-            const int max_num_rdx_nodes_;
+            const int max_rdx_nodes_;
             const int num_keys_;
-            const int num_key_bytes_;
+            const int max_key_bytes_;
 
             // branch node typedef
             typedef struct bnode
             {
-                unsigned int id;     // IDentification(id=0) for branch node - must be first field in nod
-                unsigned int br;     // br=0: from left parent BRanch - br=1: from right parent branch
+                unsigned int id;     // IDentification(id=0 branch node,id=1 data node) - must be first field in node
+                unsigned int br;     // br=0: from left parent BRanch - br=1: from right parent BRanch
                 void *p;             // ptr to Parent node
-                unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
+                unsigned int nsn;    // Node Sequence Number - 0->max_rdx_nodes_
                 unsigned int b;      // Bit number to do branch test on(bits start at 0 from right to left)
                 void *l, *r;         // Left and Right node ptrs
             } BNODE;
 
-            // data node typedef for application declarations.  the key must have one extra byte from num_key_bytes_
+            // data node typedef for application declarations.  the key must have one extra byte from max_key_bytes_
             // specified above in order to have an "impossible" key data node set at initialization
             typedef struct dnode
             {
                 unsigned int id;     // IDentification(id=1) for data node - must be first field in node
                 unsigned int *br;    // br=0: from left parent BRanch - br=1: from right parent branch - br[num_keys_]
                 BNODE **p;           // ptr to Parent node - p[num_keys_]
-                unsigned int nsn;    // Node Sequence Number - 0->max_num_rdx_nodes_
+                unsigned int nsn;    // Node Sequence Number - 0->max_rdx_nodes_
                 void *nnfp;          // Next Node Free Ptr
                 unsigned int alloc;  // 1 - allocated in rdx trie, 0 - on free queue
-                unsigned char *key;  // search KEY(s) - key[num_keys_][1+num_key_bytes_]
+                unsigned char *key;  // search KEY(s) - key[num_keys_][1+max_key_bytes_]
                 app_data data;       // user defined data structure
             } DNODE;
 
-            // typedef of struct for PATRICIA node holding max_num_rdx_nodes_ data
-            // nodes with num_keys_ keys of length num_key_bytes_
+            // typedef of struct for PATRICIA node holding max_rdx_nodes_ data
+            // nodes with num_keys_ keys of length max_key_bytes_
             typedef struct pnode
             {
-                // rdx trie size - includes all data and branch nodes including the root node
+                // rdx trie size in bytes - includes all data and branch nodes including the root node
                 // - does not include one time calloc()'s in member functions(small)
-                unsigned int calloc_size;
+                unsigned int bsize;
 
                 // total number of nodes allocated(does not include root(0xff key) node)
-                unsigned int tot_nodes;
+                unsigned int alloc_nodes;
 
                 // head of rdx search node trie for each key
                 BNODE **head;  // BNODE *head[num_keys_]
 
                 // array holding ptrs to app_data used in sort()
-                app_data **app_data_ptrs;  // app_data *app_data_ptrs[max_num_rdx_nodes_+1]
+                app_data **app_data_ptrs;  // app_data *app_data_ptrs[max_rdx_nodes_+1]
 
                 // number of ptrs in node_ptrs array(not including root node)
                 unsigned int app_data_ptrs_cnt;
 
                 // branch nodes and free queue head ptr(s) of branch nodes
-                BNODE *bnodes;  // BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]
+                BNODE *bnodes;  // BNODE bnodes[max_rdx_nodes_+1][num_keys_]
                 BNODE **bfree_head;  // BNODE *bfree_head[num_keys_]
 
                 // data nodes and free queue head ptr of data nodes
-                DNODE *dnodes;  // DNODE dnodes[max_num_rdx_nodes_+1]
+                DNODE *dnodes;  // DNODE dnodes[max_rdx_nodes_+1]
                 DNODE *dfree_head;
             } PNODE_;
 
@@ -417,7 +446,7 @@ namespace MultiKeyRdxPat
 
             // given a key and bit number (bits numbered 0 from right) will return that bit
             // used by: insert(), search(), remove(), print()
-                inline unsigned int
+                unsigned int
             gbit
                 (
                     unsigned char *key,
@@ -429,12 +458,12 @@ namespace MultiKeyRdxPat
                 unsigned char mask;
 
                 // the byte index set here assumes one extra prefix byte in the input parameter key(for the
-                // 0xff of the root node impossible key). thus, data nodes with keys of num_key_bytes_ will
-                // have a 0 byte prefix added, and the byte index set here is not 0 to num_key_bytes_ but 1
-                // to num_key_bytes_+1. e.g. if num_key_bytes_=1 and bit_num=0 then byte is set to 1 not 0.
-                // if num_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
+                // 0xff of the root node impossible key). thus, data nodes with keys of max_key_bytes_ will
+                // have a 0 byte prefix added, and the byte index set here is not 0 to max_key_bytes_ but 1
+                // to max_key_bytes_+1. e.g. if max_key_bytes_=1 and bit_num=0 then byte is set to 1 not 0.
+                // if max_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
                 mask = 1;
-                byte = num_key_bytes_ - bit_num/8;
+                byte = max_key_bytes_ - bit_num/8;
                 mask <<= bit_num%8;
                 bit = key[byte] & mask;
                 bit >>= bit_num%8;
@@ -508,9 +537,9 @@ namespace MultiKeyRdxPat
              *     None
              *
              * Comments:
-             *     1. remember that the data structure has 1+max_num_rdx_nodes_ nodes(each of which has one data and
+             *     1. remember that the data structure has 1+max_rdx_nodes_ nodes(each of which has one data and
              *        num_keys_ branch nodes).  the first is the always allocated impossible key root node.  the rest
-             *        are the max_num_rdx_nodes_ user usable nodes.
+             *        are the max_rdx_nodes_ user usable nodes.
              *
              *     2. certain pointers in the root node, such as parent pointers, are set to zero and permanently
              *        remain so since they have nothing to point to.  in root node printouts they should be zero.
@@ -522,7 +551,7 @@ namespace MultiKeyRdxPat
                 )
             {
                 // set data and branch node sequence numbers and node allocated status
-                for ( int n = 0 ; n < max_num_rdx_nodes_+1 ; n++ )
+                for ( int n = 0 ; n < max_rdx_nodes_+1 ; n++ )
                 {
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
@@ -535,7 +564,7 @@ namespace MultiKeyRdxPat
                 rdx_.dnodes[0].alloc = 1;  // root impossible key(0xff) node
 
                 // reset total allocated nodes
-                rdx_.tot_nodes = 0;
+                rdx_.alloc_nodes = 0;
 
                 // for each key set various branch/data/head fields and pointers
                 for ( int k = 0 ; k < num_keys_ ; k++ )
@@ -547,13 +576,13 @@ namespace MultiKeyRdxPat
                     rdx_.bnodes[0*num_keys_+k].id = 0;
                     rdx_.bnodes[0*num_keys_+k].br = 0;
                     rdx_.bnodes[0*num_keys_+k].p = NULL;
-                    rdx_.bnodes[0*num_keys_+k].b = num_key_bytes_*8;
+                    rdx_.bnodes[0*num_keys_+k].b = max_key_bytes_*8;
                     rdx_.bnodes[0*num_keys_+k].l = &rdx_.dnodes[0];
                     rdx_.bnodes[0*num_keys_+k].r = NULL;
 
                     // build the branch node free list
                     rdx_.bfree_head[k] = &(rdx_.bnodes[1*num_keys_+k]);
-                    for ( int n = 1 ; n < max_num_rdx_nodes_ ; n++ )
+                    for ( int n = 1 ; n < max_rdx_nodes_ ; n++ )
                     {
                         rdx_.bnodes[n*num_keys_+k].id = 0;
                         rdx_.bnodes[n*num_keys_+k].br = 0;
@@ -562,26 +591,26 @@ namespace MultiKeyRdxPat
                         rdx_.bnodes[n*num_keys_+k].l = NULL;
                         rdx_.bnodes[n*num_keys_+k].r = NULL;
                     }
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].id = 0;
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].br = 0;
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].p = NULL;
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].b = 0;
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].l = NULL;
-                    rdx_.bnodes[max_num_rdx_nodes_*num_keys_+k].r = NULL;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].id = 0;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].br = 0;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].p = NULL;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].b = 0;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].l = NULL;
+                    rdx_.bnodes[max_rdx_nodes_*num_keys_+k].r = NULL;
 
                     // init data node fields
-                    for ( int n = 0 ; n < max_num_rdx_nodes_+1 ; n++ )
+                    for ( int n = 0 ; n < max_rdx_nodes_+1 ; n++ )
                     {
                         rdx_.dnodes[n].br[k] = 0;
                         rdx_.dnodes[n].p[k] = 0;
-                        memset( &rdx_.dnodes[n].key[k*(1+num_key_bytes_)], 0, num_key_bytes_+1 );
+                        memset( &rdx_.dnodes[n].key[k*(1+max_key_bytes_)], 0, max_key_bytes_+1 );
                     }
 
                     // set data node parent pointers of root node to branch nodes for each key
                     rdx_.dnodes[0].p[k] = &rdx_.bnodes[0*num_keys_+k];
 
                     // init head data node key to impossible value, (the extra high order 0xff byte).
-                    memset( &rdx_.dnodes[0].key[k*(1+num_key_bytes_)], 0xff, num_key_bytes_+1 );
+                    memset( &rdx_.dnodes[0].key[k*(1+max_key_bytes_)], 0xff, max_key_bytes_+1 );
                 }
 
                 // build the data node free list - use DNODE nnfp as pointer to next node
@@ -589,17 +618,17 @@ namespace MultiKeyRdxPat
 
                 rdx_.dfree_head = &rdx_.dnodes[1];
 
-                for ( int n = 1 ; n < max_num_rdx_nodes_ ; n++ )
+                for ( int n = 1 ; n < max_rdx_nodes_ ; n++ )
                 {
                     rdx_.dnodes[n].nnfp = (BNODE *)(&rdx_.dnodes[n+1]);
                     rdx_.dnodes[n].id = 1;
                 }
-                rdx_.dnodes[max_num_rdx_nodes_].nnfp = NULL;
-                rdx_.dnodes[max_num_rdx_nodes_].id = 1;
+                rdx_.dnodes[max_rdx_nodes_].nnfp = NULL;
+                rdx_.dnodes[max_rdx_nodes_].id = 1;
             }  // initialize()
 
         public:
-            MKRdxPat( int mnrn, int nk, int nkb ) : max_num_rdx_nodes_(mnrn), num_keys_(nk), num_key_bytes_(nkb)
+            MKRdxPat( int mnrn, int nk, int nkb ) : max_rdx_nodes_(mnrn), num_keys_(nk), max_key_bytes_(nkb)
             {
                 unsigned char *fptr;
 
@@ -607,10 +636,10 @@ namespace MultiKeyRdxPat
                 char tmpstr[TMPSTR_SIZE];
 
 
-                if ( max_num_rdx_nodes_ < 1 )
+                if ( max_rdx_nodes_ < 1 )
                 {
-                    cerr << "max_num_rdx_nodes_ = " << max_num_rdx_nodes_ << "(must be > 0)" << "\n";
-                    throw "max_num_rdx_nodes_ < 1(must be > 0)";
+                    cerr << "max_rdx_nodes_ = " << max_rdx_nodes_ << "(must be > 0)" << "\n";
+                    throw "max_rdx_nodes_ < 1(must be > 0)";
                 }
 
                 if ( num_keys_ < 1 )
@@ -619,66 +648,66 @@ namespace MultiKeyRdxPat
                     throw "num_keys_ < 1(must be > 0)";
                 }
 
-                if ( num_key_bytes_ < 1 )
+                if ( max_key_bytes_ < 1 )
                 {
-                    cerr << "num_key_bytes_ = " << num_key_bytes_ << "(must be > 0)" << "\n";
-                    throw "num_key_bytes_ < 1(must be > 0)";
+                    cerr << "max_key_bytes_ = " << max_key_bytes_ << "(must be > 0)" << "\n";
+                    throw "max_key_bytes_ < 1(must be > 0)";
                 }
 
-                rdx_.calloc_size = 0;
+                rdx_.bsize = 0;
 
-                // total calloc() segments =  5(in PNODE_) + ( max_num_rdx_nodes_+1 ) * 3(in DNODE)
-                rdx_.calloc_size += (num_keys_) * sizeof(BNODE *) +                         // BNODE *head[num_keys_]
-                                    (max_num_rdx_nodes_+1) * sizeof(app_data *) +           // app_data *app_data_ptrs[max_num_rdx_nodes_+1]
-                                    ((max_num_rdx_nodes_+1) * num_keys_) * sizeof(BNODE) +  // BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]
+                // total calloc() segments =  5(in PNODE_) + ( max_rdx_nodes_+1 ) * 3(in DNODE)
+                rdx_.bsize += (num_keys_) * sizeof(BNODE *) +                         // BNODE *head[num_keys_]
+                                    (max_rdx_nodes_+1) * sizeof(app_data *) +           // app_data *app_data_ptrs[max_rdx_nodes_+1]
+                                    ((max_rdx_nodes_+1) * num_keys_) * sizeof(BNODE) +  // BNODE bnodes[max_rdx_nodes_+1][num_keys_]
                                     (num_keys_) * sizeof(BNODE *) +                         // BNODE *bfree_head[num_keys_]
-                                    (max_num_rdx_nodes_+1) * sizeof(DNODE);                 // DNODE dnodes[max_num_rdx_nodes_+1]
+                                    (max_rdx_nodes_+1) * sizeof(DNODE);                 // DNODE dnodes[max_rdx_nodes_+1]
 
-                for ( int i = 0 ; i < max_num_rdx_nodes_+1 ; i++ )
+                for ( int i = 0 ; i < max_rdx_nodes_+1 ; i++ )
                 {
-                    rdx_.calloc_size += (num_keys_) * sizeof(unsigned int) +                       // unsigned int br[num_keys_]
+                    rdx_.bsize += (num_keys_) * sizeof(unsigned int) +                       // unsigned int br[num_keys_]
                                         (num_keys_) * sizeof(BNODE *) +                            // BNODE *p[num_keys_]
-                                        (num_keys_ * (1+num_key_bytes_)) * sizeof(unsigned char);  // unsigned char key[num_keys_][1+num_key_bytes_]
+                                        (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char);  // unsigned char key[num_keys_][1+max_key_bytes_]
                 }
 
-                fptr = (unsigned char *)calloc( rdx_.calloc_size, sizeof(unsigned char) );
+                fptr = (unsigned char *)calloc( rdx_.bsize, sizeof(unsigned char) );
 
                 // dynamic allocation for PNODE_
                 rdx_.head = (BNODE **)(fptr);
                 fptr += (num_keys_) * sizeof(BNODE *);
                 snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *head[num_keys_]",
-                    max_num_rdx_nodes_, num_keys_, num_key_bytes_);
+                    max_rdx_nodes_, num_keys_, max_key_bytes_);
                 free_msg_.push_back(tmpstr);
 
                 rdx_.app_data_ptrs = (app_data **)(fptr);
-                fptr += (max_num_rdx_nodes_+1) * sizeof(DNODE *);
-                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE *node_ptrs[max_num_rdx_nodes_+1]",
-                    max_num_rdx_nodes_, num_keys_, num_key_bytes_);
+                fptr += (max_rdx_nodes_+1) * sizeof(DNODE *);
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE *node_ptrs[max_rdx_nodes_+1]",
+                    max_rdx_nodes_, num_keys_, max_key_bytes_);
                 free_msg_.push_back(tmpstr);
 
                 rdx_.bnodes = (BNODE *)(fptr);
-                fptr += ((max_num_rdx_nodes_+1) * num_keys_) * sizeof(BNODE);
-                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE bnodes[max_num_rdx_nodes_+1][num_keys_]",
-                    max_num_rdx_nodes_, num_keys_, num_key_bytes_);
+                fptr += ((max_rdx_nodes_+1) * num_keys_) * sizeof(BNODE);
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE bnodes[max_rdx_nodes_+1][num_keys_]",
+                    max_rdx_nodes_, num_keys_, max_key_bytes_);
                 free_msg_.push_back(tmpstr);
 
                 rdx_.bfree_head = (BNODE **)(fptr);
                 fptr += (num_keys_) * sizeof(BNODE *);
                 snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): BNODE *bfree_head[num_keys_]",
-                    max_num_rdx_nodes_, num_keys_, num_key_bytes_);
+                    max_rdx_nodes_, num_keys_, max_key_bytes_);
                 free_msg_.push_back(tmpstr);
 
                 rdx_.dnodes = (DNODE *)(fptr);
-                fptr += (max_num_rdx_nodes_+1) * sizeof(DNODE);
-                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE dnodes[max_num_rdx_nodes_+1]",
-                    max_num_rdx_nodes_, num_keys_, num_key_bytes_);
+                fptr += (max_rdx_nodes_+1) * sizeof(DNODE);
+                snprintf(tmpstr, sizeof(tmpstr), "PNODE_(%d,%d,%d): MKRdxPat(): calloc(): DNODE dnodes[max_rdx_nodes_+1]",
+                    max_rdx_nodes_, num_keys_, max_key_bytes_);
                 free_msg_.push_back(tmpstr);
 
 
                 // dynamic allocation for DNODE
-                for ( int i = 0 ; i < max_num_rdx_nodes_+1 ; i++ )
+                for ( int i = 0 ; i < max_rdx_nodes_+1 ; i++ )
                 {
-                    snprintf(tmpstr, sizeof(tmpstr), "DNODE(%d): MKRdxPat(): calloc(): br[num_keys_], p[num_keys_], key[num_keys_][1+num_key_bytes_]", i);
+                    snprintf(tmpstr, sizeof(tmpstr), "DNODE(%d): MKRdxPat(): calloc(): br[num_keys_], p[num_keys_], key[num_keys_][1+max_key_bytes_]", i);
                     free_msg_.push_back(tmpstr);
 
                     rdx_.dnodes[i].br = (unsigned int *) fptr;
@@ -688,7 +717,7 @@ namespace MultiKeyRdxPat
                     fptr += (num_keys_) * sizeof(BNODE *);
 
                     rdx_.dnodes[i].key = (unsigned char *) fptr;
-                    fptr += (num_keys_ * (1+num_key_bytes_)) * sizeof(unsigned char);
+                    fptr += (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char);
                 }
 
                 initialize();
@@ -722,9 +751,9 @@ namespace MultiKeyRdxPat
              *
              * Purpose: 
              *     remove a data node from the free list in the PNODE_ data structure and insert this node into the trie with keys
-             *     key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all keys(key[k][0]) is the key boolean.
+             *     key[NUM_KEYS][1+MAX_KEY_BYTES].  the second subscript first byte for all keys(key[k][0]) is the key boolean.
              *     the key boolean should always be set to 1 since all keys are needed for insertion.  the actual key bytes
-             *     (key[k][1 to NUM_KEY_BYTES]) follow the key boolean.  each key must be unique within it's key
+             *     (key[k][1 to MAX_KEY_BYTES]) follow the key boolean.  each key must be unique within it's key
              *     index(0 to NUM_KEYS-1).
              *
              * Usage:
@@ -733,7 +762,7 @@ namespace MultiKeyRdxPat
              *         int data;
              *     }
              *
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
              *     app_data *app_datap;
              *     int return_code;
              *
@@ -746,7 +775,7 @@ namespace MultiKeyRdxPat
              *     4. if any key boolean is not 1 set return_code to 3 and set app_datap to NULL
              *
              * Parameters:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
              *     app_data **app_datapp                        - pointer to pointer to the inserted data node app_data struct
              *                                                    or NULL if insertion fails
              *
@@ -756,7 +785,7 @@ namespace MultiKeyRdxPat
                 int
             insert
                 (
-                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                     app_data **app_datapp
                 )
             {
@@ -779,7 +808,7 @@ namespace MultiKeyRdxPat
                 // typedef and in the same relative position in order to get the correct value.
                 static BNODE **c;  // static BNODE *c[num_keys_];
 
-                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+num_key_bytes_];
+                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+max_key_bytes_];
 
                 static bool alloc = false;
 
@@ -815,16 +844,16 @@ namespace MultiKeyRdxPat
                     free_ptr_.push_back(fptr);
                     free_msg_.push_back("insert(): calloc(): static BNODE *c[num_keys_]");
 
-                    fptr = calloc( num_keys_ * (1+num_key_bytes_), sizeof(unsigned char));
+                    fptr = calloc( num_keys_ * (1+max_key_bytes_), sizeof(unsigned char));
                     ky = (unsigned char *)(fptr);
                     free_ptr_.push_back(fptr);
-                    free_msg_.push_back("insert(): calloc(): static unsigned char ky[num_keys_][1+num_key_bytes_]");
+                    free_msg_.push_back("insert(): calloc(): static unsigned char ky[num_keys_][1+max_key_bytes_]");
                 }
 
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
                     // for insertion all key booleans must be 1
-                    if ( key[k*(1+num_key_bytes_)+0] != 1 )
+                    if ( key[k*(1+max_key_bytes_)+0] != 1 )
                     {
                         *app_datapp = NULL;
                         return 3;
@@ -834,18 +863,18 @@ namespace MultiKeyRdxPat
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
                     // copy key to storage with extra byte for comparison
-                    ky[k*(1+num_key_bytes_)+0] = 0;
-                    memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
+                    ky[k*(1+max_key_bytes_)+0] = 0;
+                    memmove( &ky[k*(1+max_key_bytes_)+1], &key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
 
                     // search for key in rdx trie
                     c[k] = (BNODE *)(rdx_.head[k]->l);
                     while ( c[k]->id == 0 )
                     {
-                        c[k] = ( gbit( &ky[k*(1+num_key_bytes_)], c[k]->b ) ) ? (BNODE *)(c[k]->r) : (BNODE *)(c[k]->l);
+                        c[k] = ( gbit( &ky[k*(1+max_key_bytes_)], c[k]->b ) ) ? (BNODE *)(c[k]->r) : (BNODE *)(c[k]->l);
                     }
 
                     // if key found return node in arg and set return to 1
-                    if ( memcmp( &ky[k*(1+num_key_bytes_)], &((DNODE *)c[k])->key[k*(1+num_key_bytes_)], num_key_bytes_+1 ) == 0 )
+                    if ( memcmp( &ky[k*(1+max_key_bytes_)], &((DNODE *)c[k])->key[k*(1+max_key_bytes_)], max_key_bytes_+1 ) == 0 )
                     {
                         *app_datapp = &( ((DNODE *)(c[k]))->data );
                         return 1;
@@ -864,7 +893,7 @@ namespace MultiKeyRdxPat
 
                 dna = rdx_.dfree_head;
                 rdx_.dfree_head = (DNODE *)(rdx_.dfree_head->nnfp);
-                rdx_.tot_nodes++;
+                rdx_.alloc_nodes++;
 
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
@@ -877,8 +906,8 @@ namespace MultiKeyRdxPat
                     //       (the furthest right most bit) then this statement will call gbit() with a negative
                     //       value of key_bit and a memory violation will probably result or at the very least
                     //       wholly incorrect insertion.
-                    key_bit[k] = num_key_bytes_*8;
-                    while ( gbit( &((DNODE *)c[k])->key[k*(1+num_key_bytes_)], key_bit[k] ) == gbit( &ky[k*(1+num_key_bytes_)+0], key_bit[k] ) )
+                    key_bit[k] = max_key_bytes_*8;
+                    while ( gbit( &((DNODE *)c[k])->key[k*(1+max_key_bytes_)], key_bit[k] ) == gbit( &ky[k*(1+max_key_bytes_)+0], key_bit[k] ) )
                     {
                         key_bit[k]--;
                     }
@@ -895,7 +924,7 @@ namespace MultiKeyRdxPat
                     while ( c[k]->id == 0 && c[k]->b > key_bit[k] )
                     {
                         p[k] = c[k];
-                        if ( gbit( &ky[k*(1+num_key_bytes_)+0], c[k]->b ) )
+                        if ( gbit( &ky[k*(1+max_key_bytes_)+0], c[k]->b ) )
                         {
                             c[k] = (BNODE *)(c[k]->r);
                             lr[k] = 1;
@@ -930,7 +959,7 @@ namespace MultiKeyRdxPat
                     bna[k]->br = lr[k];
                     bna[k]->b = key_bit[k];
                     bna[k]->p = p[k];
-                    if ( gbit( &ky[k*(1+num_key_bytes_)+0], bna[k]->b ) )
+                    if ( gbit( &ky[k*(1+max_key_bytes_)+0], bna[k]->b ) )
                     {
                         bna[k]->l = (void *)(c[k]);
                         bna[k]->r = (void *)(dna);
@@ -961,21 +990,21 @@ namespace MultiKeyRdxPat
 
                     #ifdef DEBUG
                     printf("DEBUG-1: ky k = %d\n", k);
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
+                        printf("%X ", *(&ky[k*(1+max_key_bytes_)+0]+i) );
                     }
                     printf("\n");
                     #endif
 
                     // set child key
-                    memmove( &(dna->key[k*(1+num_key_bytes_)]), &ky[k*(1+num_key_bytes_)], num_key_bytes_+1 );
+                    memmove( &(dna->key[k*(1+max_key_bytes_)]), &ky[k*(1+max_key_bytes_)], max_key_bytes_+1 );
 
                     #ifdef DEBUG
                     printf("DEBUG-2: dna->key[] k = %d\n", k);
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("%X ", *( &(dna->key[k*(1+num_key_bytes_)])+i ) );
+                        printf("%X ", *( &(dna->key[k*(1+max_key_bytes_)])+i ) );
                     }
                     printf("\n\n");
                     #endif
@@ -1006,14 +1035,14 @@ namespace MultiKeyRdxPat
              *     search()
              *
              * Purpose: 
-             *     search trie for the data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte
+             *     search trie for the data node with the keys key[NUM_KEYS][1+MAX_KEY_BYTES].  the second subscript first byte
              *     for all keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or
-             *     0(do not use key).  the actual key bytes(key[k][1 to num_key_bytes_]) follow the key boolean.  thus, 1 to
+             *     0(do not use key).  the actual key bytes(key[k][1 to max_key_bytes_]) follow the key boolean.  thus, 1 to
              *     num_keys_ keys may be used in any given search.  only one key is necessary to find the data node.  each key
              *     must be unique within it's key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
              *     app_data *app_datap;
              *
              *     app_datap = rdx->search((unsigned char *)key);
@@ -1026,10 +1055,10 @@ namespace MultiKeyRdxPat
              *     5. if no key boolean is 1 then no keys are used and return NULL
              *    
              * Parameters:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
              *
              * Comments:
-             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+             *     e.g. set NUM_KEYS=3 and MAX_KEY_BYTES=4
              *
              *          example 1:
              *          in key[][]:
@@ -1060,7 +1089,7 @@ namespace MultiKeyRdxPat
                 app_data *
             search
                 (
-                    unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+                    unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                 )
             {
                 // c[] is declared as BNODE * but is cast to DNODE * at the end of a search.
@@ -1072,7 +1101,7 @@ namespace MultiKeyRdxPat
                 static BNODE *c;
                 BNODE *csav;
 
-                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+num_key_bytes_];
+                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+max_key_bytes_];
 
                 static bool alloc = false;  // static - only first time search() for calloc() calls
 
@@ -1091,10 +1120,10 @@ namespace MultiKeyRdxPat
                     free_ptr_.push_back(fptr);
                     free_msg_.push_back("search(): calloc(): static BNODE *c[num_keys_]");
 
-                    fptr = calloc( num_keys_ * (1+num_key_bytes_), sizeof(unsigned char));
+                    fptr = calloc( num_keys_ * (1+max_key_bytes_), sizeof(unsigned char));
                     ky = (unsigned char *) fptr;
                     free_ptr_.push_back(fptr);
-                    free_msg_.push_back("search(): calloc(): static unsigned char ky[num_keys_][1+num_key_bytes_]");
+                    free_msg_.push_back("search(): calloc(): static unsigned char ky[num_keys_][1+max_key_bytes_]");
                 }
 
                 int n = 0;
@@ -1104,11 +1133,11 @@ namespace MultiKeyRdxPat
                     printf("DEBUG-5: k = %d\n", k);
                     #endif
 
-                    if ( key[k*(1+num_key_bytes_)+0] == 0 )
+                    if ( key[k*(1+max_key_bytes_)+0] == 0 )
                     {
                         continue;  // if key boolean is 0 skip key
                     }
-                    else if ( key[k*(1+num_key_bytes_)+0] == 1 )
+                    else if ( key[k*(1+max_key_bytes_)+0] == 1 )
                     {
                         n++;  // if key boolean is 1 use key
                     }
@@ -1118,14 +1147,14 @@ namespace MultiKeyRdxPat
                     }
 
                     // copy key to storage with extra byte for comparison
-                    ky[k*(1+num_key_bytes_)+0] = 0;
-                    memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
+                    ky[k*(1+max_key_bytes_)+0] = 0;
+                    memmove( &ky[k*(1+max_key_bytes_)+1], &key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
 
                     // search for key in rdx trie
                     c = (BNODE *)(rdx_.head[k]->l);
                     while ( c->id == 0 )
                     {
-                        c = ( gbit( &ky[k*(1+num_key_bytes_)+0], c->b ) ) ? (BNODE *)(c->r) : (BNODE *)(c->l);
+                        c = ( gbit( &ky[k*(1+max_key_bytes_)+0], c->b ) ) ? (BNODE *)(c->r) : (BNODE *)(c->l);
                     }
 
                     #ifdef DEBUG
@@ -1148,16 +1177,16 @@ namespace MultiKeyRdxPat
                     }
 
                     #ifdef DEBUG
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("%X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
+                        printf("%X ", *(&ky[k*(1+max_key_bytes_)+0]+i) );
                     }
                     printf("\n");
 
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-8: %p\n",  (void *)(&((DNODE *)c)->key[k*(1+num_key_bytes_)]+i) );
-                        printf("DEBUG-9: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
+                        printf("DEBUG-8: %p\n",  (void *)(&((DNODE *)c)->key[k*(1+max_key_bytes_)]+i) );
+                        printf("DEBUG-9: %X\n", *( &((DNODE *)c)->key[k*(1+max_key_bytes_)]+i ) );
                     }
                     printf("\n");
 
@@ -1165,7 +1194,7 @@ namespace MultiKeyRdxPat
                     #endif
 
                     // if key not found return NULL
-                    if ( memcmp( &ky[k*(1+num_key_bytes_)+0], &((DNODE *)c)->key[k*(1+num_key_bytes_)], num_key_bytes_+1 ) != 0 )
+                    if ( memcmp( &ky[k*(1+max_key_bytes_)+0], &((DNODE *)c)->key[k*(1+max_key_bytes_)], max_key_bytes_+1 ) != 0 )
                     {
                         #ifdef DEBUG
                         printf("DEBUG-11: k = exit2\n");
@@ -1193,14 +1222,14 @@ namespace MultiKeyRdxPat
              *     remove()
              *
              * Purpose: 
-             *     remove trie data node with the keys key[NUM_KEYS][1+NUM_KEY_BYTES].  the second subscript first byte for all
+             *     remove trie data node with the keys key[NUM_KEYS][1+MAX_KEY_BYTES].  the second subscript first byte for all
              *     keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or 0(do not use key).
-             *     the actual key bytes(key[k][1 to NUM_KEY_BYTES]) follow the key boolean.  thus, 1 to NUM_KEYS keys may be used
+             *     the actual key bytes(key[k][1 to MAX_KEY_BYTES]) follow the key boolean.  thus, 1 to NUM_KEYS keys may be used
              *     for any given remove.  only one key is necessary to remove the data node.  each key must be unique within it's
              *     key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
              *     app_data *app_datap;
              *
              *     app_datap = rdx->remove((unsigned char *)key);
@@ -1213,10 +1242,10 @@ namespace MultiKeyRdxPat
              *     5. if no key boolean is 1 then no keys are used and return NULL
              *
              * Parameters:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
              *
              * Comments:
-             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+             *     e.g. set NUM_KEYS=3 and MAX_KEY_BYTES=4
              *
              *          example 1:
              *          in key[][]:
@@ -1239,7 +1268,7 @@ namespace MultiKeyRdxPat
                 app_data *
             remove
                 (
-                    unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+                    unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                 )
             {
                 int n;
@@ -1256,7 +1285,7 @@ namespace MultiKeyRdxPat
                 static BNODE *c;
                 BNODE *csav;
 
-                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+num_key_bytes_];
+                static unsigned char *ky;  // static unsigned char ky[num_keys_][1+max_key_bytes_];
 
                 static bool alloc = false;  // static - only first time remove() for calloc() calls
 
@@ -1275,24 +1304,24 @@ namespace MultiKeyRdxPat
                     free_ptr_.push_back(fptr);
                     free_msg_.push_back("remove(): calloc(): static BNODE *c[num_keys_]");
 
-                    fptr = calloc( num_keys_ * (1+num_key_bytes_), sizeof(unsigned char));
+                    fptr = calloc( num_keys_ * (1+max_key_bytes_), sizeof(unsigned char));
                     ky = (unsigned char *) fptr;
                     free_ptr_.push_back(fptr);
-                    free_msg_.push_back("remove(): calloc(): static unsigned char ky[num_keys_][1+num_key_bytes_]");
+                    free_msg_.push_back("remove(): calloc(): static unsigned char ky[num_keys_][1+max_key_bytes_]");
                 }
 
                 n = 0;
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
                     #ifdef DEBUG
-                    printf("DEBUG-13: key boolean = %X\n", key[k*(1+num_key_bytes_)+0]);
+                    printf("DEBUG-13: key boolean = %X\n", key[k*(1+max_key_bytes_)+0]);
                     #endif
 
-                    if ( key[k*(1+num_key_bytes_)+0] == 0 )
+                    if ( key[k*(1+max_key_bytes_)+0] == 0 )
                     {
                         continue;
                     }
-                    else if ( key[k*(1+num_key_bytes_)+0] == 1 )
+                    else if ( key[k*(1+max_key_bytes_)+0] == 1 )
                     {
                         n++;  // if key boolean is 1 use key
                     }
@@ -1307,21 +1336,21 @@ namespace MultiKeyRdxPat
 
                     #ifdef DEBUG
                     printf("DEBUG-15: k = %d\n", k);
-                    printf("DEBUG-16: max_num_rdx_nodes_ = %d\n", max_num_rdx_nodes_);
+                    printf("DEBUG-16: max_rdx_nodes_ = %d\n", max_rdx_nodes_);
                     printf("DEBUG-17: num_keys_ = %d\n", num_keys_);
-                    printf("DEBUG-18: num_key_bytes_ = %d\n", num_key_bytes_);
+                    printf("DEBUG-18: max_key_bytes_ = %d\n", max_key_bytes_);
                     #endif
 
 
                     // copy key to storage with extra byte for comparison
-                    ky[k*(1+num_key_bytes_)+0] = 0;
-                    memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
+                    ky[k*(1+max_key_bytes_)+0] = 0;
+                    memmove( &ky[k*(1+max_key_bytes_)+1], &key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
 
                     // search for key in rdx trie
                     c = (BNODE *)(rdx_.head[k]->l);
                     while ( c->id == 0 )
                     {
-                        c = ( gbit( &ky[k*(1+num_key_bytes_)+0], c->b ) ) ? (BNODE *)(c->r) : (BNODE *)(c->l);
+                        c = ( gbit( &ky[k*(1+max_key_bytes_)+0], c->b ) ) ? (BNODE *)(c->r) : (BNODE *)(c->l);
                     }
 
                     // check if all keys end at the same data node - if not return NULL
@@ -1339,22 +1368,22 @@ namespace MultiKeyRdxPat
                     }
 
                     #ifdef DEBUG
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-19: %X ", *(&ky[k*(1+num_key_bytes_)+0]+i) );
+                        printf("DEBUG-19: %X ", *(&ky[k*(1+max_key_bytes_)+0]+i) );
                     }
                     printf("\n");
 
-                    for ( int i = 0 ; i < num_key_bytes_+1 ; i++ )
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-20: %p\n",  (void *)(&((DNODE *)c)->key[k*(1+num_key_bytes_)]+i) );
-                        printf("DEBUG-21: %X\n", *( &((DNODE *)c)->key[k*(1+num_key_bytes_)]+i ) );
+                        printf("DEBUG-20: %p\n",  (void *)(&((DNODE *)c)->key[k*(1+max_key_bytes_)]+i) );
+                        printf("DEBUG-21: %X\n", *( &((DNODE *)c)->key[k*(1+max_key_bytes_)]+i ) );
                     }
                     printf("\n");
                     #endif
 
                     // if key not found return NULL
-                    if ( memcmp( &ky[k*(1+num_key_bytes_)+0], &((DNODE *)c)->key[k*(1+num_key_bytes_)], num_key_bytes_+1 ) != 0 )
+                    if ( memcmp( &ky[k*(1+max_key_bytes_)+0], &((DNODE *)c)->key[k*(1+max_key_bytes_)], max_key_bytes_+1 ) != 0 )
                     {
                         return NULL;  // key not found
                     }
@@ -1418,7 +1447,7 @@ namespace MultiKeyRdxPat
                 rdx_.dfree_head = (DNODE *)c;
 
                 // decrement total allocated nodes
-                rdx_.tot_nodes--;
+                rdx_.alloc_nodes--;
 
                 // set return pointer to removed node app_data
                 return &( ((DNODE *)(c))->data );
@@ -1429,7 +1458,7 @@ namespace MultiKeyRdxPat
              *     sort()
              *
              * Purpose: 
-             *     sort pointers to app_data (app_data *app_data_ptrs[max_num_rdx_nodes_+1]) by key index k in key ascending order
+             *     sort pointers to app_data (app_data *app_data_ptrs[max_rdx_nodes_+1]) by key index k in key ascending order
              *
              * Usage:
              *     app_data **app_datapp;
@@ -1470,7 +1499,7 @@ namespace MultiKeyRdxPat
 
                 // set full node_ptrs array to 0xf0 - shouldn't affect anything - then 0xf0 pattern
                 // will be in array elements not allocated - makes debugging easier
-                memset( rdx_.app_data_ptrs, 0xf0, (max_num_rdx_nodes_+1) * sizeof(app_data *) );
+                memset( rdx_.app_data_ptrs, 0xf0, (max_rdx_nodes_+1) * sizeof(app_data *) );
 
                 rdx_.app_data_ptrs_cnt = 0;
 
@@ -1488,66 +1517,233 @@ namespace MultiKeyRdxPat
 
             /*
              *======================================================================================================================
-             *     nodes()
+             *     alloc_nodes()
              *
              * Purpose: 
              *     return the number of allocated data nodes in the trie.
              *
              * Usage:
-             *     int n;
+             *     int alloc_nodes;
              *
-             *     n = rdx->nodes();
+             *     alloc_nodes = rdx->alloc_nodes();
              *
              * Returns:
-             *     1. int n - number of allocated nodes in the trie(0 - NAX_NUM_RDX_NODES)
+             *     1. int alloc_nodes - number of allocated nodes in the trie(0 - MAX_RDX_NODES)
              *
              * Parameters:
              *     None
              *
              * Comments:
-             *     the number of actual nodes in the trie is MAX_NUM_RDX_NODES+1.  the extra node is the always allocated impossible
-             *     key node with key(s) 0xff.  the number of user available nodes is MAX_NUM_RDX_NODES.  this function returns
-             *     only the number of user allocated nodes in the trie.
+             *     the number of actual nodes in the trie is MAX_RDX_NODES+1.  the extra node is the always allocated impossible
+             *     key node with key(s) 0xff.  the maximum number of user available nodes is MAX_RDX_NODES.  this function
+             *     returns only the number of user allocated nodes in the trie.
              */
 
                 int
-            nodes
+            alloc_nodes
                 (
                 )
             {
-               return rdx_.tot_nodes;
-            }  // nodes()
+               return rdx_.alloc_nodes;
+            }  // alloc_nodes()
 
             /*
              *======================================================================================================================
-             *     size()
+             *     bsize()
              *
              * Purpose: 
-             *     return the size of the trie.
+             *     return the size in bytes of the trie
              *
              * Usage:
-             *     int size;
+             *     int bsize;
              *
-             *     size = rdx->size();
+             *     bsize = rdx->bsize();
              *
              * Returns:
-             *     1. int size - the size of the trie
+             *     1. int bsize - the size in bytes of the trie
              *
              * Parameters:
              *     None
              *
              * Comments:
-             *     rdx trie size - includes all data and branch nodes including the root node
+             *     rdx trie size in bytes - includes all data and branch nodes including the root node
              *     - does not include one time calloc()'s in member functions(small)
              */
 
                 int
-            size
+            bsize
                 (
                 )
             {
-               return rdx_.calloc_size;
-            }  // size()
+               return rdx_.bsize;
+            }  // bsize()
+
+            /*
+             *======================================================================================================================
+             *     max_rdx_nodes()
+             *
+             * Purpose: 
+             *     return the maximum number of data nodes that may be allocated in the trie
+             *
+             * Usage:
+             *     int max_rdx_nodes;
+             *
+             *     max_rdx_nodes = rdx->max_rdx_nodes();
+             *
+             * Returns:
+             *     1. int max_rdx_nodes - maximum number of data nodes that may be allocated in the trie
+             *
+             * Parameters:
+             *     None
+             *
+             * Comments:
+             *     1. alloc_nodes() will always return 0 to max_rdx_nodes()
+             */
+
+                int
+            max_rdx_nodes
+                (
+                )
+            {
+               return max_rdx_nodes_;
+            }  // max_rdx_nodes()
+
+            /*
+             *======================================================================================================================
+             *     num_keys()
+             *
+             * Purpose: 
+             *     return the number of keys in the trie
+             *
+             * Usage:
+             *     int num_keys;
+             *
+             *     num_keys = rdx->num_keys();
+             *
+             * Returns:
+             *     1. int num_keys - the number of keys in the trie
+             *
+             * Parameters:
+             *     None
+             *
+             * Comments:
+             */
+
+                int
+            num_keys
+                (
+                )
+            {
+               return num_keys_;
+            }  // num_keys()
+
+            /*
+             *======================================================================================================================
+             *     max_key_bytes()
+             *
+             * Purpose: 
+             *     return the maximum number of bytes in any of the num_keys_ keys
+             *
+             * Usage:
+             *     int max_key_bytes;
+             *
+             *     max_key_bytes = rdx->max_key_bytes();
+             *
+             * Returns:
+             *     1. int max_key_bytes - the maximum number of bytes in any of the num_keys_ keys
+             *
+             * Parameters:
+             *     None
+             *
+             * Comments:
+             */
+
+                int
+            max_key_bytes
+                (
+                )
+            {
+               return max_key_bytes_;
+            }  // max_key_bytes()
+
+            /*
+             *======================================================================================================================
+             *     chg_max_rdx_nodes()
+             *
+             * Purpose: 
+             *     create a new copy object of type MKRdxPat<app_data> with a new max_rdx_nodes_ and the same copied data.
+             *     the new max_rdx_nodes_ value may be equal to the number of currently allocated nodes or larger.  thus, the
+             *     new object can be shrunk to the size of the current number of allocated data nodes or expanded without limit.  
+             *
+             * Usage:
+             *     int new_max_rdx_nodes;
+             *
+             *     MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
+             *
+             * Returns:
+             *     1. object of type MKRdxPat<app_data> containing the same data as the originating object with a new size limit
+             *     2. if new_max_rdx_nodes is less than the number of currently allocated nodes then return NULL
+             *     3. if any transfer of a data node from the originating MKRdxPat<app_data> object to the new
+             *        MKRdxPat<app_data> object fails return NULL
+             *
+             * Parameters:
+             *     int new_max_rdx_nodes - the new size, max_rdx_nodes_, of the returned object
+             *
+             * Comments:
+             *     1. the originating object is not affected in any way
+             */
+
+                MKRdxPat<app_data> *
+            chg_max_rdx_nodes
+                (
+                    int new_max_rdx_nodes
+                )
+            {
+                if ( new_max_rdx_nodes < rdx_.alloc_nodes )
+                {
+                    return NULL;
+                }
+
+                MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(new_max_rdx_nodes, num_keys_, max_key_bytes_);
+
+                // get size of app_data struct
+                int datasize = sizeof( rdx_.dnodes[0].data );
+
+                //pointer to app_data struct returned by an insert()
+                app_data *app_datap;
+
+                // allocate space for the keys for node insertion into the new object
+                unsigned char *rdx_key = (unsigned char *) calloc( num_keys_ * (1+max_key_bytes_) , sizeof(unsigned char) );
+
+                // loop over all data nodes in the originating MKRdxPat<app_data> object and copy the allocated data nodes.
+                // not node 0 because this is the impossible root node which will already be in the new object upon creation
+                for ( int node = 1, return_code = 0 ; node < 1+max_rdx_nodes_ ; node++ )
+                {
+                    // alloc=0 node not allocated, alloc=1 node allocated
+                    if ( rdx_.dnodes[node].alloc == 1 )
+                    {
+                        for ( int k = 0 ; k < num_keys_ ; k++ )
+                        {
+                            rdx_key[k*(1+max_key_bytes_)+0] = 1;
+                            memmove( &rdx_key[k*(1+max_key_bytes_)+1], &rdx_.dnodes[node].key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
+                        }
+
+                        // insert node with same keys as old object
+                        return_code = rdx->insert((unsigned char *)rdx_key, &app_datap);
+                        if ( return_code != 0 )
+                        {
+                            return NULL;
+                        }
+
+                        // move app_data struct data to new node
+                        memmove(app_datap, &rdx_.dnodes[node].data, datasize );
+                    }
+                }
+
+                free(rdx_key);
+
+                return rdx;
+            }  // chg_max_rdx_nodes()
 
             /*
              *======================================================================================================================
@@ -1562,21 +1758,21 @@ namespace MultiKeyRdxPat
              *            branch nodes printed and n data nodes printed.  the path along branch nodes to data nodes is not
              *            demonstrated.  useful only for small tries for debugging purposes.
              *
-             *         b. the first arg is an array of 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' of an existing allocated
+             *         b. the first arg is an array of 'unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]' of an existing allocated
              *            data node
              *
              *            print the data node and each branch node for each key(1 - NUM_KEYS) that leads to the found data node.
              *            the application data is not printed, only the trie structure data.
              *
-             *     Setting 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]':
+             *     Setting 'unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]':
              *
              *     the second subscript first byte for all keys(key[k][0]) is the key boolean.  the key boolean should be set to
-             *     1(use the key) or 0(do not use key).  the actual key bytes(key[k][1 to NUM_KEY_BYTES]) follow the key boolean.
+             *     1(use the key) or 0(do not use key).  the actual key bytes(key[k][1 to MAX_KEY_BYTES]) follow the key boolean.
              *     thus, 1 to NUM_KEYS keys may be used.  only one key is necessary to find the data node.  each key must be unique
              *     within it's key index(0 - NUM_KEYS-1).
              *
              * Usage:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES];
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
              *     ofstream& os;
              *     int return_code;
              *
@@ -1588,11 +1784,11 @@ namespace MultiKeyRdxPat
              *     2. return_code = 1 if data node for key[][] not found
              *
              * Parameters:
-             *     unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and NUM_KEY_BYTES key bytes
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
              *     ofstream& os                                 - output stream
              *
              * Comments:
-             *     e.g. set NUM_KEYS=3 and NUM_KEY_BYTES=4
+             *     e.g. set NUM_KEYS=3 and MAX_KEY_BYTES=4
              *
              *          example 1:
              *          in key[][]:
@@ -1615,14 +1811,14 @@ namespace MultiKeyRdxPat
                 int
             print
                 (
-                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                     ofstream& os
                 )
             {
                 const int TMPSTR_SIZE = 256;
                 char tmpstr[TMPSTR_SIZE];
 
-                static unsigned char *ky;  // unsigned char ky[1+num_key_bytes_];
+                static unsigned char *ky;  // unsigned char ky[1+max_key_bytes_];
 
                 BNODE *c;
                 app_data *app_datap;
@@ -1636,10 +1832,10 @@ namespace MultiKeyRdxPat
 
                     alloc = true;
 
-                    fptr = calloc( 1+num_key_bytes_, sizeof(unsigned char));
+                    fptr = calloc( 1+max_key_bytes_, sizeof(unsigned char));
                     ky = (unsigned char *) fptr;
                     free_ptr_.push_back(fptr);
-                    free_msg_.push_back("print(): calloc(): unsigned char ky[1+num_key_bytes_]");
+                    free_msg_.push_back("print(): calloc(): unsigned char ky[1+max_key_bytes_]");
                 }
 
                 if ( key == NULL )
@@ -1651,11 +1847,11 @@ namespace MultiKeyRdxPat
                           "branch nodes printed and n data nodes printed.  the path along branch nodes to data nodes is not\n"
                           "demonstrated.  useful only for small tries for debugging purposes.\n\n"
 
-                          "Total nodes allocated: " << rdx_.tot_nodes << "  Number of keys: " << num_keys_ << "  Key length: " << num_key_bytes_ << "\n\n\n"
+                          "Total nodes allocated: " << rdx_.alloc_nodes << "  Number of keys: " << num_keys_ << "  Key length: " << max_key_bytes_ << "\n\n\n"
                           "NODE n\n\n"
                           "Branch Node Format:\n"
                           "  key = (key index into key array in data node)\n"
-                          "  nsn = (node sequence number, 0-max_num_rdx_nodes_+1)\n"
+                          "  nsn = (node sequence number, 0-max_rdx_nodes_+1)\n"
                           "   id = (node id - 0 = branch node, 1 - data node)\n"
                           "  bna = (branch node address)\n"
                           "   br = (left/right branch of parent - 0 = left, 1 = right)\n"
@@ -1669,14 +1865,14 @@ namespace MultiKeyRdxPat
                           "  dna = (data node address)\n"
                           "   br = (left/right branch of parent - 0 = left, 1 = right)\n"
                           "    p = (parent address)\n"
-                          "  nsn = (node sequence number, 0-max_num_rdx_nodes_+1)\n"
+                          "  nsn = (node sequence number, 0-max_rdx_nodes_+1)\n"
                           "alloc = (0-node not allocated, 1-node allocated)\n"
                           "key n = (hex key value)\n"
                           "      .\n"
                           "      .\n"
                           "      .\n\n\n";
 
-                    for ( int n = 0 ; n < max_num_rdx_nodes_+1 ; n++ )
+                    for ( int n = 0 ; n < max_rdx_nodes_+1 ; n++ )
                     {
                         if ( rdx_.dnodes[n].alloc != 1 )
                         {
@@ -1775,9 +1971,9 @@ namespace MultiKeyRdxPat
                         {
                             snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
                             os << tmpstr;
-                            for ( int b = 0 ; b < num_key_bytes_ ; b++ )
+                            for ( int b = 0 ; b < max_key_bytes_ ; b++ )
                             {
-                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", rdx_.dnodes[n].key[k*(1+num_key_bytes_)+b+1]);
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", rdx_.dnodes[n].key[k*(1+max_key_bytes_)+b+1]);
                                 os << tmpstr;
                             }
                             os << "\n";
@@ -1802,9 +1998,9 @@ namespace MultiKeyRdxPat
                     {
                         snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
                         os << tmpstr;
-                        for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
+                        for ( int b = 0 ; b < 1+max_key_bytes_ ; b++ )
                         {
-                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+max_key_bytes_)+b]);
                             os << tmpstr;
                         }
                         os << "\n";
@@ -1812,7 +2008,7 @@ namespace MultiKeyRdxPat
                     os << "\n";
 
                     os << "Branch Node Format:\n"
-                          "  nsn = (node sequence number, 0-max_num_rdx_nodes_+1)\n"
+                          "  nsn = (node sequence number, 0-max_rdx_nodes_+1)\n"
                           "   id = (node id - 0 = branch node, 1 - data node)\n"
                           "  bna = (branch node address)\n"
                           "   br = (left/right branch of parent - 0 = left, 1 = right)\n"
@@ -1826,7 +2022,7 @@ namespace MultiKeyRdxPat
                           "  dna = (data node address)\n"
                           "   br = (left/right branch of parent - 0 = left, 1 = right)\n"
                           "    p = (parent address)\n"
-                          "  nsn = (node sequence number, 0-max_num_rdx_nodes_+1)\n"
+                          "  nsn = (node sequence number, 0-max_rdx_nodes_+1)\n"
                           "alloc = (0-node not allocated, 1-node allocated)\n"
                           "key n = (hex key value)\n"
                           "      .\n"
@@ -1843,15 +2039,15 @@ namespace MultiKeyRdxPat
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
                         // copy key to storage with extra byte for comparison
-                        ky[k*(1+num_key_bytes_)+0] = 0;
-                        memmove( &ky[k*(1+num_key_bytes_)+1], &key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
+                        ky[k*(1+max_key_bytes_)+0] = 0;
+                        memmove( &ky[k*(1+max_key_bytes_)+1], &key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
 
                         os << "==========\n";
                         snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
                         os << tmpstr;
-                        for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
+                        for ( int b = 0 ; b < 1+max_key_bytes_ ; b++ )
                         {
-                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                            snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+max_key_bytes_)+b]);
                             os << tmpstr;
                         }
                         os << "\n\n";
@@ -1906,9 +2102,9 @@ namespace MultiKeyRdxPat
                         {
                             snprintf(tmpstr, sizeof(tmpstr), "  key %2d = ", k);
                             os << tmpstr;
-                            for ( int b = 0 ; b < 1+num_key_bytes_ ; b++ )
+                            for ( int b = 0 ; b < 1+max_key_bytes_ ; b++ )
                             {
-                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+num_key_bytes_)+b]);
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", key[k*(1+max_key_bytes_)+b]);
                                 os << tmpstr;
                             }
                             os << "\n";
@@ -1972,27 +2168,27 @@ namespace MultiKeyRdxPat
                 DNODE *dhead;
 
                 // holds all of the allocated branch node addresses
-                // unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1]; -> bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
+                // unsigned long bnode_addrs[num_keys_][max_rdx_nodes_+1]; -> bnode_addrs[k*(max_rdx_nodes_+1)+n]
                 static unsigned long *bnode_addrs;
 
                 // holds all of the unallocated branch node addresses
-                // unsigned long free_bnode_addrs[num_keys_][max_num_rdx_nodes_+1]; -> free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
+                // unsigned long free_bnode_addrs[num_keys_][max_rdx_nodes_+1]; -> free_bnode_addrs[k*(max_rdx_nodes_+1)+n]
                 static unsigned long *free_bnode_addrs;
 
                 // holds all of the allocated data node addresses
-                // unsigned long dnode_addrs[max_num_rdx_nodes_+1]; -> dnode_addrs[n]
+                // unsigned long dnode_addrs[max_rdx_nodes_+1]; -> dnode_addrs[n]
                 static unsigned long *dnode_addrs;
 
                 // holds all of the unallocated data node addresses
-                // unsigned long free_dnode_addrs[max_num_rdx_nodes_+1]; -> free_dnode_addrs[n]
+                // unsigned long free_dnode_addrs[max_rdx_nodes_+1]; -> free_dnode_addrs[n]
                 static unsigned long *free_dnode_addrs;
 
                 // hold all of the allocated data node keys
-                // unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_]; -> dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]
+                // unsigned char dnode_keys[num_keys_][max_rdx_nodes_+1][max_key_bytes_]; -> dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]
                 static unsigned char *dnode_keys;
 
-                // holds integer indexes(0 to max_num_rdx_nodes_) of free and allocated nodes
-                // unsigned long node_index[2][max_num_rdx_nodes_+1]; -> node_index[i*(max_num_rdx_nodes_+1)+n]
+                // holds integer indexes(0 to max_rdx_nodes_) of free and allocated nodes
+                // unsigned long node_index[2][max_rdx_nodes_+1]; -> node_index[i*(max_rdx_nodes_+1)+n]
                 static unsigned long *node_index;
 
                 static bool alloc = false;  // static - only first time verify() for calloc() calls
@@ -2004,40 +2200,40 @@ namespace MultiKeyRdxPat
                     alloc = true;
 
 
-                    fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1), sizeof(unsigned long));
+                    fptr = calloc( num_keys_ * (max_rdx_nodes_+1), sizeof(unsigned long));
                     bnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1]");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long bnode_addrs[num_keys_][max_rdx_nodes_+1]");
                     free_msg_.push_back(tmpstr);
 
-                    fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1), sizeof(unsigned long));
+                    fptr = calloc( num_keys_ * (max_rdx_nodes_+1), sizeof(unsigned long));
                     free_bnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_bnode_addrs[num_keys_][max_num_rdx_nodes_+1];");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_bnode_addrs[num_keys_][max_rdx_nodes_+1];");
                     free_msg_.push_back(tmpstr);
 
-                    fptr = calloc( max_num_rdx_nodes_+1, sizeof(unsigned long));
+                    fptr = calloc( max_rdx_nodes_+1, sizeof(unsigned long));
                     dnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long dnode_addrs[max_num_rdx_nodes_+1];");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long dnode_addrs[max_rdx_nodes_+1];");
                     free_msg_.push_back(tmpstr);
 
-                    fptr = calloc( max_num_rdx_nodes_+1, sizeof(unsigned long));
+                    fptr = calloc( max_rdx_nodes_+1, sizeof(unsigned long));
                     free_dnode_addrs = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_dnode_addrs[max_num_rdx_nodes_+1];");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long free_dnode_addrs[max_rdx_nodes_+1];");
                     free_msg_.push_back(tmpstr);
 
-                    fptr = calloc( num_keys_ * (max_num_rdx_nodes_+1) * num_key_bytes_ , sizeof(unsigned char));
+                    fptr = calloc( num_keys_ * (max_rdx_nodes_+1) * max_key_bytes_ , sizeof(unsigned char));
                     dnode_keys = (unsigned char *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_];");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned char dnode_keys[num_keys_][max_rdx_nodes_+1][max_key_bytes_];");
                     free_msg_.push_back(tmpstr);
 
-                    fptr = calloc( 2 * (max_num_rdx_nodes_+1) , sizeof(unsigned long));
+                    fptr = calloc( 2 * (max_rdx_nodes_+1) , sizeof(unsigned long));
                     node_index = (unsigned long *) fptr;
                     free_ptr_.push_back(fptr);
-                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long node_index[2][max_num_rdx_nodes_+1];");
+                    snprintf(tmpstr, sizeof(tmpstr), "verify(): calloc(): unsigned long node_index[2][max_rdx_nodes_+1];");
                     free_msg_.push_back(tmpstr);
                 }
 
@@ -2045,28 +2241,28 @@ namespace MultiKeyRdxPat
                 // each free/alloc node and the total number of free and allocated nodes
                 tot_free_nodes = 0;
                 tot_alloc_nodes = 0;
-                for ( int n = 0 ; n < max_num_rdx_nodes_+1 ; n++ )
+                for ( int n = 0 ; n < max_rdx_nodes_+1 ; n++ )
                 {
                     if ( rdx_.dnodes[n].alloc == 0 )
                     {
-                        node_index[FREE*(max_num_rdx_nodes_+1)+tot_free_nodes] = n;
+                        node_index[FREE*(max_rdx_nodes_+1)+tot_free_nodes] = n;
                         free_dnode_addrs[tot_free_nodes] = (unsigned long)&rdx_.dnodes[n];
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            free_bnode_addrs[k*(max_num_rdx_nodes_+1)+tot_free_nodes] = (unsigned long)&rdx_.bnodes[n*num_keys_+k];
+                            free_bnode_addrs[k*(max_rdx_nodes_+1)+tot_free_nodes] = (unsigned long)&rdx_.bnodes[n*num_keys_+k];
                         }
 
                         tot_free_nodes++;
                     }
                     else
                     {
-                        node_index[ALLOC*(max_num_rdx_nodes_+1)+tot_alloc_nodes] = n;
+                        node_index[ALLOC*(max_rdx_nodes_+1)+tot_alloc_nodes] = n;
                         dnode_addrs[tot_alloc_nodes] = (unsigned long)&rdx_.dnodes[n];
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            bnode_addrs[k*(max_num_rdx_nodes_+1)+tot_alloc_nodes] = (unsigned long)&rdx_.bnodes[n*num_keys_+k];
-                            memmove( &dnode_keys[(k*(max_num_rdx_nodes_+1)+tot_alloc_nodes)*num_key_bytes_+0], &rdx_.dnodes[n].key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
-                                   // dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]
+                            bnode_addrs[k*(max_rdx_nodes_+1)+tot_alloc_nodes] = (unsigned long)&rdx_.bnodes[n*num_keys_+k];
+                            memmove( &dnode_keys[(k*(max_rdx_nodes_+1)+tot_alloc_nodes)*max_key_bytes_+0], &rdx_.dnodes[n].key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
+                                   // dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]
                         }
 
                         tot_alloc_nodes++;
@@ -2088,11 +2284,11 @@ namespace MultiKeyRdxPat
 
                     for ( int n = 0 ; n < tot_free_nodes ; n++ )
                     {
-                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[FREE*(max_num_rdx_nodes_+1)+n], free_dnode_addrs[n]);
+                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[FREE*(max_rdx_nodes_+1)+n], free_dnode_addrs[n]);
                         os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                           snprintf(tmpstr, sizeof(tmpstr), "  %08lx", free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
+                           snprintf(tmpstr, sizeof(tmpstr), "  %08lx", free_bnode_addrs[k*(max_rdx_nodes_+1)+n]);
                             os << tmpstr;
                         }
                         os << "\n";
@@ -2110,11 +2306,11 @@ namespace MultiKeyRdxPat
 
                     for ( int n = 0 ; n < tot_alloc_nodes ; n++ )
                     {
-                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[ALLOC*(max_num_rdx_nodes_+1)+n], dnode_addrs[n]);
+                        snprintf(tmpstr, sizeof(tmpstr), "%4ld  %08lx          ", node_index[ALLOC*(max_rdx_nodes_+1)+n], dnode_addrs[n]);
                         os << tmpstr;
                         for ( int k = 0 ; k < num_keys_ ; k++ )
                         {
-                            snprintf(tmpstr, sizeof(tmpstr), "  %08lx", bnode_addrs[k*(max_num_rdx_nodes_+1)+n]);
+                            snprintf(tmpstr, sizeof(tmpstr), "  %08lx", bnode_addrs[k*(max_rdx_nodes_+1)+n]);
                             os << tmpstr;
                         }
                         os << "\n";
@@ -2123,9 +2319,9 @@ namespace MultiKeyRdxPat
                         {
                             snprintf(tmpstr, sizeof(tmpstr), "      key %-2d = ", k);
                             os << tmpstr;
-                            for ( int b = 0 ; b < num_key_bytes_ ; b++ )
+                            for ( int b = 0 ; b < max_key_bytes_ ; b++ )
                             {
-                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
+                                snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]);
                                 os << tmpstr;
                             }
                             os << "\n";
@@ -2172,12 +2368,12 @@ namespace MultiKeyRdxPat
                         return 3;
                     }
 
-                    if ( rdx_.bnodes[0*num_keys_+k].b != (unsigned int)num_key_bytes_*8 )
+                    if ( rdx_.bnodes[0*num_keys_+k].b != (unsigned int)max_key_bytes_*8 )
                     {
                         if ( vm == ERR_CODE_PRINT )
                         {
                             snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 4): Root branch node with b not equal to"
-                                        " num_key_bytes_*8 - %d\n",
+                                        " max_key_bytes_*8 - %d\n",
                                 __FILE__, __LINE__, rdx_.bnodes[0*num_keys_+k].b);
                             os << tmpstr;
                         }
@@ -2195,9 +2391,9 @@ namespace MultiKeyRdxPat
                         return 5;
                     }
 
-                    for ( int b = 0 ; b < num_key_bytes_+1 ; b++ )
+                    for ( int b = 0 ; b < max_key_bytes_+1 ; b++ )
                     {
-                        if ( rdx_.dnodes[0].key[k*(1+num_key_bytes_)+b] != 0xff )
+                        if ( rdx_.dnodes[0].key[k*(1+max_key_bytes_)+b] != 0xff )
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
@@ -2212,7 +2408,7 @@ namespace MultiKeyRdxPat
 
                 // save data node, free node, branch node and key node address queues(will be unsorted),
                 // total number of free nodes and total number of allocated nodes
-                for ( int n = 0 ; n < max_num_rdx_nodes_+1 ; n++ )
+                for ( int n = 0 ; n < max_rdx_nodes_+1 ; n++ )
                 {
                     if ( rdx_.dnodes[n].id != 1 )
                     {
@@ -2264,27 +2460,27 @@ namespace MultiKeyRdxPat
                     }
                 }
 
-                // verify that the sum of free and allocated nodes is max_num_rdx_nodes_+1 nodes
-                if ( (tot_alloc_nodes + tot_free_nodes) != max_num_rdx_nodes_+1 )
+                // verify that the sum of free and allocated nodes is max_rdx_nodes_+1 nodes
+                if ( (tot_alloc_nodes + tot_free_nodes) != max_rdx_nodes_+1 )
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
                         snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 11): Total allocated nodes(%d) + free nodes(%d)"
-                                    " not equal max_num_rdx_nodes_+1(%d)\n",
-                            __FILE__, __LINE__, tot_alloc_nodes, tot_free_nodes, max_num_rdx_nodes_+1);
+                                    " not equal max_rdx_nodes_+1(%d)\n",
+                            __FILE__, __LINE__, tot_alloc_nodes, tot_free_nodes, max_rdx_nodes_+1);
                         os << tmpstr;
                     }
                     return 11;
                 }
 
-                // verify that the tot_alloc_nodes equals rdx_.tot_nodes
-                if ( (unsigned int)tot_alloc_nodes != (rdx_.tot_nodes+1) )
+                // verify that the tot_alloc_nodes equals rdx_.alloc_nodes
+                if ( (unsigned int)tot_alloc_nodes != (rdx_.alloc_nodes+1) )
                 {
                     if ( vm == ERR_CODE_PRINT )
                     {
                         snprintf(tmpstr, sizeof(tmpstr), "rdx->verify():(file %s  line %d  ERR_CODE 12): Total allocated nodes(%d)"
-                                    " not equal rdx_.tot_nodes(%d)\n",
-                            __FILE__, __LINE__, tot_alloc_nodes, rdx_.tot_nodes);
+                                    " not equal rdx_.alloc_nodes(%d)\n",
+                            __FILE__, __LINE__, tot_alloc_nodes, rdx_.alloc_nodes);
                         os << tmpstr;
                     }
                     return 12;
@@ -2297,7 +2493,7 @@ namespace MultiKeyRdxPat
 
                     for ( n = 0 ; n < tot_alloc_nodes ; n++ )
                     {
-                        // unsigned long dnode_addrs[max_num_rdx_nodes_+1]; -> dnode_addrs[n]
+                        // unsigned long dnode_addrs[max_rdx_nodes_+1]; -> dnode_addrs[n]
                         unsigned long ul = dnode_addrs[n];
                         da.push_back(ul);
                     }
@@ -2319,7 +2515,7 @@ namespace MultiKeyRdxPat
 
                     for ( n = 0 ; n < tot_free_nodes ; n++ )
                     {
-                        // unsigned long free_dnode_addrs[max_num_rdx_nodes_+1]; -> free_dnode_addrs[n]
+                        // unsigned long free_dnode_addrs[max_rdx_nodes_+1]; -> free_dnode_addrs[n]
                         unsigned long ul = free_dnode_addrs[n];
                         fda.push_back(ul);
                     }
@@ -2343,8 +2539,8 @@ namespace MultiKeyRdxPat
 
                         for ( n = 0 ; n < tot_alloc_nodes ; n++ )
                         {
-                            // unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1]; -> bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
-                            unsigned long ul = bnode_addrs[k*(max_num_rdx_nodes_+1)+n];
+                            // unsigned long bnode_addrs[num_keys_][max_rdx_nodes_+1]; -> bnode_addrs[k*(max_rdx_nodes_+1)+n]
+                            unsigned long ul = bnode_addrs[k*(max_rdx_nodes_+1)+n];
                             ba.push_back(ul);
                         }
 
@@ -2353,7 +2549,7 @@ namespace MultiKeyRdxPat
                         n = 0;
                         for( vector<unsigned long>::iterator it = ba.begin(); it != ba.end(); ++it )
                         {
-                            bnode_addrs[k*(max_num_rdx_nodes_+1)+n] = *it;
+                            bnode_addrs[k*(max_rdx_nodes_+1)+n] = *it;
                             n++;
                         }
                     }
@@ -2365,8 +2561,8 @@ namespace MultiKeyRdxPat
 
                         for ( n = 0 ; n < tot_free_nodes ; n++ )
                         {
-                            // unsigned long free_bnode_addrs[num_keys_][max_num_rdx_nodes_+1]; -> free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
-                            unsigned long ul = free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n];
+                            // unsigned long free_bnode_addrs[num_keys_][max_rdx_nodes_+1]; -> free_bnode_addrs[k*(max_rdx_nodes_+1)+n]
+                            unsigned long ul = free_bnode_addrs[k*(max_rdx_nodes_+1)+n];
                             fba.push_back(ul);
                         }
 
@@ -2375,7 +2571,7 @@ namespace MultiKeyRdxPat
                         n = 0;
                         for( vector<unsigned long>::iterator it = fba.begin(); it != fba.end(); ++it )
                         {
-                            free_bnode_addrs[k*(max_num_rdx_nodes_+1)+n] = *it;
+                            free_bnode_addrs[k*(max_rdx_nodes_+1)+n] = *it;
                             n++;
                         }
                     }
@@ -2387,8 +2583,8 @@ namespace MultiKeyRdxPat
 
                         for ( n = 0 ; n < tot_alloc_nodes ; n++ )
                         {
-                            // unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_]; -> dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]
-                            string s( (char *)(&dnode_keys[(k*(max_num_rdx_nodes_+1)+0)*num_key_bytes_+(n*num_key_bytes_)]), num_key_bytes_);
+                            // unsigned char dnode_keys[num_keys_][max_rdx_nodes_+1][max_key_bytes_]; -> dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]
+                            string s( (char *)(&dnode_keys[(k*(max_rdx_nodes_+1)+0)*max_key_bytes_+(n*max_key_bytes_)]), max_key_bytes_);
                             dk.push_back(s);
                         }
 
@@ -2397,7 +2593,7 @@ namespace MultiKeyRdxPat
                         n = 0;
                         for( vector<string>::iterator it = dk.begin(); it != dk.end(); ++it )
                         {
-                            (*it).copy( (char *)(&dnode_keys[(k*(max_num_rdx_nodes_+1)+0)*num_key_bytes_+(n*num_key_bytes_)]), num_key_bytes_ );
+                            (*it).copy( (char *)(&dnode_keys[(k*(max_rdx_nodes_+1)+0)*max_key_bytes_+(n*max_key_bytes_)]), max_key_bytes_ );
                             n++;
                         }
                     }
@@ -2409,7 +2605,7 @@ namespace MultiKeyRdxPat
                 {
                     for ( int n = 0 ; n < tot_alloc_nodes-1 ; n++ )
                     {
-                        if ( memcmp( &dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+0], &dnode_keys[(k*(max_num_rdx_nodes_+1)+n+1)*num_key_bytes_+0], num_key_bytes_ ) == 0 )
+                        if ( memcmp( &dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+0], &dnode_keys[(k*(max_rdx_nodes_+1)+n+1)*max_key_bytes_+0], max_key_bytes_ ) == 0 )
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
@@ -2417,9 +2613,9 @@ namespace MultiKeyRdxPat
                                             " and key value\n   ",
                                     __FILE__, __LINE__, k);
                                 os << tmpstr;
-                                for ( int b = 0 ; b < num_key_bytes_ ; b++ )
+                                for ( int b = 0 ; b < max_key_bytes_ ; b++ )
                                 {
-                                    snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]);
+                                    snprintf(tmpstr, sizeof(tmpstr), "%02x ", dnode_keys[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]);
                                     os << tmpstr;
                                 }
                                 os << "\n";
@@ -2443,7 +2639,7 @@ namespace MultiKeyRdxPat
                         // check if current pointer is in free data node list
                         ptr = bsearch(
                                          (void *)(&bhead),
-                                         (void *)(&free_bnode_addrs[k*(max_num_rdx_nodes_+1)+0]),
+                                         (void *)(&free_bnode_addrs[k*(max_rdx_nodes_+1)+0]),
                                          tot_free_nodes,
                                          sizeof(unsigned long),
                                          unsigned_long_compare
@@ -2534,7 +2730,7 @@ namespace MultiKeyRdxPat
                             ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].p;
                             ptr = bsearch(
                                              (void *)(&ui),
-                                             (void *)(&bnode_addrs[k*(max_num_rdx_nodes_+1)+0]),
+                                             (void *)(&bnode_addrs[k*(max_rdx_nodes_+1)+0]),
                                              tot_alloc_nodes,
                                              sizeof(unsigned long),
                                              unsigned_long_compare
@@ -2553,7 +2749,7 @@ namespace MultiKeyRdxPat
                         }
 
                         // check if PATRICIA algorithm branch test bit number is valid
-                        if ( rdx_.bnodes[n*num_keys_+k].b > (unsigned int)num_key_bytes_*8 )
+                        if ( rdx_.bnodes[n*num_keys_+k].b > (unsigned int)max_key_bytes_*8 )
                         {
                             if ( vm == ERR_CODE_PRINT )
                             {
@@ -2569,7 +2765,7 @@ namespace MultiKeyRdxPat
                         ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].l;
                         bptr = bsearch(
                                           (void *)(&ui),
-                                          (void *)(&bnode_addrs[k*(max_num_rdx_nodes_+1)+0]),
+                                          (void *)(&bnode_addrs[k*(max_rdx_nodes_+1)+0]),
                                           tot_alloc_nodes,
                                           sizeof(unsigned long),
                                           unsigned_long_compare
@@ -2600,7 +2796,7 @@ namespace MultiKeyRdxPat
                             ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].r;
                             bptr = bsearch(
                                               (void *)(&ui),
-                                              (void *)(&bnode_addrs[k*(max_num_rdx_nodes_+1)+0]),
+                                              (void *)(&bnode_addrs[k*(max_rdx_nodes_+1)+0]),
                                               tot_alloc_nodes,
                                               sizeof(unsigned long),
                                               unsigned_long_compare
@@ -2629,7 +2825,7 @@ namespace MultiKeyRdxPat
                         ui = (unsigned long)rdx_.dnodes[n].p[k];
                         ptr = bsearch(
                                          (void *)(&ui),
-                                         (void *)(&bnode_addrs[k*(max_num_rdx_nodes_+1)+0]),
+                                         (void *)(&bnode_addrs[k*(max_rdx_nodes_+1)+0]),
                                          tot_alloc_nodes,
                                          sizeof(unsigned long),
                                          unsigned_long_compare
@@ -2664,8 +2860,8 @@ namespace MultiKeyRdxPat
                 // retrieve all keys from all data nodes and use normal search(rdx->search())
                 // to find them - ignore root node keys
 
-                // unsigned char key[num_keys_][1+num_key_bytes_]
-                unsigned char *key = (unsigned char *)calloc( num_keys_ * (1+num_key_bytes_), sizeof(unsigned char) );
+                // unsigned char key[num_keys_][1+max_key_bytes_]
+                unsigned char *key = (unsigned char *)calloc( num_keys_ * (1+max_key_bytes_), sizeof(unsigned char) );
 
                 for ( int n = 1 ; n < tot_alloc_nodes ; n++ )
                 {
@@ -2675,8 +2871,8 @@ namespace MultiKeyRdxPat
                     // get data node keys directly from allocated data node
                     for ( int k = 0 ; k < num_keys_ ; k++ )
                     {
-                        key[k*(1+num_key_bytes_)+0] = 1;
-                        memmove( &key[k*(1+num_key_bytes_)+1], &rdx_.dnodes[n].key[k*(1+num_key_bytes_)+1], num_key_bytes_ );
+                        key[k*(1+max_key_bytes_)+0] = 1;
+                        memmove( &key[k*(1+max_key_bytes_)+1], &rdx_.dnodes[n].key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
                     }
 
                     // search for node n keys

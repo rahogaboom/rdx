@@ -125,8 +125,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. Only the impossible pre-allocated root node should be printed since\n";
@@ -135,7 +135,7 @@ main()
 
         os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -196,8 +196,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. One node insertion with return code 0\n";
@@ -208,7 +208,7 @@ main()
 
 
         os << "b. Total nodes allocated(not including root node) 1\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         app_datap->id = 20;
         os << "set app_datap->id = 20\n";
@@ -217,7 +217,7 @@ main()
         os << "set app_datap->d = 2.0\n";
         os << "get app_datap->d = " << app_datap->d << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "c. No verification error\n";
@@ -231,7 +231,7 @@ main()
 
         os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "e. Same keys node insertion should return code 1\n";
@@ -240,7 +240,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "f. Different keys node insertion into full rdx should return code 2\n";
@@ -254,7 +254,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "g. Same keys node insertion with a key boolean set to 0 should return code 3\n";
@@ -264,7 +264,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -322,8 +322,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
@@ -339,7 +339,7 @@ main()
 
         os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -400,8 +400,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. Four data node insertions with return code 0\n";
@@ -426,7 +426,7 @@ main()
 
 
         os << "b. Total nodes allocated(not including root node) 4\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "c. No verification error\n\n";
@@ -434,7 +434,7 @@ main()
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -495,8 +495,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. insert 4 data nodes and search/find them\n";
@@ -508,7 +508,7 @@ main()
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
         }
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "b. fail to find 4 nodes who's keys were not inserted\n\n";
@@ -528,7 +528,7 @@ main()
         }
         os << "\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -598,8 +598,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. Sort rdx with no nodes inserted and key index set to 3 - should return -1\n";
@@ -645,7 +645,7 @@ main()
             os << string;
         }
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         for ( int k = 0 ; k < NUM_KEYS ; k++ )
         {
@@ -674,7 +674,7 @@ main()
             os << "rdx - Total sorted nodes = " << return_code << "\n\n";
         }
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -737,8 +737,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         for ( int n = 0, sum = 0 ; n < 5 ; n++ )
@@ -757,7 +757,7 @@ main()
             os << string;
         }
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
 
         os << "a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n";
@@ -780,7 +780,7 @@ main()
 
         os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -838,8 +838,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. Do not report success - report only errors in insert/search/remove operations\n\n";
@@ -914,7 +914,7 @@ main()
         }
         os << " Total Insert/Search/Remove tests run " << test_num << "  Total errors detected " << tot_errs << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         delete rdx;
 
@@ -981,8 +981,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. insert one data node - should succeed\n";
@@ -995,7 +995,7 @@ main()
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "b. search on the inserted data node - should succeed\n";
@@ -1203,8 +1203,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
@@ -1217,7 +1217,7 @@ main()
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n";
 
-            os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n";
+            os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
         }
         os << "\n\n";
 
@@ -1290,8 +1290,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
@@ -1316,7 +1316,7 @@ main()
 
 
         os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
@@ -1435,8 +1435,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
@@ -1461,7 +1461,7 @@ main()
 
 
         os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
         os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
@@ -1553,8 +1553,8 @@ main()
 
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
 
-        os << "rdx - Nodes allocated = " << rdx->nodes() << "\n";
-        os << "rdx - Bytes allocated = " << rdx->size() << "\n\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
@@ -1644,8 +1644,8 @@ main()
 
         MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
 
-        os << "rdx1 - Nodes allocated = " << rdx1->nodes() << "\n";
-        os << "rdx1 - Bytes allocated = " << rdx1->size() << "\n\n";
+        os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
 
         for ( int n = 0, id = 0, d = 0. ; n < MAX_NUM_RDX_NODES1 ; n++, id++, d++ )
         {
@@ -1666,8 +1666,8 @@ main()
         }
         os << "\n";
 
-        os << "rdx1 - Nodes allocated = " << rdx1->nodes() << "\n";
-        os << "rdx1 - Bytes allocated = " << rdx1->size() << "\n\n";
+        os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
 
         os << "b. No verification error in first trie\n";
         return_code = rdx1->verify(ERR_CODE_PRINT, os);
@@ -1718,8 +1718,8 @@ main()
 
         MKRdxPat<app_data2> *rdx2 = new MKRdxPat<app_data2>(MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2);
 
-        os << "rdx2 - Nodes allocated = " << rdx2->nodes() << "\n";
-        os << "rdx2 - Bytes allocated = " << rdx2->size() << "\n\n";
+        os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
 
         for ( int n = 0, id = 100, d = 200.0 ; n < MAX_NUM_RDX_NODES2 ; n++, id++, d++ )
         {
@@ -1740,14 +1740,156 @@ main()
         }
         os << "\n";
 
-        os << "rdx2 - Nodes allocated = " << rdx2->nodes() << "\n";
-        os << "rdx2 - Bytes allocated = " << rdx2->size() << "\n\n";
+        os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
 
         os << "d. No verification error in second trie\n";
         return_code = rdx2->verify(ERR_CODE_PRINT, os);
         os << "\n";
 
         delete rdx2;
+
+        os.close();
+    }
+
+    {  // TEST 14
+        int return_code;
+        int sum = 0;
+
+
+        ofstream os;
+        os.open("MKRdxPat.TEST14.results");
+
+        os << "\n"
+              "TEST 14: \n"
+              "         Expected Results:\n"
+              "            d. No verification error in second trie\n\n";
+
+
+        //
+        // define app_data1, MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1, rdx_key1[][][]
+        //
+
+        // application data of type app_data1 defined here
+        struct app_data1
+        {
+            int id;
+            double d;
+            int j;
+        };
+
+        app_data1 *app_data1p;
+        app_data1 **app_data1pp;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES1 = 25;
+
+        // number of rdx search keys
+        const int NUM_KEYS1 = 5;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES1 = 10;
+
+        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key1[MAX_NUM_RDX_NODES1+1][NUM_KEYS1][1+NUM_KEY_BYTES1];
+
+        memset(rdx_key1, 0, (MAX_NUM_RDX_NODES1+1) * NUM_KEYS1 * (1+NUM_KEY_BYTES1));
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES1+1 ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS1 ; k++ )
+            {
+                rdx_key1[n][k][0] = 1;  // set key boolean to 1
+                rdx_key1[n][k][NUM_KEY_BYTES1] = sum++;
+            }
+        }
+
+        os << "a. First trie filled with data\n"
+              "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n"
+              "NUM_KEYS1 = " << NUM_KEYS1 << "\n"
+              "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
+
+        MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
+
+        for ( int n = 0, id = 10, d = 2.0 ; n < 20 ; n++, id++, d++ )
+        {
+            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, NUM_KEY_BYTES1);
+            return_code = rdx1->insert((unsigned char *)rdx_key1[n], &app_data1p);
+
+            os << "return_code = rdx1->insert((unsigned char *)rdx_key1[" << n << "], &app_data1p); return_code = " << return_code << "\n\n";
+
+            if ( return_code == 0 )
+            {
+                app_data1p->id = id;
+                os << "set app_data1p->id = " << id << "\n";
+                os << "get app_data1p->id = " << app_data1p->id << "\n";
+                app_data1p->d = d;
+                os << "set app_data1p->d = " << d << "\n";
+                os << "get app_data1p->d = " << app_data1p->d << "\n\n";
+            }
+        }
+        os << "\n";
+
+        os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
+
+        return_code = rdx1->sort(&app_data1pp, 0);
+
+        os << "return_code = rdx1->sort(&app_data1pp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_data1pp << "\n\n\n";
+
+        MKRdxPat<app_data1> *rdx2 = rdx1->chg_max_rdx_nodes(100);
+        // os << "n = " << n << "\n";
+
+        delete rdx1;
+
+        os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
+
+        app_data1 *app_data2p;
+        //app_data1 **app_data2pp;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_NUM_RDX_NODES2 = 50;
+
+        // number of rdx search keys
+        const int NUM_KEYS2 = 5;
+
+        // number of bytes in each key(s)
+        const int NUM_KEY_BYTES2 = 10;
+
+        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key2[MAX_NUM_RDX_NODES2+1][NUM_KEYS2][1+NUM_KEY_BYTES2];
+
+        memset(rdx_key2, 0, (MAX_NUM_RDX_NODES2+1) * NUM_KEYS2 * (1+NUM_KEY_BYTES2));
+        for ( int n = 0 ; n < MAX_NUM_RDX_NODES2+1 ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS2 ; k++ )
+            {
+                rdx_key2[n][k][0] = 1;  // set key boolean to 1
+                rdx_key2[n][k][NUM_KEY_BYTES1] = sum++;
+            }
+        }
+
+        for ( int n = 0, id = 100, d = 20.0 ; n < 50 ; n++, id++, d++ )
+        {
+            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, NUM_KEY_BYTES2);
+            return_code = rdx2->insert((unsigned char *)rdx_key2[n], &app_data2p);
+
+            os << "return_code = rdx2->insert((unsigned char *)rdx_key2[" << n << "], &app_data2p); return_code = " << return_code << "\n\n";
+
+            if ( return_code == 0 )
+            {
+                app_data2p->id = id;
+                os << "set app_data2p->id = " << id << "\n";
+                os << "get app_data2p->id = " << app_data2p->id << "\n";
+                app_data2p->d = d;
+                os << "set app_data2p->d = " << d << "\n";
+                os << "get app_data2p->d = " << app_data2p->d << "\n\n";
+            }
+        }
+        os << "\n";
+
+        os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
 
         os.close();
     }

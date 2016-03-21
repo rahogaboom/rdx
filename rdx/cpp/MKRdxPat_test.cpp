@@ -35,7 +35,7 @@
  *
  * NOTES:
  *     1. all tests are independent.  any test may be deleted; it will affect no other test
- *     2. try the tests with different values for MAX_NUM_RDX_NODES, NUM_KEYS and NUM_KEY_BYTES
+ *     2. try the tests with different values for MAX_RDX_NODES, NUM_KEYS and MAX_KEY_BYTES
  *     3. each test outputs to it's own file of filename format: MKRdxPat.TESTn.results
  *     4. use the './MKRdxPat.mk' script to compile and execute the tests
  *     5. use './MKRdxPat.mk clean' to clean the directory
@@ -55,7 +55,7 @@ print_key
         unsigned char *key,
         ofstream& os,
         int NUM_KEYS,
-        int NUM_KEY_BYTES
+        int MAX_KEY_BYTES
     )
 {
     const size_t MSG_BUF_SIZE = 256;
@@ -64,14 +64,14 @@ print_key
     os << "kb key\n";
     for ( int k = 0 ; k < NUM_KEYS ; k++ )
     {
-        for ( int b = 0 ; b < NUM_KEY_BYTES+1 ; b++ )
+        for ( int b = 0 ; b < MAX_KEY_BYTES+1 ; b++ )
         {
-            snprintf(string, MSG_BUF_SIZE, "%02x ", key[k*(NUM_KEY_BYTES+1) + b]);
+            snprintf(string, MSG_BUF_SIZE, "%02x ", key[k*(MAX_KEY_BYTES+1) + b]);
             os << string;
 
         }
 
-        switch ( key[k*(NUM_KEY_BYTES+1) + 0] )
+        switch ( key[k*(MAX_KEY_BYTES+1) + 0] )
         {
             case 0:
                 os << "  // do not use key = " << k;
@@ -102,13 +102,13 @@ main()
         };
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 4;
+        const int MAX_RDX_NODES = 4;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
         ofstream os;
         os.open("MKRdxPat.TEST0.results");
@@ -119,11 +119,11 @@ main()
               "           a. Only the impossible pre-allocated root node should be printed since\n"
               "              no other nodes have been inserted\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -155,24 +155,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 1;
+        const int MAX_RDX_NODES = 1;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -190,18 +190,18 @@ main()
               "           f. Different keys node insertion into full rdx should return code 2\n"
               "           g. Same keys node insertion with a key boolean set to 0 should return code 3\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
         os << "a. One node insertion with return code 0\n";
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n\n";
@@ -235,7 +235,7 @@ main()
 
 
         os << "e. Same keys node insertion should return code 1\n";
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
@@ -249,7 +249,7 @@ main()
         rdx_key[0][0][1] = 1;  // set first key(key index 0) first key byte to different from 0
         rdx_key[0][1][1] = 1;  // set second key(key index 1) first key byte to different from 0
         rdx_key[0][2][1] = 1;  // set third key(key index 2) first key byte to different from 0
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
@@ -259,7 +259,7 @@ main()
 
         os << "g. Same keys node insertion with a key boolean set to 0 should return code 3\n";
         rdx_key[0][1][0] = 0;  // set second key(key index 1) boolean to 0
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
@@ -285,24 +285,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 4;
+        const int MAX_RDX_NODES = 4;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -316,17 +316,17 @@ main()
               "              nodes leading to that data node.  If there are N keys in that data node then\n"
               "              there will be N branch node sequences that lead to the same data node\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
@@ -363,24 +363,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 6;
+        const int MAX_RDX_NODES = 6;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -394,11 +394,11 @@ main()
               "           b. Total nodes allocated(not including root node) 4\n"
               "           c. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -407,7 +407,7 @@ main()
         os << "a. Four data node insertions with return code 0\n";
         for ( int n = 0, id = 10, d = 2.0 ; n < 4 ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -459,24 +459,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 8;
+        const int MAX_RDX_NODES = 8;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -484,16 +484,16 @@ main()
         os.open("MKRdxPat.TEST4.results");
 
         os << "\n"
-              "TEST 4: Search for all MAX_NUM_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n"
+              "TEST 4: Search for all MAX_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n"
               "        Expected Results:\n"
               "           a. insert 4 data nodes and search/find them\n"
               "           b. fail to find 4 nodes who's keys were not inserted\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -502,7 +502,7 @@ main()
         os << "a. insert 4 data nodes and search/find them\n";
         for ( int n = 0 ; n < 4 ; n++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -512,9 +512,9 @@ main()
 
 
         os << "b. fail to find 4 nodes who's keys were not inserted\n\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             app_datap = rdx->search((unsigned char *)rdx_key[n]);
 
             if (app_datap == NULL)
@@ -559,24 +559,24 @@ main()
         app_data **app_datapp;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 4;
+        const int MAX_RDX_NODES = 4;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = MAX_NUM_RDX_NODES*NUM_KEYS ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = MAX_RDX_NODES*NUM_KEYS ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum--;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum--;
             }
         }
 
@@ -592,11 +592,11 @@ main()
               "           d. For each key the return code will equal the number of sorted nodes and the\n"
               "              nodes array will hold the array of node pointers to nodes in sorted order\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -615,7 +615,7 @@ main()
 
 
         os << "c. Sort rdx with one node inserted and key index set to 0 - should return 1\n";
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[" << 0 << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -632,9 +632,9 @@ main()
 
         os << "d. For each key the return code will equal the number of sorted nodes and the\n";
         os << "   nodes array will hold the array of node pointers to nodes in sorted order\n";
-        for ( int n = 1, sum = 1 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 1, sum = 1 ; n < MAX_RDX_NODES ; n++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n";
@@ -701,24 +701,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 8;
+        const int MAX_RDX_NODES = 8;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -731,11 +731,11 @@ main()
               "           a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n"
               "              allocated and zero allocated nodes upon completion\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -746,7 +746,7 @@ main()
             const size_t MSG_BUF_SIZE = 256;
             char string[MSG_BUF_SIZE];
 
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n";
@@ -762,9 +762,9 @@ main()
 
         os << "a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n";
         os << "   allocated and zero allocated nodes upon completion\n\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             app_datap = rdx->remove((unsigned char *)rdx_key[n]);
             if (app_datap == NULL)
             {
@@ -811,32 +811,32 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 8;
+        const int MAX_RDX_NODES = 8;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
 
         ofstream os;
         os.open("MKRdxPat.TEST7.results");
 
         os << "\n"
-              "TEST 7: Insert/Search/Remove MAX_NUM_RDX_NODES nodes with random keys repeatedly\n"
+              "TEST 7: Insert/Search/Remove MAX_RDX_NODES nodes with random keys repeatedly\n"
               "        Expected Results:\n"
               "           a. Do not report success - report only errors in insert/search/remove operations\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -848,22 +848,22 @@ main()
 
         for ( test_num = 0, tot_errs = 0 ; test_num < 32 ; test_num++ )
         {
-            // in rdx_key[][][] generate MAX_NUM_RDX_NODES sets of NUM_KEYS keys each of NUM_KEY_BYTES in length
+            // in rdx_key[][][] generate MAX_RDX_NODES sets of NUM_KEYS keys each of MAX_KEY_BYTES in length
             srand(time(NULL));
-            for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+            for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
             {
                 for ( int k = 0 ; k < NUM_KEYS ; k++ )
                 {
                     rdx_key[n][k][0] = 1;  // set key boolean to 1
-                    for ( int b = 1 ; b < 1+NUM_KEY_BYTES ; b++ )
+                    for ( int b = 1 ; b < 1+MAX_KEY_BYTES ; b++ )
                     {
                         rdx_key[n][k][b] = rand() & 0x000000ff;
                     }
                 }
             }
 
-            // insert full set of MAX_NUM_RDX_NODES data nodes
-            for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+            // insert full set of MAX_RDX_NODES data nodes
+            for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
             {
                 return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
@@ -876,8 +876,8 @@ main()
             }
             os << "\n";
 
-            // search for full set of MAX_NUM_RDX_NODES data nodes
-            for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+            // search for full set of MAX_RDX_NODES data nodes
+            for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
             {
                 app_datap = rdx->search((unsigned char *)rdx_key[n]);
 
@@ -893,8 +893,8 @@ main()
             }
             os << "\n";
 
-            // remove a full set of MAX_NUM_RDX_NODES data nodes
-            for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+            // remove a full set of MAX_RDX_NODES data nodes
+            for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
             {
                 app_datap = rdx->remove((unsigned char *)rdx_key[n]);
 
@@ -937,24 +937,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 1;
+        const int MAX_RDX_NODES = 1;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES][NUM_KEYS][1+NUM_KEY_BYTES];
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, MAX_NUM_RDX_NODES * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 3 ; n < MAX_NUM_RDX_NODES ; n++ )
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 3 ; n < MAX_RDX_NODES ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -975,11 +975,11 @@ main()
               "           h. remove using only one incorrect key - should fail\n"
               "           i. remove using only one correct key - should succeed\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
@@ -990,7 +990,7 @@ main()
         rdx_key[0][0][0] = 1;  // use first key 0 = 3
         rdx_key[0][1][0] = 1;  // use second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
 
         os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -1003,7 +1003,7 @@ main()
         rdx_key[0][0][0] = 1;  // use first key 0 = 3
         rdx_key[0][1][0] = 1;  // use second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->search((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1022,7 +1022,7 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->search((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1041,8 +1041,8 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 6 - wrong
-        rdx_key[0][2][NUM_KEY_BYTES] = 6;  // use third key 2 = 6 - wrong
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        rdx_key[0][2][MAX_KEY_BYTES] = 6;  // use third key 2 = 6 - wrong
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->search((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1061,8 +1061,8 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 2;  // use third key 2 = 5 - key boolean 2 is invalid
-        rdx_key[0][2][NUM_KEY_BYTES] = 5;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        rdx_key[0][2][MAX_KEY_BYTES] = 5;  // use third key 2 = 5
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->search((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1081,7 +1081,7 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 0;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->search((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1100,7 +1100,7 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 1;  // use second key 1 = 4
         rdx_key[0][2][0] = 0;  // ignore third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         return_code = rdx->print((unsigned char *)rdx_key[0], os);
 
         os << "return_code = rdx->print((unsigned char *)rdx_key[0], os); print success(0) or fail(!0) -> return code = " << return_code << "\n";
@@ -1112,8 +1112,8 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 6 - wrong
-        rdx_key[0][2][NUM_KEY_BYTES] = 6;  // use third key 2 = 6 - wrong
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        rdx_key[0][2][MAX_KEY_BYTES] = 6;  // use third key 2 = 6 - wrong
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->remove((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1132,8 +1132,8 @@ main()
         rdx_key[0][0][0] = 0;  // ignore first key 0 = 3
         rdx_key[0][1][0] = 0;  // ignore second key 1 = 4
         rdx_key[0][2][0] = 1;  // use third key 2 = 5
-        rdx_key[0][2][NUM_KEY_BYTES] = 5;  // use third key 2 = 5
-        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, NUM_KEY_BYTES);
+        rdx_key[0][2][MAX_KEY_BYTES] = 5;  // use third key 2 = 5
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
         app_datap = rdx->remove((unsigned char *)rdx_key[0]);
 
         if (app_datap == NULL)
@@ -1165,24 +1165,24 @@ main()
         app_data *app_datap;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 4;
+        const int MAX_RDX_NODES = 4;
 
         // number of rdx search keys
         const int NUM_KEYS = 3;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 4;
+        const int MAX_KEY_BYTES = 4;
 
-        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+        // 1+MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES+1][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -1190,29 +1190,29 @@ main()
         os.open("MKRdxPat.TEST9.results");
 
         os << "\n"
-              "TEST 9: Insert MAX_NUM_RDX_NODES+1 data nodes in a rdx trie of only MAX_NUM_RDX_NODES nodes\n"
+              "TEST 9: Insert MAX_RDX_NODES+1 data nodes in a rdx trie of only MAX_RDX_NODES nodes\n"
               "        Expected Results:\n"
-              "           a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "           a. MAX_RDX_NODES node insertions with return code 0\n"
               "           b. 1 node insertion with return code 2(no free nodes)\n"
-              "           c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
+              "           c. Total nodes allocated(not including root node) MAX_RDX_NODES\n"
               "           d. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
-        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
+        os << "a. MAX_RDX_NODES node insertions with return code 0\n";
         os << "b. 1 node insertion with return code 2(no free nodes)\n";
-        os << "c. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        os << "c. Total nodes allocated(not including root node) MAX_RDX_NODES\n";
+        for ( int n = 0 ; n < MAX_RDX_NODES+1 ; n++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n";
@@ -1249,24 +1249,24 @@ main()
 
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 256;
+        const int MAX_RDX_NODES = 256;
 
         // number of rdx search keys
         const int NUM_KEYS = 1;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 1;
+        const int MAX_KEY_BYTES = 1;
 
-        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+        // 1+MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES+1][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -1276,28 +1276,28 @@ main()
         os << "\n"
               "TEST 10: Create rdx trie with 1 key of 1 byte and 256 data nodes\n"
               "         Expected Results:\n"
-              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
-              "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
-              "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n"
+              "            a. MAX_RDX_NODES node insertions with return code 0\n"
+              "            b. Total nodes allocated(not including root node) MAX_RDX_NODES\n"
+              "            c. Search for all MAX_RDX_NODES data nodes - total errors = 0\n"
               "            d. Sort rdx - should return 256\n"
               "            e. Remove all data nodes - should return 0\n"
               "            f. Only the impossible pre-allocated root node should be printed since\n"
               "            g. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
-        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
+        os << "a. MAX_RDX_NODES node insertions with return code 0\n";
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_RDX_NODES ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -1315,12 +1315,12 @@ main()
         os << "\n";
 
 
-        os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
+        os << "b. Total nodes allocated(not including root node) MAX_RDX_NODES\n";
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
-        os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        os << "c. Search for all MAX_RDX_NODES data nodes - total errors = 0\n";
+        for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             app_datap = rdx->search((unsigned char *)rdx_key[n]);
 
@@ -1346,7 +1346,7 @@ main()
 
 
         os << "e. Remove all data nodes - should return 0\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             app_datap = rdx->remove((unsigned char *)rdx_key[n]);
 
@@ -1396,24 +1396,24 @@ main()
 
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 2;
+        const int MAX_RDX_NODES = 2;
 
         // number of rdx search keys
         const int NUM_KEYS = 8;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 16;
+        const int MAX_KEY_BYTES = 16;
 
-        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+        // 1+MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES+1][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++ )
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum++;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
             }
         }
 
@@ -1423,26 +1423,26 @@ main()
         os << "\n"
               "TEST 11: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n"
               "         Expected Results:\n"
-              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
-              "            b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n"
-              "            c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n"
+              "            a. MAX_RDX_NODES node insertions with return code 0\n"
+              "            b. Total nodes allocated(not including root node) MAX_RDX_NODES\n"
+              "            c. Search for all MAX_RDX_NODES data nodes - total errors = 0\n"
               "            d. Print entire trie - allocated node and root node\n"
               "            e. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
-        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
+        os << "a. MAX_RDX_NODES node insertions with return code 0\n";
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_RDX_NODES ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -1460,12 +1460,12 @@ main()
         os << "\n";
 
 
-        os << "b. Total nodes allocated(not including root node) MAX_NUM_RDX_NODES\n";
+        os << "b. Total nodes allocated(not including root node) MAX_RDX_NODES\n";
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
 
 
-        os << "c. Search for all MAX_NUM_RDX_NODES data nodes - total errors = 0\n";
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES ; n++ )
+        os << "c. Search for all MAX_RDX_NODES data nodes - total errors = 0\n";
+        for ( int n = 0 ; n < MAX_RDX_NODES ; n++ )
         {
             app_datap = rdx->search((unsigned char *)rdx_key[n]);
 
@@ -1515,24 +1515,24 @@ main()
 
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES = 4;
+        const int MAX_RDX_NODES = 4;
 
         // number of rdx search keys
         const int NUM_KEYS = 4;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES = 2;
+        const int MAX_KEY_BYTES = 2;
 
-        // 1+MAX_NUM_RDX_NODES nodes of NUM_KEYS keys of NUM_KEY_BYTES bytes - set all key booleans to 1
-        unsigned char rdx_key[MAX_NUM_RDX_NODES+1][NUM_KEYS][1+NUM_KEY_BYTES];
+        // 1+MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES+1][NUM_KEYS][1+MAX_KEY_BYTES];
 
-        memset(rdx_key, 0, (MAX_NUM_RDX_NODES+1) * NUM_KEYS * (1+NUM_KEY_BYTES));
-        for ( int n = 0, sum = 0 ; n < MAX_NUM_RDX_NODES+1 ; n++, sum++ )
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES+1 ; n++, sum++ )
         {
             for ( int k = 0 ; k < NUM_KEYS ; k++ )
             {
                 rdx_key[n][k][0] = 1;  // set key boolean to 1
-                rdx_key[n][k][NUM_KEY_BYTES] = sum;
+                rdx_key[n][k][MAX_KEY_BYTES] = sum;
             }
         }
 
@@ -1543,24 +1543,24 @@ main()
               "TEST 12: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n"
               "         key values the same for each key but unique within a key\n"
               "         Expected Results:\n"
-              "            a. MAX_NUM_RDX_NODES node insertions with return code 0\n"
+              "            a. MAX_RDX_NODES node insertions with return code 0\n"
               "            b. Print entire trie - allocated node and root node\n"
               "            c. No verification error\n\n";
 
-        os << "MAX_NUM_RDX_NODES = " << MAX_NUM_RDX_NODES << "\n"
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
               "NUM_KEYS = " << NUM_KEYS << "\n"
-              "NUM_KEY_BYTES = " << NUM_KEY_BYTES << "\n\n";
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
 
-        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
         os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
 
 
-        os << "a. MAX_NUM_RDX_NODES node insertions with return code 0\n";
-        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_NUM_RDX_NODES ; n++, id++, d++ )
+        os << "a. MAX_RDX_NODES node insertions with return code 0\n";
+        for ( int n = 0, id = 10, d = 2.0 ; n < MAX_RDX_NODES ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, NUM_KEY_BYTES);
+            print_key((unsigned char *)rdx_key[n], os, NUM_KEYS, MAX_KEY_BYTES);
             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
             os << "return_code = rdx->insert((unsigned char *)rdx_key[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
@@ -1602,7 +1602,7 @@ main()
 
 
         //
-        // define app_data1, MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1, rdx_key1[][][]
+        // define app_data1, MAX_RDX_NODES1, NUM_KEYS1, MAX_KEY_BYTES1, rdx_key1[][][]
         //
 
         // application data of type app_data1 defined here
@@ -1616,40 +1616,40 @@ main()
         app_data1 *app_data1p;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES1 = 25;
+        const int MAX_RDX_NODES1 = 25;
 
         // number of rdx search keys
         const int NUM_KEYS1 = 5;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES1 = 10;
+        const int MAX_KEY_BYTES1 = 10;
 
-        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
-        unsigned char rdx_key1[MAX_NUM_RDX_NODES1+1][NUM_KEYS1][1+NUM_KEY_BYTES1];
+        // 1+MAX_RDX_NODES1 nodes of NUM_KEYS1 keys of MAX_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key1[MAX_RDX_NODES1+1][NUM_KEYS1][1+MAX_KEY_BYTES1];
 
-        memset(rdx_key1, 0, (MAX_NUM_RDX_NODES1+1) * NUM_KEYS1 * (1+NUM_KEY_BYTES1));
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES1+1 ; n++ )
+        memset(rdx_key1, 0, (MAX_RDX_NODES1+1) * NUM_KEYS1 * (1+MAX_KEY_BYTES1));
+        for ( int n = 0 ; n < MAX_RDX_NODES1+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS1 ; k++ )
             {
                 rdx_key1[n][k][0] = 1;  // set key boolean to 1
-                rdx_key1[n][k][NUM_KEY_BYTES1] = sum++;
+                rdx_key1[n][k][MAX_KEY_BYTES1] = sum++;
             }
         }
 
         os << "a. First trie filled with data\n"
-              "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n"
+              "MAX_RDX_NODES1 = " << MAX_RDX_NODES1 << "\n"
               "NUM_KEYS1 = " << NUM_KEYS1 << "\n"
-              "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
+              "MAX_KEY_BYTES1 = " << MAX_KEY_BYTES1 << "\n\n";
 
-        MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
+        MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_RDX_NODES1, NUM_KEYS1, MAX_KEY_BYTES1);
 
         os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
         os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
 
-        for ( int n = 0, id = 0, d = 0. ; n < MAX_NUM_RDX_NODES1 ; n++, id++, d++ )
+        for ( int n = 0, id = 0, d = 0. ; n < MAX_RDX_NODES1 ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, NUM_KEY_BYTES1);
+            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, MAX_KEY_BYTES1);
             return_code = rdx1->insert((unsigned char *)rdx_key1[n], &app_data1p);
 
             os << "return_code = rdx1->insert((unsigned char *)rdx_key1[" << n << "], &app_data1p); return_code = " << return_code << "\n\n";
@@ -1677,7 +1677,7 @@ main()
 
 
         //
-        // define app_data2, MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2, rdx_key2[][][]
+        // define app_data2, MAX_RDX_NODES2, NUM_KEYS2, MAX_KEY_BYTES2, rdx_key2[][][]
         //
 
         // application data of type app_data2 defined here
@@ -1690,40 +1690,40 @@ main()
         app_data2 *app_data2p;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES2 = 50;
+        const int MAX_RDX_NODES2 = 50;
 
         // number of rdx search keys
         const int NUM_KEYS2 = 7;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES2 = 16;
+        const int MAX_KEY_BYTES2 = 16;
 
-        // 1+MAX_NUM_RDX_NODES2 nodes of NUM_KEYS2 keys of NUM_KEY_BYTES2 bytes - set all key booleans to 1
-        unsigned char rdx_key2[MAX_NUM_RDX_NODES2+1][NUM_KEYS2][1+NUM_KEY_BYTES2];
+        // 1+MAX_RDX_NODES2 nodes of NUM_KEYS2 keys of MAX_KEY_BYTES2 bytes - set all key booleans to 1
+        unsigned char rdx_key2[MAX_RDX_NODES2+1][NUM_KEYS2][1+MAX_KEY_BYTES2];
 
-        memset(rdx_key2, 0, (MAX_NUM_RDX_NODES2+1) * NUM_KEYS2 * (1+NUM_KEY_BYTES2));
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES2+1 ; n++ )
+        memset(rdx_key2, 0, (MAX_RDX_NODES2+1) * NUM_KEYS2 * (1+MAX_KEY_BYTES2));
+        for ( int n = 0 ; n < MAX_RDX_NODES2+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS2 ; k++ )
             {
                 rdx_key2[n][k][0] = 1;  // set key boolean to 1
-                rdx_key2[n][k][NUM_KEY_BYTES2] = sum++;
+                rdx_key2[n][k][MAX_KEY_BYTES2] = sum++;
             }
         }
 
         os << "c. Second trie filled with data\n"
-              "MAX_NUM_RDX_NODES2 = " << MAX_NUM_RDX_NODES2 << "\n"
+              "MAX_RDX_NODES2 = " << MAX_RDX_NODES2 << "\n"
               "NUM_KEYS2 = " << NUM_KEYS2 << "\n"
-              "NUM_KEY_BYTES2 = " << NUM_KEY_BYTES2 << "\n\n";
+              "MAX_KEY_BYTES2 = " << MAX_KEY_BYTES2 << "\n\n";
 
-        MKRdxPat<app_data2> *rdx2 = new MKRdxPat<app_data2>(MAX_NUM_RDX_NODES2, NUM_KEYS2, NUM_KEY_BYTES2);
+        MKRdxPat<app_data2> *rdx2 = new MKRdxPat<app_data2>(MAX_RDX_NODES2, NUM_KEYS2, MAX_KEY_BYTES2);
 
         os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
         os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
 
-        for ( int n = 0, id = 100, d = 200.0 ; n < MAX_NUM_RDX_NODES2 ; n++, id++, d++ )
+        for ( int n = 0, id = 100, d = 200.0 ; n < MAX_RDX_NODES2 ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, NUM_KEY_BYTES2);
+            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, MAX_KEY_BYTES2);
             return_code = rdx2->insert((unsigned char *)rdx_key2[n], &app_data2p);
 
             os << "return_code = rdx2->insert((unsigned char *)rdx_key2[" << n << "], &app_data2p); return_code = " << return_code << "\n\n";
@@ -1767,64 +1767,64 @@ main()
 
 
         //
-        // define app_data1, MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1, rdx_key1[][][]
+        // define app_data, MAX_RDX_NODES1, NUM_KEYS1, MAX_KEY_BYTES1, rdx_key1[][][]
         //
 
-        // application data of type app_data1 defined here
-        struct app_data1
+        // application data of type app_data defined here
+        struct app_data
         {
             int id;
             double d;
             int j;
         };
 
-        app_data1 *app_data1p;
-        app_data1 **app_data1pp;
+        app_data *app_datap;
+        app_data **app_datapp;
 
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES1 = 25;
+        const int MAX_RDX_NODES1 = 25;
 
         // number of rdx search keys
         const int NUM_KEYS1 = 5;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES1 = 10;
+        const int MAX_KEY_BYTES1 = 10;
 
-        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
-        unsigned char rdx_key1[MAX_NUM_RDX_NODES1+1][NUM_KEYS1][1+NUM_KEY_BYTES1];
+        // 1+MAX_RDX_NODES1 nodes of NUM_KEYS1 keys of MAX_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key1[MAX_RDX_NODES1+1][NUM_KEYS1][1+MAX_KEY_BYTES1];
 
-        memset(rdx_key1, 0, (MAX_NUM_RDX_NODES1+1) * NUM_KEYS1 * (1+NUM_KEY_BYTES1));
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES1+1 ; n++ )
+        memset(rdx_key1, 0, (MAX_RDX_NODES1+1) * NUM_KEYS1 * (1+MAX_KEY_BYTES1));
+        for ( int n = 0 ; n < MAX_RDX_NODES1+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS1 ; k++ )
             {
                 rdx_key1[n][k][0] = 1;  // set key boolean to 1
-                rdx_key1[n][k][NUM_KEY_BYTES1] = sum++;
+                rdx_key1[n][k][MAX_KEY_BYTES1] = sum++;
             }
         }
 
         os << "a. First trie filled with data\n"
-              "MAX_NUM_RDX_NODES1 = " << MAX_NUM_RDX_NODES1 << "\n"
+              "MAX_RDX_NODES1 = " << MAX_RDX_NODES1 << "\n"
               "NUM_KEYS1 = " << NUM_KEYS1 << "\n"
-              "NUM_KEY_BYTES1 = " << NUM_KEY_BYTES1 << "\n\n";
+              "MAX_KEY_BYTES1 = " << MAX_KEY_BYTES1 << "\n\n";
 
-        MKRdxPat<app_data1> *rdx1 = new MKRdxPat<app_data1>(MAX_NUM_RDX_NODES1, NUM_KEYS1, NUM_KEY_BYTES1);
+        MKRdxPat<app_data> *rdx1 = new MKRdxPat<app_data>(MAX_RDX_NODES1, NUM_KEYS1, MAX_KEY_BYTES1);
 
         for ( int n = 0, id = 10, d = 2.0 ; n < 20 ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, NUM_KEY_BYTES1);
-            return_code = rdx1->insert((unsigned char *)rdx_key1[n], &app_data1p);
+            print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, MAX_KEY_BYTES1);
+            return_code = rdx1->insert((unsigned char *)rdx_key1[n], &app_datap);
 
-            os << "return_code = rdx1->insert((unsigned char *)rdx_key1[" << n << "], &app_data1p); return_code = " << return_code << "\n\n";
+            os << "return_code = rdx1->insert((unsigned char *)rdx_key1[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
 
             if ( return_code == 0 )
             {
-                app_data1p->id = id;
-                os << "set app_data1p->id = " << id << "\n";
-                os << "get app_data1p->id = " << app_data1p->id << "\n";
-                app_data1p->d = d;
-                os << "set app_data1p->d = " << d << "\n";
-                os << "get app_data1p->d = " << app_data1p->d << "\n\n";
+                app_datap->id = id;
+                os << "set app_datap->id = " << id << "\n";
+                os << "get app_datap->id = " << app_datap->id << "\n";
+                app_datap->d = d;
+                os << "set app_datap->d = " << d << "\n";
+                os << "get app_datap->d = " << app_datap->d << "\n\n";
             }
         }
         os << "\n";
@@ -1832,58 +1832,54 @@ main()
         os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
         os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
 
-        return_code = rdx1->sort(&app_data1pp, 0);
+        return_code = rdx1->sort(&app_datapp, 0);
 
-        os << "return_code = rdx1->sort(&app_data1pp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_data1pp << "\n\n\n";
+        os << "return_code = rdx1->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_datapp << "\n\n\n";
 
-        MKRdxPat<app_data1> *rdx2 = rdx1->chg_max_rdx_nodes(100);
-        // os << "n = " << n << "\n";
+        MKRdxPat<app_data> *rdx2 = rdx1->chg_max_rdx_nodes(100);
 
         delete rdx1;
 
         os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
         os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
 
-        app_data1 *app_data2p;
-        //app_data1 **app_data2pp;
-
         // maximum number of data nodes stored in rdx trie
-        const int MAX_NUM_RDX_NODES2 = 50;
+        const int MAX_RDX_NODES2 = 50;
 
         // number of rdx search keys
         const int NUM_KEYS2 = 5;
 
         // number of bytes in each key(s)
-        const int NUM_KEY_BYTES2 = 10;
+        const int MAX_KEY_BYTES2 = 10;
 
-        // 1+MAX_NUM_RDX_NODES1 nodes of NUM_KEYS1 keys of NUM_KEY_BYTES1 bytes - set all key booleans to 1
-        unsigned char rdx_key2[MAX_NUM_RDX_NODES2+1][NUM_KEYS2][1+NUM_KEY_BYTES2];
+        // 1+MAX_RDX_NODES1 nodes of NUM_KEYS1 keys of MAX_KEY_BYTES1 bytes - set all key booleans to 1
+        unsigned char rdx_key2[MAX_RDX_NODES2+1][NUM_KEYS2][1+MAX_KEY_BYTES2];
 
-        memset(rdx_key2, 0, (MAX_NUM_RDX_NODES2+1) * NUM_KEYS2 * (1+NUM_KEY_BYTES2));
-        for ( int n = 0 ; n < MAX_NUM_RDX_NODES2+1 ; n++ )
+        memset(rdx_key2, 0, (MAX_RDX_NODES2+1) * NUM_KEYS2 * (1+MAX_KEY_BYTES2));
+        for ( int n = 0 ; n < MAX_RDX_NODES2+1 ; n++ )
         {
             for ( int k = 0 ; k < NUM_KEYS2 ; k++ )
             {
                 rdx_key2[n][k][0] = 1;  // set key boolean to 1
-                rdx_key2[n][k][NUM_KEY_BYTES1] = sum++;
+                rdx_key2[n][k][MAX_KEY_BYTES1] = sum++;
             }
         }
 
         for ( int n = 0, id = 100, d = 20.0 ; n < 50 ; n++, id++, d++ )
         {
-            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, NUM_KEY_BYTES2);
-            return_code = rdx2->insert((unsigned char *)rdx_key2[n], &app_data2p);
+            print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, MAX_KEY_BYTES2);
+            return_code = rdx2->insert((unsigned char *)rdx_key2[n], &app_datap);
 
-            os << "return_code = rdx2->insert((unsigned char *)rdx_key2[" << n << "], &app_data2p); return_code = " << return_code << "\n\n";
+            os << "return_code = rdx2->insert((unsigned char *)rdx_key2[" << n << "], &app_datap); return_code = " << return_code << "\n\n";
 
             if ( return_code == 0 )
             {
-                app_data2p->id = id;
-                os << "set app_data2p->id = " << id << "\n";
-                os << "get app_data2p->id = " << app_data2p->id << "\n";
-                app_data2p->d = d;
-                os << "set app_data2p->d = " << d << "\n";
-                os << "get app_data2p->d = " << app_data2p->d << "\n\n";
+                app_datap->id = id;
+                os << "set app_datap->id = " << id << "\n";
+                os << "get app_datap->id = " << app_datap->id << "\n";
+                app_datap->d = d;
+                os << "set app_datap->d = " << d << "\n";
+                os << "get app_datap->d = " << app_datap->d << "\n\n";
             }
         }
         os << "\n";

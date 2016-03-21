@@ -47,7 +47,7 @@
  *
  *     -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty)
  *                              trie(1 default)
- *                    option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s
+ *                    option 2: fill trie(monatonic keys) then do max_rdx_nodes search()'s
  *                              with random keys
  *
  *     -s{1-86400}  - minimum run time(secs)(30 default)
@@ -62,9 +62,9 @@
  *     MKRdxPat_perf is used to evaluate the performance of the MKRdxPat class
  *     (Multi-Key Radix Fast Search) algorithm implementation.  first, change
  *     the three arguments:
- *         const int max_num_rdx_nodes = 200000;
+ *         const int max_rdx_nodes = 200000;
  *         const int num_keys          = 2;
- *         const int num_key_bytes     = 16;
+ *         const int max_key_bytes     = 16;
  *     to match your application.  then insert in 'struct app_data{}' your application data
  *     node.  Re-compile.  run ./MKRdxPat_perf.  examine the MKRdxPat_perf.results file.
  *     see EXAMPLE OUTPUT below.  the file begins with a data/time and the -c option
@@ -78,7 +78,7 @@
  * NOTES
  *
  *     1. you need to select the three constructor arguments based on your application.
- *        remember that num_key_bytes is set to the longest key length.  see the MKRdxPat.hpp
+ *        remember that max_key_bytes is set to the longest key length.  see the MKRdxPat.hpp
  *        Description section for a detailed explanation of setting key arrays.
  *
  *     2. a more realistic performance evaluation my be had by modifying the code here to
@@ -93,7 +93,7 @@
  *        was an arbitrary selection.  i've run tests with 2,000,000 data nodes.  if, for
  *        example, the MAC address was added as a third key then the number of keys would
  *        be three but, with the MAC address length at 6 bytes, the IPv6 address would
- *        still be the longest and thus num_key_bytes would still be 16.
+ *        still be the longest and thus max_key_bytes would still be 16.
  *
  * DEPENDENCIES
  *
@@ -134,16 +134,16 @@
  *     NUMA node0 CPU(s):     0,1
  *     Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt rdtscp lm 3dnowext 3dnow rep_good nopl pni cx16 lahf_lm cmp_legacy svm extapic cr8_legacy 3dnowprefetch lbrv vmmcall
  *
- *     max_num_rdx_nodes = 200,000
+ *     max_rdx_nodes = 200,000
  *     num_keys = 2
- *     num_key_bytes = 16
+ *     max_key_bytes = 16
  *         (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)
  *
  *     trie size = 42,000,242b
  *
  *     Minimum run time(sec): 30.000000
  *     Block Muliplier: 100
- *     insert()/remove() increments: 40,000,000(100*2*max_num_rdx_nodes)
+ *     insert()/remove() increments: 40,000,000(100*2*max_rdx_nodes)
  *
  *     seconds = 56.462147  total inserts/removes = 40,000,000
  *
@@ -214,7 +214,7 @@ main
         "\n"
         "    -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty)\n"
         "                             trie(1 default)\n"
-        "                   option 2: fill trie(monatonic keys) then do max_num_rdx_nodes search()'s\n"
+        "                   option 2: fill trie(monatonic keys) then do max_rdx_nodes search()'s\n"
         "                             with random keys\n"
         "\n"
         "    -s{1-86400}  - minimum run time(secs)(30 default)\n"
@@ -230,9 +230,9 @@ main
     // ================================================
 
     // MKRdxPat.hpp class constructor arguments
-    const int max_num_rdx_nodes = 2000000;
+    const int max_rdx_nodes = 2000000;
     const int num_keys          = 3;
-    const int num_key_bytes     = 16;
+    const int max_key_bytes     = 16;
 
     // application data of type app_data defined here
     struct app_data
@@ -243,11 +243,11 @@ main
     // ================================================
 
 
-    // holds sets of keys for max_num_rdx_nodes sets with num_keys keys of
-    // num_key_bytes length with all key booleans set to 1
+    // holds sets of keys for max_rdx_nodes sets with num_keys keys of
+    // max_key_bytes length with all key booleans set to 1
     // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
     //       arrays do no blow the stack
-    static unsigned char rdx_key[max_num_rdx_nodes][num_keys][1+num_key_bytes];
+    static unsigned char rdx_key[max_rdx_nodes][num_keys][1+max_key_bytes];
 
     app_data *app_datap;
 
@@ -339,9 +339,9 @@ main
 
     os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
 
-    // rdx_key[][][] - generate max_num_rdx_nodes nodes of num_keys keys of
-    // num_key_bytes bytes and set all key booleans to 1
-    for ( int n = 0, sum = 0 ; n < max_num_rdx_nodes ; n++, sum++ )
+    // rdx_key[][][] - generate max_rdx_nodes nodes of num_keys keys of
+    // max_key_bytes bytes and set all key booleans to 1
+    for ( int n = 0, sum = 0 ; n < max_rdx_nodes ; n++, sum++ )
     {
         for ( int k = 0 ; k < num_keys ; k++ )
         {
@@ -351,11 +351,11 @@ main
     }
 
     // MKRdxPat class trie constructor
-    MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_num_rdx_nodes, num_keys, num_key_bytes);
+    MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_rdx_nodes, num_keys, max_key_bytes);
 
     os << "\n";
-    snprintf(tmpstr, sizeof(tmpstr), "\nmax_num_rdx_nodes = %'d\nnum_keys = %d\nnum_key_bytes = %d\n",
-        max_num_rdx_nodes, num_keys, num_key_bytes);
+    snprintf(tmpstr, sizeof(tmpstr), "\nmax_rdx_nodes = %'d\nnum_keys = %d\nmax_key_bytes = %d\n",
+        max_rdx_nodes, num_keys, max_key_bytes);
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
     os << tmpstr;
@@ -375,8 +375,8 @@ main
                 double sec;
                 int return_code;
 
-                snprintf(tmpstr, sizeof(tmpstr), "insert()/remove() increments: %'d(%d*2*max_num_rdx_nodes)\n\n",
-                    block_multiply_opt*2*max_num_rdx_nodes, block_multiply_opt);
+                snprintf(tmpstr, sizeof(tmpstr), "insert()/remove() increments: %'d(%d*2*max_rdx_nodes)\n\n",
+                    block_multiply_opt*2*max_rdx_nodes, block_multiply_opt);
                 os << tmpstr;
 
                 clock_gettime(CLOCK_MONOTONIC, &tstart);
@@ -385,7 +385,7 @@ main
                 {
                     for ( int i = 0 ; i < block_multiply_opt ; i++ )
                     {
-                        for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
+                        for ( int n = 0 ; n < max_rdx_nodes ; n++ )
                         {
                             return_code = rdx->insert((unsigned char *)rdx_key[n], &app_datap);
 
@@ -395,7 +395,7 @@ main
                             }
                         }
 
-                        for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
+                        for ( int n = 0 ; n < max_rdx_nodes ; n++ )
                         {
                             app_datap = rdx->remove((unsigned char *)rdx_key[n]);
 
@@ -406,7 +406,7 @@ main
                         }
                     }
 
-                    total_inserts_removes += max_num_rdx_nodes*2*block_multiply_opt;
+                    total_inserts_removes += max_rdx_nodes*2*block_multiply_opt;
 
                     clock_gettime(CLOCK_MONOTONIC, &tend);
 
@@ -427,19 +427,19 @@ main
         case 2:
             {
                 long total_searches = 0;
-                int random[max_num_rdx_nodes];  // for random key search()
+                int random[max_rdx_nodes];  // for random key search()
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
-                snprintf(tmpstr, sizeof(tmpstr), "search() increments: %'d(%d*max_num_rdx_nodes)\n\n",
-                    block_multiply_opt*max_num_rdx_nodes, block_multiply_opt);
+                snprintf(tmpstr, sizeof(tmpstr), "search() increments: %'d(%d*max_rdx_nodes)\n\n",
+                    block_multiply_opt*max_rdx_nodes, block_multiply_opt);
                 os << tmpstr;
 
                 srand(time(NULL));
-                for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
+                for ( int n = 0 ; n < max_rdx_nodes ; n++ )
                 {
                     rdx->insert((unsigned char *)rdx_key[n], &app_datap);
-                    random[n] = rand() % max_num_rdx_nodes;  // not crypto random - will produce some duplicates - ok
+                    random[n] = rand() % max_rdx_nodes;  // not crypto random - will produce some duplicates - ok
                 }
 
                 clock_gettime(CLOCK_MONOTONIC, &tstart);
@@ -448,7 +448,7 @@ main
                 {
                     for ( int i = 0 ; i < block_multiply_opt ; i++ )
                     {
-                        for ( int n = 0 ; n < max_num_rdx_nodes ; n++ )
+                        for ( int n = 0 ; n < max_rdx_nodes ; n++ )
                         {
                             app_datap = rdx->search((unsigned char *)rdx_key[random[n]]);
 

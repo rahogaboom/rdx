@@ -231,8 +231,8 @@ main
 
     // MKRdxPat.hpp class constructor arguments
     const int max_rdx_nodes = 2000000;
-    const int num_keys          = 3;
-    const int max_key_bytes     = 16;
+    const int num_keys      = 3;
+    const int max_key_bytes = 16;
 
     // application data of type app_data defined here
     struct app_data

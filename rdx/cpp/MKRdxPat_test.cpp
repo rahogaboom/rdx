@@ -1761,8 +1761,12 @@ main()
         os.open("MKRdxPat.TEST14.results");
 
         os << "\n"
-              "TEST 14: \n"
+              "TEST 14: Create rdx trie with max 25 data nodes, insert 20 data nodes, use chg_max_rdx_nodes() member\n"
+              "         to create new trie with max 100 data nodes and the same data, insert 50 new data nodes\n"
               "         Expected Results:\n"
+              "            a. Insert 20 data nodes in rdx1 trie - trie has 25 data nodes max\n"
+              "            b. Insert 50 data nodes in rdx2 trie - trie has 100 data nodes max\n"
+              "            c. trie should have 100 data nodes max and 70 data nodes\n"
               "            d. No verification error in second trie\n\n";
 
 
@@ -1779,7 +1783,6 @@ main()
         };
 
         app_data *app_datap;
-        app_data **app_datapp;
 
         // maximum number of data nodes stored in rdx trie
         const int MAX_RDX_NODES1 = 25;
@@ -1803,13 +1806,14 @@ main()
             }
         }
 
-        os << "a. First trie filled with data\n"
+        os << "a. Insert 20 data nodes in rdx1 trie - trie has 25 data nodes max\n"
               "MAX_RDX_NODES1 = " << MAX_RDX_NODES1 << "\n"
               "NUM_KEYS1 = " << NUM_KEYS1 << "\n"
               "MAX_KEY_BYTES1 = " << MAX_KEY_BYTES1 << "\n\n";
 
         MKRdxPat<app_data> *rdx1 = new MKRdxPat<app_data>(MAX_RDX_NODES1, NUM_KEYS1, MAX_KEY_BYTES1);
 
+        // insert 20 data nodes - set some values for struct data
         for ( int n = 0, id = 10, d = 2.0 ; n < 20 ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key1[n], os, NUM_KEYS1, MAX_KEY_BYTES1);
@@ -1830,18 +1834,21 @@ main()
         os << "\n";
 
         os << "rdx1 - Nodes allocated = " << rdx1->alloc_nodes() << "\n";
-        os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n\n";
+        os << "rdx1 - Bytes allocated = " << rdx1->bsize() << "\n";
+        os << "rdx1 - max_rdx_nodes = " << rdx1->max_rdx_nodes() << "\n";
+        os << "rdx1 - num_keys = " << rdx1->num_keys() << "\n";
+        os << "rdx1 - max_key_bytes = " << rdx1->max_key_bytes() << "\n\n";
 
-        return_code = rdx1->sort(&app_datapp, 0);
-
-        os << "return_code = rdx1->sort(&app_datapp, " << 0 << "); return_code = " << return_code << "  app_datapp = " << app_datapp << "\n\n\n";
-
+        os << "b. Insert 50 data nodes in rdx2 trie - trie has 100 data nodes max\n";
         MKRdxPat<app_data> *rdx2 = rdx1->chg_max_rdx_nodes(100);
 
         delete rdx1;
 
         os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
-        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n";
+        os << "rdx2 - max_rdx_nodes = " << rdx2->max_rdx_nodes() << "\n";
+        os << "rdx2 - num_keys = " << rdx2->num_keys() << "\n";
+        os << "rdx2 - max_key_bytes = " << rdx2->max_key_bytes() << "\n\n";
 
         // maximum number of data nodes stored in rdx trie
         const int MAX_RDX_NODES2 = 50;
@@ -1865,6 +1872,7 @@ main()
             }
         }
 
+        // insert 50 data nodes - set some values for struct data
         for ( int n = 0, id = 100, d = 20.0 ; n < 50 ; n++, id++, d++ )
         {
             print_key((unsigned char *)rdx_key2[n], os, NUM_KEYS2, MAX_KEY_BYTES2);
@@ -1884,8 +1892,17 @@ main()
         }
         os << "\n";
 
+        os << "c. trie should have 100 data nodes max and 70 data nodes\n";
         os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
-        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n\n";
+        os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n";
+        os << "rdx2 - max_rdx_nodes = " << rdx2->max_rdx_nodes() << "\n";
+        os << "rdx2 - num_keys = " << rdx2->num_keys() << "\n";
+        os << "rdx2 - max_key_bytes = " << rdx2->max_key_bytes() << "\n\n";
+
+        os << "d. No verification error in second trie\n\n";
+        return_code = rdx2->verify(ERR_CODE_PRINT, os);
+
+        os << "return_code = rdx2->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n\n";
 
         os.close();
     }

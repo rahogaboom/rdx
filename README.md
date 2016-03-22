@@ -29,9 +29,9 @@ rdx
                Model name:            AMD Athlon(tm) 64 X2 Dual Core Processor 4000+
                CPU MHz:               2109.535
 
-               max_num_rdx_nodes = 2,000,000
+               max_rdx_nodes = 2,000,000
                num_keys = 3
-               num_key_bytes = 16
+               max_key_bytes = 16
 
                trie size = 558,000,327b
 

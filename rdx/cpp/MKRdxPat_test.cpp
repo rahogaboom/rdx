@@ -1904,6 +1904,8 @@ main()
 
         os << "return_code = rdx2->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n\n";
 
+        delete rdx2;
+
         os.close();
     }
 }

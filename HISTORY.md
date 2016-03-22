@@ -9,6 +9,8 @@
        maximum size.  the new trie may be smaller or larger
        than the original, but no smaller than the number of
        allocated nodes in the originating trie.
+    d. new test for new member function to create resized
+       clone of existing trie
 
 
  rdx-1.0.13.tar.gz - 

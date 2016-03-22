@@ -1,4 +1,16 @@
 
+ rdx-1.0.14.tar.gz - 
+    a. bug fix - 'static's from C version eliminated from
+       member functions
+    b. three new accessor member functions to get the
+       constructor arguments
+    c. new member function to create and return a trie
+       with the same allocated data nodes but a different
+       maximum size.  the new trie may be smaller or larger
+       than the original, but no smaller than the number of
+       allocated nodes in the originating trie.
+
+
  rdx-1.0.13.tar.gz - 
     a. minor code and documentation updates
 

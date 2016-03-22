@@ -62,9 +62,9 @@ rdx
         // ================================================
 
         // MKRdxPat.hpp class constructor arguments
-        const int max_num_rdx_nodes = 200000;
-        const int num_keys          = 2;
-        const int num_key_bytes     = 16;
+        const int max_rdx_nodes = 200000;
+        const int num_keys      = 2;
+        const int max_key_bytes = 16;
 
         // application data of type app_data defined here
         struct app_data
@@ -99,9 +99,9 @@ rdx
  *
  *     MKRdxPat<app_data>
  *         (
- *             int MAX_NUM_RDX_NODES,
+ *             int MAX_RDX_NODES,
  *             int NUM_KEYS,
- *             int NUM_KEY_BYTES
+ *             int MAX_KEY_BYTES
  *         );
  *         e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
  *
@@ -118,10 +118,10 @@ rdx
  *         int
  *     insert
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             app_data **app_datapp
  *         );
- *         e.g. return_code = rdx->insert((unsigned char *)key, &app_datap);
+ *         e.g. int return_code = rdx->insert((unsigned char *)key, &app_datap);
  *
  *
  *     struct app_data
@@ -132,9 +132,9 @@ rdx
  *         app_data *
  *     search
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
- *         e.g. app_datap = rdx->search((unsigned char *)key);
+ *         e.g. app_data *app_datap = rdx->search((unsigned char *)key);
  *
  *
  *     struct app_data
@@ -145,9 +145,9 @@ rdx
  *         app_data *
  *     remove
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
- *         e.g. app_datap = rdx->remove((unsigned char *)key);
+ *         e.g. app_data *app_datap = rdx->remove((unsigned char *)key);
  *
  *
  *         int
@@ -156,31 +156,60 @@ rdx
  *             app_data ***app_datappp,
  *             int k
  *         );
- *         e.g. return_code = rdx->sort(&app_datapp, k);
+ *         e.g. int return_code = rdx->sort(&app_datapp, k);
  *
  *
  *         int
- *     nodes
+ *     alloc_nodes
  *         (
  *         );
- *         e.g. nodes = rdx->nodes();
+ *         e.g. int alloc_nodes = rdx->alloc_nodes();
  *
  *
  *         int
- *     size 
+ *     bsize
  *         (
  *         );
- *         e.g. size = rdx->size();
+ *         e.g. int bsize = rdx->bsize();
+ *
+ *
+ *         int
+ *     max_rdx_nodes
+ *         (
+ *         );
+ *         e.g. int max_rdx_nodes = rdx->max_rdx_nodes();
+ *
+ *
+ *         int
+ *     num_keys
+ *         (
+ *         );
+ *         e.g. int num_keys = rdx->num_keys();
+ *
+ *
+ *         int
+ *     max_key_bytes 
+ *         (
+ *         );
+ *         e.g. int max_key_bytes = rdx->max_key_bytes();
+ *
+ *
+ *         MKRdxPat<app_data> *
+ *     chg_max_rdx_nodes 
+ *         (
+ *             int new_max_rdx_nodes
+ *         );
+ *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
  *
  *         int
  *     print
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             ofstream& os
  *         );
- *         e.g. return_code = rdx->print(NULL, os);
- *         e.g. return_code = rdx->print((unsigned char *)key, os);
+ *         e.g. int return_code = rdx->print(NULL, os);
+ *         e.g. int return_code = rdx->print((unsigned char *)key, os);
  *
  *
  *         int
@@ -189,8 +218,8 @@ rdx
  *             VERIFY_MODE vm,
  *             ofstream& os
  *         );
- *         e.g. return_code = rdx->verify(ERR_CODE, os);
- *         e.g. return_code = rdx->verify(ERR_CODE_PRINT, os);
+ *         e.g. int return_code = rdx->verify(ERR_CODE, os);
+ *         e.g. int return_code = rdx->verify(ERR_CODE_PRINT, os);
  *
  *======================================================================================================================
  *
@@ -203,12 +232,12 @@ rdx
  *     either singly of several simultaneously.
  *
  *     For example, a data structure that required either of an IPv4, IPv6 or MAC address key(s) to access
- *     data nodes.  In this case NUM_KEYS would be 3 and NUM_KEY_BYTES would be 16(the longest - see below).
+ *     data nodes.  In this case NUM_KEYS would be 3 and MAX_KEY_BYTES would be 16(the longest - see below).
  *
- *     The MKRdxPat class supports a data structure of MAX_NUM_RDX_NODES data nodes and NUM_KEYS keys per
- *     data node with keys of NUM_KEY_BYTES bytes or less.  The class constructor:
+ *     The MKRdxPat class supports a data structure of MAX_RDX_NODES data nodes and NUM_KEYS keys per
+ *     data node with keys of MAX_KEY_BYTES bytes or less.  The class constructor:
  *
- *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_NUM_RDX_NODES, NUM_KEYS, NUM_KEY_BYTES);
+ *         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
  *
  *     along with a:
  *
@@ -221,17 +250,17 @@ rdx
  *     key or any number of keys simultaneously.  Keys must be unique within their key index(0 - NUM_KEYS-1),
  *     but not over different key indexes.  Member functions that require keys are passed the array:
  *
- *         unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]
+ *         unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *
  *     One extra prefix byte, a key boolean - required to be 0(ignore) or 1(search), is set with each key to
  *     specify if the key is to be used in the data node search.  It is suggested that the array be first
  *     memset() to 0:
  *
- *         memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));
+ *         memset(key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));
  *
  *     and then only keys to be used copied in with the key boolean(set to 1) prepended.
  *
- *     In most cases the necessary keys will be of different lengths.  The NUM_KEY_BYTES constructor argument
+ *     In most cases the necessary keys will be of different lengths.  The MAX_KEY_BYTES constructor argument
  *     would be set to the longest of these.  All other shorter keys would be left justified in the key[][]
  *     array, that is, start just after the key boolean.  Thus, for the example above, the IPv6 key would use
  *     the full 16 bytes, the IPv4 key would use the first four bytes after the key boolean(with the rest(12)
@@ -265,11 +294,11 @@ rdx
  *     branch and data nodes.
  *
  *     For a trie of NUM_KEYS keys, each data node will have NUM_KEYS branch nodes associated with it.  The
- *     number of actual data nodes in the data structure is MAX_NUM_RDX_NODES+1.  This extra node is for the
+ *     number of actual data nodes in the data structure is MAX_RDX_NODES+1.  This extra node is for the
  *     initial branch nodes and initial data node with the impossible key of all 0xff's(1,2,3).  The number
- *     of user storable nodes is MAX_NUM_RDX_NODES.   The user, through the constructor, declares PNODEs,
- *     each of which contains a radix PATRICIA trie of MAX_NUM_RDX_NODES nodes with NUM_KEYS keys of
- *     at most NUM_KEY_BYTES bytes length.
+ *     of user storable nodes is MAX_RDX_NODES.   The user, through the constructor, declares PNODEs,
+ *     each of which contains a radix PATRICIA trie of MAX_RDX_NODES nodes with NUM_KEYS keys of
+ *     at most MAX_KEY_BYTES bytes length.
  *
  *     These routines are a modification of the algorithm cited.  Specifically, the upward pointers used to
  *     terminate search are not used, and are instead used to point to data nodes as trie leaves.  In
@@ -294,34 +323,34 @@ rdx
  *        node must be at least one bit longer.  this requires the data node storage for the keys to have one
  *        extra byte.
  *
- *     3. all keys are the same length - NUM_KEY_BYTES bytes.  the performance hit, the small memory savings
+ *     3. all keys are the same length - MAX_KEY_BYTES bytes.  the performance hit, the small memory savings
  *        and the added code complexity of having individually sized keys did not seem worth it.  thus, the
- *        longest required key will determine NUM_KEY_BYTES.  shorter keys may be left justified in the
- *        NUM_KEY_BYTES bytes.
+ *        longest required key will determine MAX_KEY_BYTES.  shorter keys may be left justified in the
+ *        MAX_KEY_BYTES bytes.
  *
- *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+NUM_KEY_BYTES]' array be first memset() to
+ *     4. it is suggested that the 'unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]' array be first memset() to
  *        0 and then all the keys to be used with key boolean 1 added in one operation(keys with key boolean
- *        0 are never needed) e.g. memset(key, 0, NUM_KEYS * (1+NUM_KEY_BYTES));.
+ *        0 are never needed) e.g. memset(key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));.
  *
  *     5. multidemensional arrays in C++ are implemented by subscripting calloc()'ed memory with parameterized
- *        values calculated from the static C array versions.  One, two and three dimensional arrays are
- *        illustrated as follows(see verify() for actual usage):
+ *        values calculated from the C array versions.  One, two and three dimensional arrays are illustrated
+ *        as follows(see verify() for actual usage):
  *
- *        n -> subscripts max_num_rdx_nodes_
+ *        n -> subscripts max_rdx_nodes_
  *        k -> subscripts num_keys_
- *        b -> subscripts num_key_bytes_:
+ *        b -> subscripts max_key_bytes_:
  *
  *        a. one dimensional:
- *           unsigned long dnode_addrs[max_num_rdx_nodes_+1];
- *               -> dnode_addrs[n]
+ *           unsigned long verify_dnode_addrs_[max_rdx_nodes_+1];
+ *               -> verify_dnode_addrs_[n]
  *
  *        b. two dimensional:
- *           unsigned long bnode_addrs[num_keys_][max_num_rdx_nodes_+1];
- *               -> bnode_addrs[k*(max_num_rdx_nodes_+1)+n]
+ *           unsigned long verify_bnode_addrs_[num_keys_][max_rdx_nodes_+1];
+ *               -> verify_bnode_addrs_[k*(max_rdx_nodes_+1)+n]
  *
  *        c. three dimensional:
- *           unsigned char dnode_keys[num_keys_][max_num_rdx_nodes_+1][num_key_bytes_];
- *               -> dnode_keys[(k*(max_num_rdx_nodes_+1)+n)*num_key_bytes_+b]
+ *           unsigned char verify_dnode_keys_[num_keys_][max_rdx_nodes_+1][max_key_bytes_];
+ *               -> verify_dnode_keys_[(k*(max_rdx_nodes_+1)+n)*max_key_bytes_+b]
  *
  *======================================================================================================================
  *

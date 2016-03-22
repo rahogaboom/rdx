@@ -144,7 +144,7 @@
  *         e.g. int max_key_bytes = rdx->max_key_bytes();
  *
  *
- *         int
+ *         MKRdxPat<app_data> *
  *     chg_max_rdx_nodes 
  *         (
  *             int new_max_rdx_nodes

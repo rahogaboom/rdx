@@ -68,7 +68,7 @@
  *         int
  *     insert
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             app_data **app_datapp
  *         );
  *         e.g. int return_code = rdx->insert((unsigned char *)key, &app_datap);
@@ -82,7 +82,7 @@
  *         app_data *
  *     search
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
  *         e.g. app_data *app_datap = rdx->search((unsigned char *)key);
  *
@@ -95,7 +95,7 @@
  *         app_data *
  *     remove
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *         );
  *         e.g. app_data *app_datap = rdx->remove((unsigned char *)key);
  *
@@ -147,7 +147,7 @@
  *         MKRdxPat<app_data> *
  *     chg_max_rdx_nodes 
  *         (
- *             int new_max_rdx_nodes
+ *             const int new_max_rdx_nodes
  *         );
  *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
@@ -155,7 +155,7 @@
  *         int
  *     print
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             ofstream& os
  *         );
  *         e.g. int return_code = rdx->print(NULL, os);
@@ -672,20 +672,20 @@ namespace MultiKeyRdxPat
 
                 if ( max_rdx_nodes_ < 1 )
                 {
-                    cerr << "max_rdx_nodes_ = " << max_rdx_nodes_ << "(must be > 0)" << "\n";
-                    throw "max_rdx_nodes_ < 1(must be > 0)";
+                    cerr << "MKRdxPat.hpp: max_rdx_nodes_ = " << max_rdx_nodes_ << "(must be > 0)" << "\n";
+                    throw "MKRdxPat.hpp: max_rdx_nodes_ < 1(must be > 0)";
                 }
 
                 if ( num_keys_ < 1 )
                 {
-                    cerr << "num_keys_ = " << num_keys_ << "(must be > 0)" << "\n";
-                    throw "num_keys_ < 1(must be > 0)";
+                    cerr << "MKRdxPat.hpp: num_keys_ = " << num_keys_ << "(must be > 0)" << "\n";
+                    throw "MKRdxPat.hpp: num_keys_ < 1(must be > 0)";
                 }
 
                 if ( max_key_bytes_ < 1 )
                 {
-                    cerr << "max_key_bytes_ = " << max_key_bytes_ << "(must be > 0)" << "\n";
-                    throw "max_key_bytes_ < 1(must be > 0)";
+                    cerr << "MKRdxPat.hpp: max_key_bytes_ = " << max_key_bytes_ << "(must be > 0)" << "\n";
+                    throw "MKRdxPat.hpp: max_key_bytes_ < 1(must be > 0)";
                 }
 
                 rdx_.bsize = 0;
@@ -746,8 +746,8 @@ namespace MultiKeyRdxPat
                 fptr = (unsigned char *)calloc( rdx_.bsize, sizeof(unsigned char) );
                 if ( fptr == NULL )
                 {
-                    cerr << "Allocation of trie memory failed - calloc()\n";
-                    throw "Allocation of trie memory failed - calloc()";
+                    cerr << "MKRdxPat.hpp: Allocation of trie memory failed - calloc()\n";
+                    throw "MKRdxPat.hpp: Allocation of trie memory failed - calloc()";
                 }
 
                 free_ptr_ = (void *)fptr;
@@ -888,7 +888,7 @@ namespace MultiKeyRdxPat
                 int
             insert
                 (
-                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                    const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                     app_data **app_datapp
                 )
             {
@@ -1157,7 +1157,7 @@ namespace MultiKeyRdxPat
                 app_data *
             search
                 (
-                    unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                    const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                 )
             {
                 // c[] is declared as BNODE * but is cast to DNODE * at the end of a search.
@@ -1318,7 +1318,7 @@ namespace MultiKeyRdxPat
                 app_data *
             remove
                 (
-                    unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                    const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                 )
             {
                 int n;
@@ -1727,7 +1727,7 @@ namespace MultiKeyRdxPat
                 MKRdxPat<app_data> *
             chg_max_rdx_nodes
                 (
-                    int new_max_rdx_nodes
+                    const int new_max_rdx_nodes
                 )
             {
                 if ( new_max_rdx_nodes < rdx_.alloc_nodes )
@@ -1842,7 +1842,7 @@ namespace MultiKeyRdxPat
                 int
             print
                 (
-                    unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                    const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
                     ofstream& os
                 )
             {

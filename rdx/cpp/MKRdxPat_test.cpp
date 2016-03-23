@@ -1766,7 +1766,7 @@ main()
               "         Expected Results:\n"
               "            a. Insert 20 data nodes in rdx1 trie - trie has 25 data nodes max\n"
               "            b. Insert 50 data nodes in rdx2 trie - trie has 100 data nodes max\n"
-              "            c. trie should have 100 data nodes max and 70 data nodes\n"
+              "            c. trie should have 100 data nodes max and 70 allocated data nodes\n"
               "            d. No verification error in second trie\n\n";
 
 
@@ -1892,7 +1892,7 @@ main()
         }
         os << "\n";
 
-        os << "c. trie should have 100 data nodes max and 70 data nodes\n";
+        os << "c. trie should have 100 data nodes max and 70 allocated data nodes\n";
         os << "rdx2 - Nodes allocated = " << rdx2->alloc_nodes() << "\n";
         os << "rdx2 - Bytes allocated = " << rdx2->bsize() << "\n";
         os << "rdx2 - max_rdx_nodes = " << rdx2->max_rdx_nodes() << "\n";

@@ -52,7 +52,7 @@
  *             int MAX_RDX_NODES,
  *             int NUM_KEYS,
  *             int MAX_KEY_BYTES
- *         );
+ *         )
  *         e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
  *
  *
@@ -70,7 +70,7 @@
  *         (
  *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             app_data **app_datapp
- *         );
+ *         )
  *         e.g. int return_code = rdx->insert((unsigned char *)key, &app_datap);
  *
  *
@@ -83,7 +83,7 @@
  *     search
  *         (
  *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
- *         );
+ *         )
  *         e.g. app_data *app_datap = rdx->search((unsigned char *)key);
  *
  *
@@ -96,7 +96,7 @@
  *     remove
  *         (
  *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
- *         );
+ *         )
  *         e.g. app_data *app_datap = rdx->remove((unsigned char *)key);
  *
  *
@@ -105,42 +105,42 @@
  *         (
  *             app_data ***app_datappp,
  *             const int k
- *         );
+ *         )
  *         e.g. int return_code = rdx->sort(&app_datapp, k);
  *
  *
  *         int
  *     alloc_nodes
  *         (
- *         );
+ *         ) const
  *         e.g. int alloc_nodes = rdx->alloc_nodes();
  *
  *
  *         int
  *     bsize
  *         (
- *         );
+ *         ) const
  *         e.g. int bsize = rdx->bsize();
  *
  *
  *         int
  *     max_rdx_nodes
  *         (
- *         );
+ *         ) const
  *         e.g. int max_rdx_nodes = rdx->max_rdx_nodes();
  *
  *
  *         int
  *     num_keys
  *         (
- *         );
+ *         ) const
  *         e.g. int num_keys = rdx->num_keys();
  *
  *
  *         int
  *     max_key_bytes 
  *         (
- *         );
+ *         ) const
  *         e.g. int max_key_bytes = rdx->max_key_bytes();
  *
  *
@@ -148,7 +148,7 @@
  *     chg_max_rdx_nodes 
  *         (
  *             const int new_max_rdx_nodes
- *         );
+ *         ) const
  *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
  *
@@ -157,7 +157,7 @@
  *         (
  *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             ofstream& os
- *         );
+ *         )
  *         e.g. int return_code = rdx->print(NULL, os);
  *         e.g. int return_code = rdx->print((unsigned char *)key, os);
  *
@@ -167,7 +167,7 @@
  *         (
  *             VERIFY_MODE vm,
  *             ofstream& os
- *         );
+ *         )
  *         e.g. int return_code = rdx->verify(ERR_CODE, os);
  *         e.g. int return_code = rdx->verify(ERR_CODE_PRINT, os);
  *
@@ -356,6 +356,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <exception>
 
 using std::vector;
 using std::string;
@@ -757,7 +758,7 @@ namespace MultiKeyRdxPat
                     throw "MKRdxPat.hpp: max_key_bytes_ < 1(must be > 0)";
                 }
 
-                rdx_.bsize = 0;
+                rdx_.bsize = 0;  // the size of the trie - everything allocated by calloc()
 
                 //
                 // total calloc() segments =
@@ -1616,7 +1617,7 @@ namespace MultiKeyRdxPat
                 int
             alloc_nodes
                 (
-                )
+                ) const
             {
                return rdx_.alloc_nodes;
             }  // alloc_nodes()
@@ -1646,7 +1647,7 @@ namespace MultiKeyRdxPat
                 int
             bsize
                 (
-                )
+                ) const
             {
                return rdx_.bsize;
             }  // bsize()
@@ -1676,7 +1677,7 @@ namespace MultiKeyRdxPat
                 int
             max_rdx_nodes
                 (
-                )
+                ) const
             {
                return max_rdx_nodes_;
             }  // max_rdx_nodes()
@@ -1705,7 +1706,7 @@ namespace MultiKeyRdxPat
                 int
             num_keys
                 (
-                )
+                ) const
             {
                return num_keys_;
             }  // num_keys()
@@ -1734,7 +1735,7 @@ namespace MultiKeyRdxPat
                 int
             max_key_bytes
                 (
-                )
+                ) const
             {
                return max_key_bytes_;
             }  // max_key_bytes()
@@ -1770,7 +1771,7 @@ namespace MultiKeyRdxPat
             chg_max_rdx_nodes
                 (
                     const int new_max_rdx_nodes
-                )
+                ) const
             {
                 if ( new_max_rdx_nodes < rdx_.alloc_nodes )
                 {

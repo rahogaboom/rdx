@@ -1,4 +1,8 @@
 
+ rdx-1.0.15.tar.gz - 
+    a. 
+
+
  rdx-1.0.14.tar.gz - 
     a. bug fix - 'static's from C version eliminated from
        member functions

@@ -1,4 +1,9 @@
 
+ rdx-1.1.0.tar.gz - 
+    a. revise exception propagation
+    b. improve debugging
+
+
  rdx-1.0.15.tar.gz - 
     a. minor code and documentation updates
 

@@ -365,7 +365,10 @@ using std::ofstream;
 
 namespace MultiKeyRdxPat
 {
-    //#define DEBUG  // comment in to get DEBUG info
+    // #define DEBUG 0 // comment in to get DEBUG info
+
+    #define debug(fmt, ...) if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt, \
+                                                    __FILE__, __LINE__, __func__, __VA_ARGS__);
 
     // verify_mode arg to verify()
     typedef enum verify_mode
@@ -1113,7 +1116,7 @@ namespace MultiKeyRdxPat
                     }
 
                     #ifdef DEBUG
-                    printf("DEBUG-1: insert_ky_ k = %d\n", k);
+                    printf("insert_ky_ k = %d\n", k);
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
                         printf("%X ", *(&insert_ky_[k*(1+max_key_bytes_)+0]+i) );

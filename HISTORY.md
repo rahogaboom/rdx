@@ -1,6 +1,6 @@
 
  rdx-1.0.15.tar.gz - 
-    a. 
+    a. minor code and documentation updates
 
 
  rdx-1.0.14.tar.gz - 

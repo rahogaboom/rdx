@@ -90,7 +90,7 @@
  *     struct app_data
  *     {
  *         int data;  // user specified application data structure
- *     }
+ *     };
  *
  *         app_data *
  *     remove

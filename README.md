@@ -102,7 +102,7 @@ rdx
  *             int MAX_RDX_NODES,
  *             int NUM_KEYS,
  *             int MAX_KEY_BYTES
- *         );
+ *         )
  *         e.g. MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(512, 3, 4);
  *
  *
@@ -118,9 +118,9 @@ rdx
  *         int
  *     insert
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             app_data **app_datapp
- *         );
+ *         )
  *         e.g. int return_code = rdx->insert((unsigned char *)key, &app_datap);
  *
  *
@@ -132,21 +132,21 @@ rdx
  *         app_data *
  *     search
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
- *         );
+ *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *         )
  *         e.g. app_data *app_datap = rdx->search((unsigned char *)key);
  *
  *
  *     struct app_data
  *     {
  *         int data;  // user specified application data structure
- *     }
+ *     };
  *
  *         app_data *
  *     remove
  *         (
- *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
- *         );
+ *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *         )
  *         e.g. app_data *app_datap = rdx->remove((unsigned char *)key);
  *
  *
@@ -154,60 +154,60 @@ rdx
  *     sort
  *         (
  *             app_data ***app_datappp,
- *             int k
- *         );
+ *             const int k
+ *         )
  *         e.g. int return_code = rdx->sort(&app_datapp, k);
  *
  *
  *         int
  *     alloc_nodes
  *         (
- *         );
+ *         ) const
  *         e.g. int alloc_nodes = rdx->alloc_nodes();
  *
  *
  *         int
  *     bsize
  *         (
- *         );
+ *         ) const
  *         e.g. int bsize = rdx->bsize();
  *
  *
  *         int
  *     max_rdx_nodes
  *         (
- *         );
+ *         ) const
  *         e.g. int max_rdx_nodes = rdx->max_rdx_nodes();
  *
  *
  *         int
  *     num_keys
  *         (
- *         );
+ *         ) const
  *         e.g. int num_keys = rdx->num_keys();
  *
  *
  *         int
  *     max_key_bytes 
  *         (
- *         );
+ *         ) const
  *         e.g. int max_key_bytes = rdx->max_key_bytes();
  *
  *
  *         MKRdxPat<app_data> *
  *     chg_max_rdx_nodes 
  *         (
- *             int new_max_rdx_nodes
- *         );
+ *             const int new_max_rdx_nodes
+ *         ) const
  *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
  *
  *         int
  *     print
  *         (
- *             unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *             const unsigned char *key,  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
  *             ofstream& os
- *         );
+ *         )
  *         e.g. int return_code = rdx->print(NULL, os);
  *         e.g. int return_code = rdx->print((unsigned char *)key, os);
  *
@@ -217,7 +217,7 @@ rdx
  *         (
  *             VERIFY_MODE vm,
  *             ofstream& os
- *         );
+ *         )
  *         e.g. int return_code = rdx->verify(ERR_CODE, os);
  *         e.g. int return_code = rdx->verify(ERR_CODE_PRINT, os);
  *

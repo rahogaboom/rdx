@@ -792,13 +792,20 @@ namespace MultiKeyRdxPat
                 debug("DNODE dnodes[max_rdx_nodes_+1]  -  (max_rdx_nodes_+1) * sizeof(DNODE) = %lu\n\n",
                       (max_rdx_nodes_+1) * sizeof(DNODE));
 
+// XXXX
                 // ( max_rdx_nodes_+1 ) * 3(in DNODE)
-                for ( int i = 0 ; i < max_rdx_nodes_+1 ; i++ )
-                {
-                    rdx_.bsize += (num_keys_) * sizeof(unsigned int) +                       // unsigned int br[num_keys_]
-                                  (num_keys_) * sizeof(BNODE *) +                            // BNODE *p[num_keys_]
-                                  (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char);  // unsigned char key[num_keys_][1+max_key_bytes_]
-                }
+                rdx_.bsize += (
+                                  (num_keys_) * sizeof(unsigned int) +                      // unsigned int br[num_keys_]
+                                  (num_keys_) * sizeof(BNODE *) +                           // BNODE *p[num_keys_]
+                                  (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char)  // unsigned char key[num_keys_][1+max_key_bytes_]
+                              ) * ( max_rdx_nodes_+1 );
+
+                debug("unsigned int br[num_keys_]  -  (num_keys_) * sizeof(unsigned int) * ( max_rdx_nodes_+1 ) = %lu\n",
+                      (num_keys_) * sizeof(unsigned int) * ( max_rdx_nodes_+1 ));
+                debug("BNODE *p[num_keys_]  -  (num_keys_) * sizeof(BNODE *) * ( max_rdx_nodes_+1 ) = %lu\n",
+                      (num_keys_) * sizeof(BNODE *) * ( max_rdx_nodes_+1 ));
+                debug("unsigned char key[num_keys_][1+max_key_bytes_]  -  (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char) * ( max_rdx_nodes_+1 ) = %lu\n\n",
+                      (num_keys_ * (1+max_key_bytes_)) * sizeof(unsigned char) * ( max_rdx_nodes_+1 ));
 
                 // 6(in insert())
                 rdx_.bsize += num_keys_ * sizeof(BNODE *) +                            // BNODE *insert_p_[num_keys_]
@@ -808,24 +815,63 @@ namespace MultiKeyRdxPat
                               num_keys_ * sizeof(BNODE *) +                            // BNODE *insert_c_[num_keys_]
                               num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char);  // unsigned char insert_ky_[num_keys_][1+max_key_bytes_]
 
+                debug("BNODE *insert_p_[num_keys_]  -  num_keys_ * sizeof(BNODE *) = %lu\n",
+                      num_keys_ * sizeof(BNODE *));
+                debug("BNODE *insert_bna_[num_keys_]  -  num_keys_ * sizeof(BNODE *) = %lu\n",
+                      num_keys_ * sizeof(BNODE *));
+                debug("unsigned int insert_lr_[num_keys_]  -  num_keys_ * sizeof(unsigned int) = %lu\n",
+                      num_keys_ * sizeof(unsigned int));
+                debug("unsigned int insert_key_bit_[num_keys_]  -  num_keys_ * sizeof(unsigned int) = %lu\n",
+                      num_keys_ * sizeof(unsigned int));
+                debug("BNODE *insert_c_[num_keys_]  -  num_keys_ * sizeof(BNODE *) = %lu\n",
+                      num_keys_ * sizeof(BNODE *));
+                debug("unsigned char insert_ky_[num_keys_][1+max_key_bytes_]  -  num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char) = %lu\n\n",
+                      num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char));
+
                 // 2(in search())
-                rdx_.bsize += num_keys_ * sizeof(BNODE *) +                            // BNODE *search_c_[num_keys_];
+                rdx_.bsize += num_keys_ * sizeof(BNODE *) +                            // BNODE *search_c_[num_keys_]
                               num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char);  // unsigned char search_ky_[num_keys_][1+max_key_bytes_]
 
+                debug("BNODE *search_c_[num_keys_]  -  num_keys_ * sizeof(BNODE *) = %lu\n",
+                      num_keys_ * sizeof(BNODE *));
+                debug("unsigned char search_ky_[num_keys_][1+max_key_bytes_]  -  num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char) = %lu\n\n",
+                      num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char));
+
                 // 2(in remove())
-                rdx_.bsize += num_keys_ * sizeof(BNODE *) +                            // BNODE *remove_c_[num_keys_];
+                rdx_.bsize += num_keys_ * sizeof(BNODE *) +                            // BNODE *remove_c_[num_keys_]
                               num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char);  // unsigned char remove_ky_[num_keys_][1+max_key_bytes_]
 
+                debug("BNODE *remove_c_[num_keys_]  -  num_keys_ * sizeof(BNODE *) = %lu\n",
+                      num_keys_ * sizeof(BNODE *));
+                debug("unsigned char remove_ky_[num_keys_][1+max_key_bytes_]  -  num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char) = %lu\n\n",
+                      num_keys_ * (1+max_key_bytes_) * sizeof(unsigned char));
+
                 // 1(in print())
-                rdx_.bsize += (1+max_key_bytes_) * sizeof(unsigned char);  // unsigned char print_ky_[1+max_key_bytes_];
+                rdx_.bsize += (1+max_key_bytes_) * sizeof(unsigned char);  // unsigned char print_ky_[1+max_key_bytes_]
+
+                debug("unsigned char print_ky_[1+max_key_bytes_]  -  (1+max_key_bytes_) * sizeof(unsigned char) = %lu\n\n",
+                      (1+max_key_bytes_) * sizeof(unsigned char));
 
                 // 6(in verify())
-                rdx_.bsize += num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) +                  // unsigned long verify_bnode_addrs_[num_keys_][max_rdx_nodes_+1];
-                              num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) +                  // unsigned long verify_free_bnode_addrs_[num_keys_][max_rdx_nodes_+1];
-                              (max_rdx_nodes_+1) * sizeof(unsigned long) +                              // unsigned long verify_dnode_addrs_[max_rdx_nodes_+1];
-                              (max_rdx_nodes_+1) * sizeof(unsigned long) +                              // unsigned long verify_free_dnode_addrs_[max_rdx_nodes_+1];
-                              num_keys_ * (max_rdx_nodes_+1) * max_key_bytes_ * sizeof(unsigned char) + // unsigned char verify_dnode_keys_[num_keys_][max_rdx_nodes_+1][max_key_bytes_];
-                              2 * (max_rdx_nodes_+1) * sizeof(unsigned long);                           // unsigned long verify_node_index_[2][max_rdx_nodes_+1];
+                rdx_.bsize += num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) +                  // unsigned long verify_bnode_addrs_[num_keys_][max_rdx_nodes_+1]
+                              num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) +                  // unsigned long verify_free_bnode_addrs_[num_keys_][max_rdx_nodes_+1]
+                              (max_rdx_nodes_+1) * sizeof(unsigned long) +                              // unsigned long verify_dnode_addrs_[max_rdx_nodes_+1]
+                              (max_rdx_nodes_+1) * sizeof(unsigned long) +                              // unsigned long verify_free_dnode_addrs_[max_rdx_nodes_+1]
+                              num_keys_ * (max_rdx_nodes_+1) * max_key_bytes_ * sizeof(unsigned char) + // unsigned char verify_dnode_keys_[num_keys_][max_rdx_nodes_+1][max_key_bytes_]
+                              2 * (max_rdx_nodes_+1) * sizeof(unsigned long);                           // unsigned long verify_node_index_[2][max_rdx_nodes_+1]
+
+                debug("unsigned long verify_bnode_addrs_[num_keys_][max_rdx_nodes_+1]  -  num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n",
+                      num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long));
+                debug("unsigned long verify_free_bnode_addrs_[num_keys_][max_rdx_nodes_+1]  -  num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n",
+                      num_keys_ * (max_rdx_nodes_+1) * sizeof(unsigned long));
+                debug("unsigned long verify_dnode_addrs_[max_rdx_nodes_+1]  -  (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n",
+                      (max_rdx_nodes_+1) * sizeof(unsigned long));
+                debug("unsigned long verify_free_dnode_addrs_[max_rdx_nodes_+1]  -  (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n",
+                      (max_rdx_nodes_+1) * sizeof(unsigned long));
+                debug("unsigned char verify_dnode_keys_[num_keys_][max_rdx_nodes_+1][max_key_bytes_]  -  num_keys_ * (max_rdx_nodes_+1) * max_key_bytes_ * sizeof(unsigned char) = %lu\n",
+                      num_keys_ * (max_rdx_nodes_+1) * max_key_bytes_ * sizeof(unsigned char));
+                debug("unsigned long verify_node_index_[2][max_rdx_nodes_+1]  -  2 * (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n\n",
+                      2 * (max_rdx_nodes_+1) * sizeof(unsigned long));
 
                 fptr = (unsigned char *)calloc( rdx_.bsize, sizeof(unsigned char) );
                 if ( fptr == NULL )

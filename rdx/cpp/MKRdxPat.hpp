@@ -365,10 +365,12 @@ using std::ofstream;
 
 namespace MultiKeyRdxPat
 {
-    #define DEBUG 1 // 0/1 for debug output
+    #define DEBUG_I 0 // 0/1 for debug output in insert()
+    #define DEBUG_S 0 // 0/1 for debug output in search()
+    #define DEBUG_R 1 // 0/1 for debug output in remove()
 
-    #define debug(fmt, ...) if (DEBUG) fprintf(stdout, "%s:%d:%s(): " fmt, \
-                                                        __FILE__, __LINE__, __func__, __VA_ARGS__);
+    #define debug(fmt, ...) if (DEBUG_I or DEBUG_S or DEBUG_R) fprintf(stdout, "%s:%d:%s(): " fmt, \
+                                                                               __FILE__, __LINE__, __func__, __VA_ARGS__);
 
     // verify_mode arg to verify()
     typedef enum verify_mode
@@ -1172,20 +1174,20 @@ namespace MultiKeyRdxPat
                         }
                     }
 
-                    #if DEBUG
-                    printf("insert_ky_ k = %d\n", k);
+                    #if DEBUG_I
+                    debug("insert_ky_ k = %d\n", k);
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("%X ", *(&insert_ky_[k*(1+max_key_bytes_)+0]+i) );
+                        printf("%X ", *(&insert_ky_[k*(1+max_key_bytes_)+0]+i));
                     }
-                    printf("\n");
+                    printf("\n\n");
                     #endif
 
                     // set child key
                     memmove( &(dna->key[k*(1+max_key_bytes_)]), &insert_ky_[k*(1+max_key_bytes_)], max_key_bytes_+1 );
 
-                    #if DEBUG
-                    printf("DEBUG-2: dna->key[] k = %d\n", k);
+                    #if DEBUG_I
+                    debug("DEBUG_I: dna->key[] k = %d\n", k);
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
                         printf("%X ", *( &(dna->key[k*(1+max_key_bytes_)])+i ) );
@@ -1200,15 +1202,15 @@ namespace MultiKeyRdxPat
                 // set node to allocated status
                 dna->alloc = 1;
 
-                #if DEBUG
-                printf("DEBUG-3: dna = %p \n", (void *)dna );
+                #if DEBUG_I
+                debug("DEBUG_I: dna = %p \n", (void *)dna );
                 #endif
 
                 // new node insertion successful, set return values
                 *app_datapp = &( dna->data );
 
-                #if DEBUG
-                printf("DEBUG-4: end insert(): %d\n", dna->id);
+                #if DEBUG_I
+                debug("DEBUG_I: end insert(): %d\n", dna->id);
                 #endif
 
                 return 0;
@@ -1290,8 +1292,8 @@ namespace MultiKeyRdxPat
                 int n = 0;  // sum of key booleans that are 1 - must be >=1
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
-                    #if DEBUG
-                    printf("DEBUG-5: k = %d\n", k);
+                    #if DEBUG_S
+                    debug("DEBUG_S: k = %d\n", k);
                     #endif
 
                     if ( key[k*(1+max_key_bytes_)+0] == 0 )
@@ -1318,9 +1320,9 @@ namespace MultiKeyRdxPat
                         search_c_ = ( gbit( &search_ky_[k*(1+max_key_bytes_)+0], search_c_->b ) ) ? (BNODE *)(search_c_->r) : (BNODE *)(search_c_->l);
                     }
 
-                    #if DEBUG
-                    printf("DEBUG-6: search_c_ = %p \n", (void *)search_c_ );
-                    printf("DEBUG-7: ((DNODE *)search_c_)->key = %p \n", (void *)((DNODE *)search_c_)->key );
+                    #if DEBUG_S
+                    debug("DEBUG_S: search_c_ = %p \n", (void *)search_c_ );
+                    debug("DEBUG_S: ((DNODE *)search_c_)->key = %p \n", (void *)((DNODE *)search_c_)->key );
                     #endif
 
                     // check if all keys end at the same data node - if not return NULL
@@ -1337,7 +1339,8 @@ namespace MultiKeyRdxPat
                         }
                     }
 
-                    #if DEBUG
+                    #if DEBUG_S
+                    debug("%s", "\n");
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
                         printf("%X ", *(&search_ky_[k*(1+max_key_bytes_)+0]+i) );
@@ -1346,19 +1349,19 @@ namespace MultiKeyRdxPat
 
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-8: %p\n",  (void *)(&((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i) );
-                        printf("DEBUG-9: %X\n", *( &((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i ) );
+                        printf("DEBUG_S: %p\n",  (void *)(&((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i) );
+                        printf("DEBUG_S: %X\n", *( &((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i ) );
                     }
                     printf("\n");
 
-                    printf("DEBUG-10: dna = %p\n", (void *)(DNODE *)search_c_ );
+                    printf("DEBUG_S: dna = %p\n", (void *)(DNODE *)search_c_ );
                     #endif
 
                     // if key not found return NULL
                     if ( memcmp( &search_ky_[k*(1+max_key_bytes_)+0], &((DNODE *)search_c_)->key[k*(1+max_key_bytes_)], max_key_bytes_+1 ) != 0 )
                     {
-                        #if DEBUG
-                        printf("DEBUG-11: k = exit2\n");
+                        #if DEBUG_S
+                        debug("%s", "DEBUG_S: k = exit2\n");
                         #endif
 
                         return NULL;  // key not found
@@ -1367,8 +1370,8 @@ namespace MultiKeyRdxPat
 
                 if ( n == 0 )
                 {
-                    #if DEBUG
-                    printf("DEBUG-12: k = exit3\n");
+                    #if DEBUG_S
+                    debug("%s", "DEBUG_S: k = exit3\n");
                     #endif
 
                     return NULL;  // no keys are used(all key booleans are 0)
@@ -1448,8 +1451,8 @@ namespace MultiKeyRdxPat
                 int n = 0;  // sum of key booleans that are 1 - must be >=1
                 for ( int k = 0 ; k < num_keys_ ; k++ )
                 {
-                    #if DEBUG
-                    printf("DEBUG-13: key boolean = %X\n", key[k*(1+max_key_bytes_)+0]);
+                    #if DEBUG_R
+                    debug("DEBUG_R: key boolean = %X\n", key[k*(1+max_key_bytes_)+0]);
                     #endif
 
                     if ( key[k*(1+max_key_bytes_)+0] == 0 )
@@ -1462,18 +1465,18 @@ namespace MultiKeyRdxPat
                     }
                     else
                     {
-                        #if DEBUG
-                        printf("DEBUG-14: k = exit0\n");
+                        #if DEBUG_R
+                        debug("%s", "DEBUG_R: k = exit0\n");
                         #endif
 
                         return NULL;  // if a key boolean is not 0 or 1
                     }
 
-                    #if DEBUG
-                    printf("DEBUG-15: k = %d\n", k);
-                    printf("DEBUG-16: max_rdx_nodes_ = %d\n", max_rdx_nodes_);
-                    printf("DEBUG-17: num_keys_ = %d\n", num_keys_);
-                    printf("DEBUG-18: max_key_bytes_ = %d\n", max_key_bytes_);
+                    #if DEBUG_R
+                    debug("DEBUG_R: k = %d\n", k);
+                    printf("DEBUG_R: max_rdx_nodes_ = %d\n", max_rdx_nodes_);
+                    printf("DEBUG_R: num_keys_ = %d\n", num_keys_);
+                    printf("DEBUG_R: max_key_bytes_ = %d\n", max_key_bytes_);
                     #endif
 
 
@@ -1502,17 +1505,18 @@ namespace MultiKeyRdxPat
                         }
                     }
 
-                    #if DEBUG
+                    #if DEBUG_R
+                    debug("%s", "\n");
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-19: %X ", *(&remove_ky_[k*(1+max_key_bytes_)+0]+i) );
+                        printf("DEBUG_R: %X ", *(&remove_ky_[k*(1+max_key_bytes_)+0]+i) );
                     }
                     printf("\n");
 
                     for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
                     {
-                        printf("DEBUG-20: %p\n",  (void *)(&((DNODE *)remove_c_)->key[k*(1+max_key_bytes_)]+i) );
-                        printf("DEBUG-21: %X\n", *( &((DNODE *)remove_c_)->key[k*(1+max_key_bytes_)]+i ) );
+                        printf("DEBUG_R: %p\n",  (void *)(&((DNODE *)remove_c_)->key[k*(1+max_key_bytes_)]+i) );
+                        printf("DEBUG_R: %X\n", *( &((DNODE *)remove_c_)->key[k*(1+max_key_bytes_)]+i ) );
                     }
                     printf("\n");
                     #endif
@@ -1526,8 +1530,8 @@ namespace MultiKeyRdxPat
 
                 if ( n == 0 )
                 {
-                    #if DEBUG
-                    printf("DEBUG-22: k = exit3\n");
+                    #if DEBUG_R
+                    debug("%s", "DEBUG_R: k = exit3\n");
                     #endif
 
                     return NULL;  // no keys are used(all key booleans are 0)

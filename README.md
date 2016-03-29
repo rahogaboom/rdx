@@ -314,6 +314,20 @@ rdx
  *
  *======================================================================================================================
  *
+ * Error Handling
+ *
+ *     1. Exceptions - The #include <exception> header is used to define exception objects throw()'n
+ *                     upon calloc() failures.  Calloc() failures are thrown in the class constructor
+ *                     MKRdxPat(), the chg_max_rdx_nodes() member function and the verify() member
+ *                     function.  All other errors are reported via return values.
+ *     2. Debugging - Debugging output is provided for the class constructor - MKRdxPat(), the insert()
+ *                    member function, the search() member function and the remove() member function.
+ *                    A debug() macro is provided.  It will generte output if any one of three defines
+ *                    - DEBUG_I(insert()), DEBUG_S(search()), DEBUG_R(remove()) - are set to 1.  If any
+ *                    of these are set to 1 then debug output for MKRdxPat() will happen.
+ *
+ *======================================================================================================================
+ *
  * Operational Notes:
  *
  *     1. the first member of BNODE and DNODE typedefs, id, should not be moved.  when doing operations on the

@@ -264,6 +264,20 @@
  *
  *======================================================================================================================
  *
+ * Error Handling
+ *
+ *     1. Exceptions - The #include <exception> header is used to define exception objects throw()'n
+ *                     upon calloc() failures.  Calloc() failures are thrown in the class constructor
+ *                     MKRdxPat(), the chg_max_rdx_nodes() member function and the verify() member
+ *                     function.  All other errors are reported via return values.
+ *     2. Debugging - Debugging output is provided for the class constructor - MKRdxPat(), the insert()
+ *                    member function, the search() member function and the remove() member function.
+ *                    A debug() macro is provided.  It will generte output if any one of three defines
+ *                    - DEBUG_I(insert()), DEBUG_S(search()), DEBUG_R(remove()) - are set to 1.  If any
+ *                    of these are set to 1 then debug output for MKRdxPat() will happen.
+ *
+ *======================================================================================================================
+ *
  * Operational Notes:
  *
  *     1. the first member of BNODE and DNODE typedefs, id, should not be moved.  when doing operations on the
@@ -367,7 +381,7 @@ namespace MultiKeyRdxPat
 {
     #define DEBUG_I 0 // 0/1 for debug output in insert()
     #define DEBUG_S 0 // 0/1 for debug output in search()
-    #define DEBUG_R 1 // 0/1 for debug output in remove()
+    #define DEBUG_R 0 // 0/1 for debug output in remove()
 
     #define debug(fmt, ...) if (DEBUG_I or DEBUG_S or DEBUG_R) fprintf(stdout, "%s:%d:%s(): " fmt, \
                                                                                __FILE__, __LINE__, __func__, __VA_ARGS__);
@@ -875,11 +889,19 @@ namespace MultiKeyRdxPat
                 debug("unsigned long verify_node_index_[2][max_rdx_nodes_+1]  -  2 * (max_rdx_nodes_+1) * sizeof(unsigned long) = %lu\n\n",
                       2 * (max_rdx_nodes_+1) * sizeof(unsigned long));
 
+                // exception object for throw()'ing calloc() error
+                class MKRdxPatConstructorExc: public std::exception
+                {
+                    virtual const char* what() const throw()
+                    {
+                        return "MKRdxPat MKRdxPat() calloc() failure.";
+                    }
+                } MKRdxPatConstructorExc;
+
                 fptr = (unsigned char *)calloc( rdx_.bsize, sizeof(unsigned char) );
                 if ( fptr == NULL )
                 {
-                    cerr << "MKRdxPat.hpp: Allocation of trie memory failed - calloc()\n";
-                    throw "MKRdxPat.hpp: Allocation of trie memory failed - calloc()";
+                    throw MKRdxPatConstructorExc;
                 }
 
                 free_ptr_ = (void *)fptr;
@@ -1850,12 +1872,20 @@ namespace MultiKeyRdxPat
                 //pointer to app_data struct returned by an insert()
                 app_data *app_datap;
 
+                // exception object for throw()'ing calloc() error
+                class MKRdxPatChgMaxRdxNodesExc: public std::exception
+                {
+                    virtual const char* what() const throw()
+                    {
+                        return "MKRdxPat chg_max_rdx_nodes() calloc() failure.";
+                    }
+                } MKRdxPatChgMaxRdxNodesExc;
+
                 // allocate space for the keys for node insertion into the new object
                 unsigned char *rdx_key = (unsigned char *) calloc( num_keys_ * (1+max_key_bytes_) , sizeof(unsigned char) );
                 if ( rdx_key == NULL )
                 {
-                    cerr << "MKRdxPat.hpp: Allocation of trie memory failed - calloc()\n";
-                    throw "MKRdxPat.hpp: Allocation of trie memory failed - calloc()";
+                    throw MKRdxPatChgMaxRdxNodesExc;
                 }
 
                 // loop over all data nodes in the originating MKRdxPat<app_data> object and copy the allocated data nodes.
@@ -2933,12 +2963,20 @@ namespace MultiKeyRdxPat
                 // retrieve all keys from all data nodes and use normal search(rdx->search())
                 // to find them - ignore root node keys
 
+                // exception object for throw()'ing calloc() error
+                class MKRdxPatVerifyExc: public std::exception
+                {
+                    virtual const char* what() const throw()
+                    {
+                        return "MKRdxPat verify() calloc() failure.";
+                    }
+                } MKRdxPatVerifyExc;
+
                 // unsigned char key[num_keys_][1+max_key_bytes_]
                 unsigned char *key = (unsigned char *)calloc( num_keys_ * (1+max_key_bytes_), sizeof(unsigned char) );
                 if ( key == NULL )
                 {
-                    cerr << "MKRdxPat.hpp: Allocation of trie memory failed - calloc()\n";
-                    throw "MKRdxPat.hpp: Allocation of trie memory failed - calloc()";
+                    throw MKRdxPatVerifyExc;
                 }
 
                 for ( int n = 1 ; n < tot_alloc_nodes ; n++ )

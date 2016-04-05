@@ -101,6 +101,14 @@
  *
  *
  *         int
+ *     keys
+ *         (
+ *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *         )
+ *         e.g. int return_code = rdx->keys((unsigned char *)key);
+ *
+ *
+ *         int
  *     sort
  *         (
  *             app_data ***app_datappp,
@@ -270,11 +278,14 @@
  *                     upon calloc() failures.  Calloc() failures are thrown in the class constructor
  *                     MKRdxPat(), the chg_max_rdx_nodes() member function and the verify() member
  *                     function.  All other errors are reported via return values.
- *     2. Debugging - Debugging output is provided for the class constructor - MKRdxPat(), the insert()
- *                    member function, the search() member function and the remove() member function.
- *                    A debug() macro is provided.  It will generte output if any one of three defines
- *                    - DEBUG_I(insert()), DEBUG_S(search()), DEBUG_R(remove()) - are set to 1.  If any
- *                    of these are set to 1 then debug output for MKRdxPat() will happen.
+ *     2. Debugging  - Debugging output is provided for the class constructor - MKRdxPat() and member
+ *                     functions insert(), search() and remove().  A debug() macro is provided.  It
+ *                     will generte output if any one of three defines - DEBUG_I(insert()), DEBUG_S(search()),
+ *                     DEBUG_R(remove()) - are set to 1.  If any of these are set to 1 then debug output for
+ *                     MKRdxPat() will happen.
+ *     3. Returns    - Member functions can return error indications.  These are documented in the comment
+ *                     headings of the functions.  These are much faster than exceptions and should be
+ *                     handled locally.
  *
  *======================================================================================================================
  *
@@ -1678,6 +1689,36 @@ namespace MultiKeyRdxPat
 
             /*
              *======================================================================================================================
+             *     keys()
+             *
+             * Purpose: 
+             *
+             * Usage:
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
+             *     int return_code;
+             *
+             *     return_code = rdx->keys((unsigned char *)key);
+             *
+             * Returns:
+             *     1. 
+             *
+             * Parameters:
+             *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
+             *
+             * Comments:
+             */
+
+                int
+            keys
+                (
+                    const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                ) const
+            {
+               return 0;
+            }  // keys()
+
+            /*
+             *======================================================================================================================
              *     alloc_nodes()
              *
              * Purpose: 
@@ -2740,13 +2781,13 @@ namespace MultiKeyRdxPat
                         void *ptr;
 
                         // check if current pointer is in free data node list
-                        ptr = bsearch(
-                                         (void *)(&bhead),
-                                         (void *)(&verify_free_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
-                                         tot_free_nodes,
-                                         sizeof(unsigned long),
-                                         unsigned_long_compare
-                                     );
+                        ptr = std::bsearch(
+                                              (void *)(&bhead),
+                                              (void *)(&verify_free_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
+                                              tot_free_nodes,
+                                              sizeof(unsigned long),
+                                              unsigned_long_compare
+                                          );
                         if ( ptr == NULL )
                         {
                             if ( vm == ERR_CODE_PRINT )
@@ -2772,13 +2813,13 @@ namespace MultiKeyRdxPat
                     void *ptr;
 
                     // check if current pointer is in free data node list
-                    ptr = bsearch(
-                                     (void *)(&dhead),
-                                     (void *)(&verify_free_dnode_addrs_[0]),
-                                     tot_free_nodes,
-                                     sizeof(unsigned long),
-                                     unsigned_long_compare
-                                 );
+                    ptr = std::bsearch(
+                                          (void *)(&dhead),
+                                          (void *)(&verify_free_dnode_addrs_[0]),
+                                          tot_free_nodes,
+                                          sizeof(unsigned long),
+                                          unsigned_long_compare
+                                      );
                     if ( ptr == NULL )
                     {
                         if ( vm == ERR_CODE_PRINT )
@@ -2831,13 +2872,13 @@ namespace MultiKeyRdxPat
                         if ( n != 0 )
                         {
                             ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].p;
-                            ptr = bsearch(
-                                             (void *)(&ui),
-                                             (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
-                                             tot_alloc_nodes,
-                                             sizeof(unsigned long),
-                                             unsigned_long_compare
-                                         );
+                            ptr = std::bsearch(
+                                                  (void *)(&ui),
+                                                  (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
+                                                  tot_alloc_nodes,
+                                                  sizeof(unsigned long),
+                                                  unsigned_long_compare
+                                              );
                             if ( ptr == NULL )
                             {
                                 if ( vm == ERR_CODE_PRINT )
@@ -2866,20 +2907,20 @@ namespace MultiKeyRdxPat
 
                         // check if left child pointer is another branch or data node
                         ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].l;
-                        bptr = bsearch(
-                                          (void *)(&ui),
-                                          (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
-                                          tot_alloc_nodes,
-                                          sizeof(unsigned long),
-                                          unsigned_long_compare
-                                      );
-                        dptr = bsearch(
-                                          (void *)(&ui),
-                                          (void *)(&verify_dnode_addrs_[0]),
-                                          tot_alloc_nodes,
-                                          sizeof(unsigned long),
-                                          unsigned_long_compare
-                                      );
+                        bptr = std::bsearch(
+                                               (void *)(&ui),
+                                               (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
+                                               tot_alloc_nodes,
+                                               sizeof(unsigned long),
+                                               unsigned_long_compare
+                                           );
+                        dptr = std::bsearch(
+                                               (void *)(&ui),
+                                               (void *)(&verify_dnode_addrs_[0]),
+                                               tot_alloc_nodes,
+                                               sizeof(unsigned long),
+                                               unsigned_long_compare
+                                           );
                         if ( bptr == NULL && dptr == NULL )
                         {
                             if ( vm == ERR_CODE_PRINT )
@@ -2897,20 +2938,20 @@ namespace MultiKeyRdxPat
                         if ( n != 0 )
                         {
                             ui = (unsigned long)rdx_.bnodes[n*num_keys_+k].r;
-                            bptr = bsearch(
-                                              (void *)(&ui),
-                                              (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
-                                              tot_alloc_nodes,
-                                              sizeof(unsigned long),
-                                              unsigned_long_compare
-                                          );
-                            dptr = bsearch(
-                                              (void *)(&ui),
-                                              (void *)(&verify_dnode_addrs_[0]),
-                                              tot_alloc_nodes,
-                                              sizeof(unsigned long),
-                                              unsigned_long_compare
-                                          );
+                            bptr = std::bsearch(
+                                                   (void *)(&ui),
+                                                   (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
+                                                   tot_alloc_nodes,
+                                                   sizeof(unsigned long),
+                                                   unsigned_long_compare
+                                               );
+                            dptr = std::bsearch(
+                                                   (void *)(&ui),
+                                                   (void *)(&verify_dnode_addrs_[0]),
+                                                   tot_alloc_nodes,
+                                                   sizeof(unsigned long),
+                                                   unsigned_long_compare
+                                               );
                             if ( bptr == NULL && dptr == NULL )
                             {
                                 if ( vm == ERR_CODE_PRINT )
@@ -2926,13 +2967,13 @@ namespace MultiKeyRdxPat
 
                         // check if data node parent pointers are all valid branch node addresses
                         ui = (unsigned long)rdx_.dnodes[n].p[k];
-                        ptr = bsearch(
-                                         (void *)(&ui),
-                                         (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
-                                         tot_alloc_nodes,
-                                         sizeof(unsigned long),
-                                         unsigned_long_compare
-                                     );
+                        ptr = std::bsearch(
+                                              (void *)(&ui),
+                                              (void *)(&verify_bnode_addrs_[k*(max_rdx_nodes_+1)+0]),
+                                              tot_alloc_nodes,
+                                              sizeof(unsigned long),
+                                              unsigned_long_compare
+                                          );
                         if ( ptr == NULL )
                         {
                             if ( vm == ERR_CODE_PRINT )

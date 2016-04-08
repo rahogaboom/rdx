@@ -1908,5 +1908,82 @@ main()
 
         os.close();
     }
+
+    {  // TEST 15
+        int return_code;
+
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int id;
+            double d;
+            int j;
+        };
+
+        app_data *app_datap;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_RDX_NODES = 1;
+
+        // number of rdx search keys
+        const int NUM_KEYS = 3;
+
+        // number of bytes in each key(s)
+        const int MAX_KEY_BYTES = 4;
+
+        // NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[NUM_KEYS][1+MAX_KEY_BYTES];
+
+        ofstream os;
+        os.open("MKRdxPat.TEST15.results");
+
+        os << "\n"
+              "TEST 15: Create rdx trie with one node, three keys a four bytes per key\n"
+              "         Expected Results:\n"
+              "            a. insert one data node in rdx trie with three keys\n"
+              "            b. search for node with only the first key using rdx->keys()\n"
+              "            c. check that the key[][] array returned by rdx->keys() has\n"
+              "                   the same keys in it that were used in the insert()\n"
+              "                   except that the second and third key booleans are 0\n\n";
+
+
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
+
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
+
+        os << "a. insert one data node in rdx trie with three keys\n";
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        rdx_key[0][0] = 1;  // set key boolean to 1
+        rdx_key[1][0] = 1;  // set key boolean to 1
+        rdx_key[2][0] = 1;  // set key boolean to 1
+        rdx_key[0][MAX_KEY_BYTES] = 1;
+        rdx_key[1][MAX_KEY_BYTES] = 2;
+        rdx_key[2][MAX_KEY_BYTES] = 3;
+        print_key((unsigned char *)rdx_key, os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->insert((unsigned char *)rdx_key, &app_datap);
+
+        os << "return_code = rdx->insert((unsigned char *)rdx_key, &app_datap); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
+
+        os << "b. search for node with only the first key using rdx->keys()\n";
+        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        rdx_key[0][0] = 1;  // set key boolean to 1
+        rdx_key[0][MAX_KEY_BYTES] = 1;
+        print_key((unsigned char *)rdx_key, os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->keys((unsigned char *)rdx_key);
+
+        os << "return_code = rdx->keys((unsigned char *)rdx_key; return_code = " << return_code << "\n\n";
+
+        os << "c. check that the key[][] array returned by rdx->keys() has\n"
+              "       the same keys in it that were used in the insert()\n"
+              "       except that the second and third key booleans are 0\n";
+        print_key((unsigned char *)rdx_key, os, NUM_KEYS, MAX_KEY_BYTES);
+
+        os.close();
+    }
 }
 

@@ -657,6 +657,176 @@ namespace MultiKeyRdxPat
 
             /*
              *======================================================================================================================
+             *     search_dnode()
+             *
+             * Purpose: 
+             *     search trie for the data node with the keys key[NUM_KEYS][1+MAX_KEY_BYTES].  the second subscript first byte
+             *     for all keys(key[k][0]) is the key boolean.  the key boolean should be set to 1(use the key) or
+             *     0(do not use key).  the actual key bytes(key[k][1 to max_key_bytes_]) follow the key boolean.  thus, 1 to
+             *     num_keys_ keys may be used in any given search.  only one key is necessary to find the data node.  each key
+             *     must be unique within it's key index(0 - NUM_KEYS-1).
+             *
+             * Usage:
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
+             *     DNODE *dnodep;
+             *
+             *     dnodep = rdx->search_dnode((unsigned char *)key);
+             *
+             * Returns:
+             *     1. if search is successful then return pointer to DNODE *(dnodep)
+             *     2. if any key boolean is not 0 or 1 return NULL
+             *     3. if two key searches end at different data nodes return NULL
+             *     4. if any key search does not end at a data node return NULL
+             *     5. if no key boolean is 1 then no keys are used and return NULL
+             *    
+             * Parameters:
+             *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
+             *
+             * Comments:
+             *     1. this routine is identical to the search() member function except for the return statement which returns
+             *        a pointer to the data node(DNODE *) instead of a pointer to the application data struct(app_data *).
+             *        it is a private function used for accessing any data values in the DNODE which users should not be able to access.
+             *
+             *     2.
+             *     e.g. set NUM_KEYS=3 and MAX_KEY_BYTES=4
+             *
+             *          example 1:
+             *          in key[][]:
+             *             key number  key
+             *             0           01 aa bb cc dd    
+             *             1           01 ee ee ee ee
+             *             2           01 ff ff ff ff
+             *
+             *             use all three keys(0,1,2) in the search
+             *
+             *          example 2:
+             *          in key[][]:
+             *             0           00 aa bb cc dd
+             *             1           01 ee ee ee ee
+             *             2           00 ff ff ff ff
+             *
+             *             use only key 1 in the search
+             *
+             *          example 3:
+             *          in key[][]:
+             *             0           01 00 00 00 01
+             *             1           01 00 00 00 01
+             *             2           01 00 00 00 01
+             *
+             *             inserted successfuly - a. all key booleans 1  b. each key unique in it's own key index(0 - 2)
+             */
+
+                DNODE *
+            search_dnode
+                (
+                    const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                )
+            {
+                //
+                // see private data for definitions
+                //
+                // BNODE *search_c_;           // BNODE *search_c_[num_keys_];
+                // unsigned char *search_ky_;  // unsigned char search_ky_[num_keys_][1+max_key_bytes_];
+
+                BNODE *csav;  // save first key data node address and make sure all key searches end at the same data node
+
+                bool firsttime = true;  // every search() call
+
+
+                int n = 0;  // sum of key booleans that are 1 - must be >=1
+                for ( int k = 0 ; k < num_keys_ ; k++ )
+                {
+                    #if DEBUG_S
+                    debug("DEBUG_S: k = %d\n", k);
+                    #endif
+
+                    if ( key[k*(1+max_key_bytes_)+0] == 0 )
+                    {
+                        continue;  // if key boolean is 0 skip key
+                    }
+                    else if ( key[k*(1+max_key_bytes_)+0] == 1 )
+                    {
+                        n++;  // if key boolean is 1 use key
+                    }
+                    else
+                    {
+                        return NULL;  // if a key boolean is not 0 or 1
+                    }
+
+                    // copy key to storage with extra byte for comparison
+                    search_ky_[k*(1+max_key_bytes_)+0] = 0;
+                    memmove( &search_ky_[k*(1+max_key_bytes_)+1], &key[k*(1+max_key_bytes_)+1], max_key_bytes_ );
+
+                    // search for key in rdx trie
+                    search_c_ = (BNODE *)(rdx_.head[k]->l);
+                    while ( search_c_->id == 0 )
+                    {
+                        search_c_ = ( gbit( &search_ky_[k*(1+max_key_bytes_)+0], search_c_->b ) ) ? (BNODE *)(search_c_->r) : (BNODE *)(search_c_->l);
+                    }
+
+                    #if DEBUG_S
+                    debug("DEBUG_S: search_c_ = %p \n", (void *)search_c_ );
+                    debug("DEBUG_S: ((DNODE *)search_c_)->key = %p \n", (void *)((DNODE *)search_c_)->key );
+                    #endif
+
+                    // check if all keys end at the same data node - if not return NULL
+                    if ( firsttime == true )
+                    {
+                        csav = search_c_;
+                        firsttime = false;
+                    }
+                    else
+                    {
+                        if ( search_c_ != csav )
+                        {
+                            return NULL;  // a key does not end at the same data node as a previous key
+                        }
+                    }
+
+                    #if DEBUG_S
+                    debug("%s", "\n");
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
+                    {
+                        printf("%X ", *(&search_ky_[k*(1+max_key_bytes_)+0]+i) );
+                    }
+                    printf("\n");
+
+                    for ( int i = 0 ; i < max_key_bytes_+1 ; i++ )
+                    {
+                        printf("DEBUG_S: %p\n",  (void *)(&((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i) );
+                        printf("DEBUG_S: %X\n", *( &((DNODE *)search_c_)->key[k*(1+max_key_bytes_)]+i ) );
+                    }
+                    printf("\n");
+
+                    printf("DEBUG_S: dna = %p\n", (void *)(DNODE *)search_c_ );
+                    #endif
+
+                    // if key not found return NULL
+                    if ( memcmp( &search_ky_[k*(1+max_key_bytes_)+0], &((DNODE *)search_c_)->key[k*(1+max_key_bytes_)], max_key_bytes_+1 ) != 0 )
+                    {
+                        #if DEBUG_S
+                        debug("%s", "DEBUG_S: k = exit2\n");
+                        #endif
+
+                        return NULL;  // key not found
+                    }
+                }
+
+                if ( n == 0 )
+                {
+                    #if DEBUG_S
+                    debug("%s", "DEBUG_S: k = exit3\n");
+                    #endif
+
+                    return NULL;  // no keys are used(all key booleans are 0)
+                }
+
+                // success - all keys found in the same data node - return data node pointer
+                return (DNODE *)(search_c_);
+            }  // search_dnode()
+
+            /*
+             *======================================================================================================================
              *     initialize()
              *
              * Purpose: 
@@ -819,7 +989,6 @@ namespace MultiKeyRdxPat
                 debug("DNODE dnodes[max_rdx_nodes_+1]  -  (max_rdx_nodes_+1) * sizeof(DNODE) = %lu\n\n",
                       (max_rdx_nodes_+1) * sizeof(DNODE));
 
-// XXXX
                 // ( max_rdx_nodes_+1 ) * 3(in DNODE)
                 rdx_.bsize += (
                                   (num_keys_) * sizeof(unsigned int) +                      // unsigned int br[num_keys_]
@@ -1410,7 +1579,7 @@ namespace MultiKeyRdxPat
                     return NULL;  // no keys are used(all key booleans are 0)
                 }
 
-                // success - all keys found in the same data node - return data node pointer
+                // success - all keys found in the same data node - return app_datap pointer
                 return &( ((DNODE *)(search_c_))->data );
             }  // search()
 
@@ -1692,6 +1861,12 @@ namespace MultiKeyRdxPat
              *     keys()
              *
              * Purpose: 
+             *     search for a data node with the key[][] argument which are a subset of the full set of keys and fill in
+             *     key[][] with the data node keys which were not used in the search .  set the key boolean to 0 and copy the
+             *     DNODE key to key[][].  for example, if three keys were used in the trie and the data node was found with only
+             *     the first key then fill in key[][] with the second and third keys, leaving the key booleans for these keys
+             *     set to 0.  thus, searching key[][] for key booleans of 0 will give all the keys not used in the original
+             *     search.
              *
              * Usage:
              *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES];
@@ -1700,10 +1875,12 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->keys((unsigned char *)key);
              *
              * Returns:
-             *     1. 
+             *     1. int return_code = 0 - data node found and missing keys filled in
+             *     2. int return_code = 1 - can't find any data node with key[][]
+             *     3. int return_code = 2 - no key[][]'s are missing to copy from DNODE
              *
              * Parameters:
-             *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
+             *     unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
              *
              * Comments:
              */
@@ -1711,10 +1888,34 @@ namespace MultiKeyRdxPat
                 int
             keys
                 (
-                    const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
-                ) const
+                    unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+                )
             {
-               return 0;
+                // pointer to DNODE
+                DNODE *dnodep;
+
+                if ( (dnodep = search_dnode(key)) == NULL )
+                {
+                    return 1;  // can't find any data node with key[][]
+                }
+
+                int missing_keys = 0;
+                for ( int k = 0 ; k < num_keys_ ; k++ )
+                {
+                    // copy missing keys from DNODE to key[][]
+                    if ( key[k*(1+max_key_bytes_)+0] == 0 )
+                    {
+                        memmove( &key[k*(1+max_key_bytes_)+1], &(dnodep->key[k*(1+max_key_bytes_)+1]), max_key_bytes_ );
+                        missing_keys++;
+                    }
+                }
+
+                if ( missing_keys == 0 )
+                {
+                    return 2;  // no key[][]'s are missing to copy from DNODE
+                }
+
+                return 0;
             }  // keys()
 
             /*

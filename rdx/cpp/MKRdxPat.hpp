@@ -101,20 +101,20 @@
  *
  *
  *         int
- *     keys
- *         (
- *             const unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
- *         )
- *         e.g. int return_code = rdx->keys((unsigned char *)key);
- *
- *
- *         int
  *     sort
  *         (
  *             app_data ***app_datappp,
  *             const int k
  *         )
  *         e.g. int return_code = rdx->sort(&app_datapp, k);
+ *
+ *
+ *         int
+ *     keys
+ *         (
+ *             unsigned char *key  // unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES]
+ *         )
+ *         e.g. int return_code = rdx->keys((unsigned char *)key);
  *
  *
  *         int
@@ -385,7 +385,6 @@
 
 using std::vector;
 using std::string;
-using std::cerr;
 using std::ofstream;
 
 namespace MultiKeyRdxPat
@@ -673,11 +672,11 @@ namespace MultiKeyRdxPat
              *     dnodep = rdx->search_dnode((unsigned char *)key);
              *
              * Returns:
-             *     1. if search is successful then return pointer to DNODE *(dnodep)
-             *     2. if any key boolean is not 0 or 1 return NULL
-             *     3. if two key searches end at different data nodes return NULL
-             *     4. if any key search does not end at a data node return NULL
-             *     5. if no key boolean is 1 then no keys are used and return NULL
+             *     1. DNODE *dnodep - if search is successful
+             *     2. DNODE *NULL - if any key boolean is not 0 or 1
+             *     3. DNODE *NULL - if two key searches end at different data nodes
+             *     4. DNODE *NULL - if any key search does not end at a data node
+             *     5. DNODE *NULL - if no key boolean is 1 then no keys are used
              *    
              * Parameters:
              *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
@@ -942,19 +941,16 @@ namespace MultiKeyRdxPat
 
                 if ( max_rdx_nodes_ < 1 )
                 {
-                    cerr << "MKRdxPat.hpp: max_rdx_nodes_ = " << max_rdx_nodes_ << "(must be > 0)" << "\n";
                     throw "MKRdxPat.hpp: max_rdx_nodes_ < 1(must be > 0)";
                 }
 
                 if ( num_keys_ < 1 )
                 {
-                    cerr << "MKRdxPat.hpp: num_keys_ = " << num_keys_ << "(must be > 0)" << "\n";
                     throw "MKRdxPat.hpp: num_keys_ < 1(must be > 0)";
                 }
 
                 if ( max_key_bytes_ < 1 )
                 {
-                    cerr << "MKRdxPat.hpp: max_key_bytes_ = " << max_key_bytes_ << "(must be > 0)" << "\n";
                     throw "MKRdxPat.hpp: max_key_bytes_ < 1(must be > 0)";
                 }
 
@@ -1206,10 +1202,10 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->insert((unsigned char *)key, &app_datap);
              *
              * Returns:
-             *     1. if insertion is successful then set return_code to 0 and set app_datap to point to app_data
-             *     2. if any key is found to already exist then set return_code to 1 and set app_datap to point to app_data
-             *     3. if no data nodes are on the free list then set return_code to 2 and set app_datap to NULL
-             *     4. if any key boolean is not 1 set return_code to 3 and set app_datap to NULL
+             *     1. int return_code = 0, app_data *app_datap - if insertion is successful
+             *     2. int return_code = 1, app_data *app_datap - if any key is found to already exist
+             *     3. int return_code = 2, app_data *NULL - if no data nodes are on the free list
+             *     4. int return_code = 3, app_data *NULL - if any key boolean is not 1
              *
              * Parameters:
              *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
@@ -1436,11 +1432,11 @@ namespace MultiKeyRdxPat
              *     app_datap = rdx->search((unsigned char *)key);
              *
              * Returns:
-             *     1. if search is successful then return pointer to app_data(app_datap)
-             *     2. if any key boolean is not 0 or 1 return NULL
-             *     3. if two key searches end at different data nodes return NULL
-             *     4. if any key search does not end at a data node return NULL
-             *     5. if no key boolean is 1 then no keys are used and return NULL
+             *     1. app_data *app_datap - if search is successful
+             *     2. app_data *NULL - if any key boolean is not 0 or 1
+             *     3. app_data *NULL - if two key searches end at different data nodes
+             *     4. app_data *NULL - if any key search does not end at a data node
+             *     5. app_data *NULL - if no key boolean is 1 then no keys are used
              *    
              * Parameters:
              *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
@@ -1601,11 +1597,11 @@ namespace MultiKeyRdxPat
              *     app_datap = rdx->remove((unsigned char *)key);
              *
              * Returns:
-             *     1. if search is successful then return pointer to app_data(app_datap)
-             *     2. if any key boolean is not 0 or 1 return NULL
-             *     3. if two key searches end at different data nodes return NULL
-             *     4. if any key search does not end at a data node return NULL
-             *     5. if no key boolean is 1 then no keys are used and return NULL
+             *     1. app_data *app_datap - if search is successful
+             *     2. app_data *NULL - if any key boolean is not 0 or 1
+             *     3. app_data *NULL - if two key searches end at different data nodes
+             *     4. app_data *NULL - if any key search does not end at a data node
+             *     5. app_data *NULL - if no key boolean is 1 then no keys are used
              *
              * Parameters:
              *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
@@ -1809,12 +1805,10 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->sort(&app_datapp, k);
              *
              * Returns:
-             *     1. return_code set to the number of sorted nodes and app_data **app_datapp pointer
+             *     1. int return_code = n, app_data **app_datapp - return the number of sorted nodes and pointer
              *        set to array of pointers to app_data
-             *     2. if there are no data nodes(no keys to sort) return 0 and set
-             *        app_data **app_datapp to NULL
-             *     3. if k, the key index, is out of range(0 - NUM_KEYS-1) return -1 and set
-             *        app_data **app_datapp to NULL
+             *     2. int return_code = 0, app_data **NULL - if there are no data nodes(no keys to sort)
+             *     3. int return_code = -1, app_data **NULL - if k, the key index, is out of range(0 - NUM_KEYS-1)
              *
              * Parameters:
              *     app_data ***app_data - pointer to pointer to pointer to app_data
@@ -1931,7 +1925,7 @@ namespace MultiKeyRdxPat
              *     alloc_nodes = rdx->alloc_nodes();
              *
              * Returns:
-             *     1. int alloc_nodes - number of allocated nodes in the trie(0 - MAX_RDX_NODES)
+             *     1. int alloc_nodes = rdx_.alloc_nodes - number of allocated nodes in the trie(0 - MAX_RDX_NODES)
              *
              * Parameters:
              *     None
@@ -1963,7 +1957,7 @@ namespace MultiKeyRdxPat
              *     bsize = rdx->bsize();
              *
              * Returns:
-             *     1. int bsize - the size in bytes of the trie
+             *     1. int bsize = rdx_.bsize - the size in bytes of the trie
              *
              * Parameters:
              *     None
@@ -1993,7 +1987,7 @@ namespace MultiKeyRdxPat
              *     max_rdx_nodes = rdx->max_rdx_nodes();
              *
              * Returns:
-             *     1. int max_rdx_nodes - maximum number of data nodes that may be allocated in the trie
+             *     1. int max_rdx_nodes = max_rdx_nodes_ - maximum number of data nodes that may be allocated in the trie
              *
              * Parameters:
              *     None
@@ -2023,7 +2017,7 @@ namespace MultiKeyRdxPat
              *     num_keys = rdx->num_keys();
              *
              * Returns:
-             *     1. int num_keys - the number of keys in the trie
+             *     1. int num_keys = num_keys_ - the number of keys in the trie
              *
              * Parameters:
              *     None
@@ -2052,7 +2046,7 @@ namespace MultiKeyRdxPat
              *     max_key_bytes = rdx->max_key_bytes();
              *
              * Returns:
-             *     1. int max_key_bytes - the maximum number of bytes in any of the num_keys_ keys
+             *     1. int max_key_bytes = max_key_bytes_ - the maximum number of bytes in any of the num_keys_ keys
              *
              * Parameters:
              *     None
@@ -2083,10 +2077,11 @@ namespace MultiKeyRdxPat
              *     MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
              *
              * Returns:
-             *     1. object of type MKRdxPat<app_data> containing the same data as the originating object with a new size limit
-             *     2. if new_max_rdx_nodes is less than the number of currently allocated nodes then return NULL
-             *     3. if any transfer of a data node from the originating MKRdxPat<app_data> object to the new
-             *        MKRdxPat<app_data> object fails return NULL
+             *     1. MKRdxPat<app_data> *rdx_new - object of type MKRdxPat<app_data> containing the same data as the
+             *                                      originating object with a new size limit
+             *     2. MKRdxPat<app_data> *NULL - if new_max_rdx_nodes is less than the number of currently allocated nodes
+             *     3. MKRdxPat<app_data> *NULL - if any transfer of a data node from the originating MKRdxPat<app_data> object
+             *                                   to the new MKRdxPat<app_data> object fails
              *
              * Parameters:
              *     const int new_max_rdx_nodes - the new size, max_rdx_nodes_, of the returned object
@@ -2195,8 +2190,8 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->print((unsigned char *)key, os);
              *
              * Returns:
-             *     1. return_code = 0 on success
-             *     2. return_code = 1 if data node for key[][] not found
+             *     1. return_code = 0 - on success
+             *     2. return_code = 1 - if data node for key[][] not found
              *
              * Parameters:
              *     const unsigned char key[NUM_KEYS][1+MAX_KEY_BYTES] - NUM_KEYS keys - one byte key boolean and MAX_KEY_BYTES key bytes
@@ -2539,8 +2534,8 @@ namespace MultiKeyRdxPat
              *     return_code = rdx->verify(ERR_CODE_PRINT, os);
              *
              * Returns:
-             *     1. return_code = 0    - 0 if no error
-             *     2. return_code = 1-25 - 1-25 for the various errors
+             *     1. return_code = 0 - if no error
+             *     2. return_code = 1-25 - for the various errors
              *
              * Parameters:
              *     VERIFY_MODE vm  - enum with possible values (ERR_CODE, ERR_CODE_PRINT)

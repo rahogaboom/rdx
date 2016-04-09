@@ -1,4 +1,10 @@
 
+ rdx-1.1.1.tar.gz - 
+    a. add new member function, rdx->keys(key), to retrieve
+       keys from a data node that were not used in the search
+       for that data node
+
+
  rdx-1.1.0.tar.gz - 
     a. revise exception propagation
     b. improve debugging output

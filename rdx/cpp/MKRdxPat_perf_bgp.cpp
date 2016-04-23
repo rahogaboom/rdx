@@ -33,11 +33,11 @@
 /*
  * NAME
  *
- *     MKRdxPat_perf
+ *     MKRdxPat_perf_bgp
  *
  * USAGE
  *
- *     ./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]
+ *     ./MKRdxPat_perf_bgp [-c{1-2}] [-r{1-3}] [-s{1-86400}] [-b{1-100000}]
  *
  * ARGUMENTS
  *
@@ -50,6 +50,12 @@
  *                    option 2: fill trie(monatonic keys) then do max_rdx_nodes search()'s
  *                              with random keys
  *
+ *     -r{1-3}      - option to set key encoding scheme
+ *                    store keys in trie as:
+ *                        1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+ *                        2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+ *                        3 - (32 bit uint)(4)n(1) binary(5 bytes)
+ *
  *     -s{1-86400}  - minimum run time(secs)(30 default)
  *
  *     -b{1-100000} - c option 1: trie will be filled/emptied this many times
@@ -59,15 +65,17 @@
  *
  * DESCRIPTION
  *
- *     MKRdxPat_perf is used to evaluate the performance of the MKRdxPat class
- *     (Multi-Key Radix Fast Search) algorithm implementation.  first, change
- *     the three arguments:
- *         const int max_rdx_nodes = 200000;
- *         const int num_keys          = 2;
- *         const int max_key_bytes     = 16;
- *     to match your application.
+ *     MKRdxPat_perf_bgp is used to evaluate the performance of the MKRdxPat class
+ *     (Multi-Key Radix Fast Search) algorithm implementation.  this test uses a file of
+ *     BGP routing information with the first field IPv4 prefixes as keys.  the trie has
+ *     fixed values for max_rdx_nodes(582378), num_keys(1) and max_key_bytes(18).  there
+ *     are three ways to encode the keys from the prefixes which are in dotted decimal
+ *     form plus the network mask.  these are(from the -r option):
+ *         1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+ *         2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+ *         3 - (32 bit uint)(4)n(1) binary(5 bytes)
  *     insert in 'struct app_data{}' your application data node.  Re-compile.  run
- *     ./MKRdxPat_perf [options].  examine the MKRdxPat_perf.results file.
+ *     ./MKRdxPat_perf_bgp [options].  examine the MKRdxPat_perf_bgp.results file.
  *     see EXAMPLE OUTPUT below.  the file output includes:
  *         1. the data/time
  *         2. the full cmd line
@@ -86,23 +94,11 @@
  *
  * NOTES
  *
- *     1. you need to select the three constructor arguments based on your application.
- *        remember that max_key_bytes is set to the longest key length.  see the MKRdxPat.hpp
- *        Description section for a detailed explanation of setting key arrays.
- *
- *     2. a more realistic performance evaluation my be had by modifying the code here to
+ *     1. a more realistic performance evaluation my be had by modifying the code here to
  *        add additional steps always or typically used in your application.  for example,
  *        a call to memset() might be made before an insert()/remove()/search() since in
  *        many cases key arrays are zero filled starting with this.  also, some processing
  *        of node data might be done that is commonly application specific.
- *
- *     3. the default coded constructor arguments in the Description above were selected
- *        based on an application that accessed data nodes by IPv4 and IPv6 addresses - the
- *        two keys.  the longest is the IPv6 address at 16 bytes.  the number of data nodes
- *        was an arbitrary selection.  i've run tests with 2,000,000 data nodes.  if, for
- *        example, the MAC address was added as a third key then the number of keys would
- *        be three but, with the MAC address length at 6 bytes, the IPv6 address would
- *        still be the longest and thus max_key_bytes would still be 16.
  *
  * DEPENDENCIES
  *
@@ -115,12 +111,12 @@
  * EXAMPLE OUTPUT
  *
  *     ####################################################################################################
- *     Sat Apr 23 12:41:10 2016
+ *     Sat Apr 23 12:18:53 2016
  *
- *     ./MKRdxPat_perf 
+ *     ./MKRdxPat_perf_bgp 
  *
  *     PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)
- *                       monatonic keys
+ *                       using bgp routing table prefix keys
  *
  *     lscpu:
  *
@@ -150,26 +146,33 @@
  *                            rdtscp lm 3dnowext 3dnow rep_good nopl pni cx16 lahf_lm cmp_legacy
  *                            svm extapic cr8_legacy 3dnowprefetch lbrv vmmcall
  *
- *     max_rdx_nodes = 1,000,000
- *     num_keys = 3
- *     max_key_bytes = 16
+ *     max_rdx_nodes = 582,378
+ *     num_keys = 1
+ *     max_key_bytes = 18
  *         (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)
  *
- *     trie size = 407,000,769b
+ *     trie size = 121,717,351b
  *
  *     -c 1 - insert()/remove()(1 default) or search()(2)
+ *     -r 1 - key encoding(1-3, 1 default)
  *     -s 30.000000 - minimum run time(sec, 30 default)
  *     -b 100 - block multiplier(100 default)
  *
- *     insert()/remove() increments: 200,000,000(100*2*max_rdx_nodes)
+ *     insert()/remove() increments: 116,475,600(100*2*max_rdx_nodes)
  *
- *     seconds = 739.618731  total inserts/removes = 200,000,000
+ *     seconds = 110.515489  total inserts/removes = 116,475,600
  *
- *     operations per second = 270,409
+ *     operations per second = 1,053,930
  *
  * SEE ALSO
  *
  *     MKRdxPat_test - the MKRdxPat.hpp class test suite
+ *     MKRdxPat_perf - performance testing with user adjustable contstructor arguments
+ *
+ * ACKNOWLEDGMENTS
+ *     Pavel Odintsov(pavel.odintsov@gmail.com)
+ *
+ *     Pavel provided the file of BGP routing prefixes from one of his BGP speakers
  *
  * AUTHOR
  *
@@ -178,11 +181,16 @@
  *
  */
 
+
+//using std::ofstream;
+
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cstring>
 #include <ctime>
+#include <stdio.h>
 
 #include <unistd.h>
 
@@ -229,13 +237,21 @@ main
 
     extern int optind;
 
+    const int BGP_SIZE = 582378;
+    const int MAX_LINE_SIZE = 256;
+    const int MAX_PREFIX_SIZE = 18;
+
     string usage =
         "usage: ./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n"
         "\n"
-        "    -c{1-2}      - option 1: repeatedly insert()(fill - monatonic keys)/remove()(empty)\n"
-        "                             trie(1 default)\n"
-        "                   option 2: fill trie(monatonic keys) then do max_rdx_nodes search()'s\n"
-        "                             with random keys\n"
+        "    -c{1-2}      - option 1: repeatedly insert()(fill)/remove()(empty) trie(1 default) using bgp routing table keys.\n"
+        "                   option 2: fill trie then do max_rdx_nodes random search()'s with bgp routing table keys.\n"
+        "\n"
+        "    -r{1-3}      - option to set key encoding scheme\n"
+        "                   store keys in trie as:\n"
+        "                       1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)\n"
+        "                       2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)\n"
+        "                       3 - (32 bit uint)(4)n(1) binary(5 bytes)\n"
         "\n"
         "    -s{1-86400}  - minimum run time(secs)(30 default)\n"
         "\n"
@@ -244,47 +260,21 @@ main
         "                               searched for this many times\n"
         "                   (100 default)\n";
 
-    //
-    // set these application specific data
-    //
-    // ================================================
-
-    // MKRdxPat.hpp class constructor arguments
-    const int max_rdx_nodes = 1000000;
-    const int num_keys      = 3;
-    const int max_key_bytes = 16;
-
-    // application data of type app_data defined here
-    struct app_data
-    {
-        int i;
-    };
-
-    // ================================================
-
-
-    // holds sets of keys for max_rdx_nodes sets with num_keys keys of
-    // max_key_bytes length with all key booleans set to 1
-    // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
-    //       arrays do no blow the stack
-    static unsigned char rdx_key[max_rdx_nodes][num_keys][1+max_key_bytes];
-
-    app_data *app_datap;
-
     // enable printf("%'d", n); for commas in large numbers
     setlocale(LC_NUMERIC, "");
 
     ofstream os;
-    os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
+    os.open("MKRdxPat_perf_bgp.results", ofstream::app|ofstream::out);
 
     // cmd line option defaults
     int pmode_opt = 1;  // performance test case option
     double rtime_opt = 30.;  // run time option
     int block_multiply_opt = 100;  // block multiply option
+    int router_key_opt = 1;  // router key encoding default
 
     opterr = 0;
     int opt;
-    while ( (opt = getopt(argc, argv, "c:s:b:")) != -1 )
+    while ( (opt = getopt(argc, argv, "c:r:s:b:")) != -1 )
     {
         switch (opt)
         {
@@ -292,7 +282,16 @@ main
                 pmode_opt = atoi(optarg);
                 if ( pmode_opt < 1 || pmode_opt > 2 )
                 {
-                    cerr << usage << "-c option out of range(1 or 2): " << pmode_opt << "\n";
+                    cerr << usage << "-c option out of range(1-2): " << pmode_opt << "\n";
+                    exit(1);
+                }
+                break;
+
+            case 'r':
+                router_key_opt = atof(optarg);
+                if ( router_key_opt < 1 || router_key_opt > 3 )
+                {
+                    cerr << usage << "-r option out of range(1 to 3): " << router_key_opt << "\n";
                     exit(1);
                 }
                 break;
@@ -331,6 +330,38 @@ main
         exit(0);
     }
 
+    //
+    // change only struct app_data {}; if desired and nothing else
+    //
+    // ================================================
+
+    // MKRdxPat.hpp class constructor arguments
+    const int max_rdx_nodes = BGP_SIZE;  // fixed - routing table entries
+    const int num_keys      = 1;  // fixed - one key(prefix) in routing table
+
+    // store keys in trie as:\n"
+    //     1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+    //     2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+    //     3 - (32 bit uint)(4)n(1) binary(5 bytes)
+    const int max_key_bytes = MAX_PREFIX_SIZE;
+
+    // application data of type app_data defined here
+    struct app_data
+    {
+        int i;
+    };
+
+    // ================================================
+
+
+    // holds sets of keys for max_rdx_nodes sets with num_keys keys of
+    // max_key_bytes length with all key booleans set to 1
+    // NOTE: the static keyword is needed to ensure that large rdx_key[][][]
+    //       arrays do no blow the stack
+    static unsigned char rdx_key[max_rdx_nodes][num_keys][1+max_key_bytes];
+
+    app_data *app_datap;
+
     // set gm time string
     time_t rawtime;
     struct tm * timeinfo;
@@ -351,30 +382,68 @@ main
     if ( pmode_opt == 1 )
     {
         os << "PERFORMANCE TEST: Do repeated rdx->insert()(fill trie) / rdx->remove()(empty trie)\n"
-              "                  monatonic keys\n\nlscpu:\n\n";
+              "                  using bgp routing table prefix keys\n\nlscpu:\n\n";
     }
     if ( pmode_opt == 2 )
     {
         os << "PERFORMANCE TEST: Do repeated rdx->search()\n"
-              "                  monatonic keys/random search\n\nlscpu:\n";
+              "                  using bgp routing table prefix keys/random search\n\nlscpu:\n";
     }
 
     os.close();
 
-    system("lscpu >> MKRdxPat_perf.results");
+    system("lscpu >> MKRdxPat_perf_bgp.results");
 
-    os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
+    os.open("MKRdxPat_perf_bgp.results", ofstream::app|ofstream::out);
+
+    FILE *bgpfp = fopen("BGP_routing_table_3peersnap_04102016_as198068", "r");
+
+    static char key[BGP_SIZE][MAX_PREFIX_SIZE+1];
+    memset(key, 0, sizeof(key));
+
+    int n = 0;
+    char line[MAX_LINE_SIZE];
+    char prefix[MAX_PREFIX_SIZE+1];
+    while ( fscanf(bgpfp, "%[^\n]\n", line) != EOF )  // read lines
+    {
+        unsigned int octet1, octet2, octet3, octet4, mask;
+
+        memset(prefix, 0, sizeof(prefix));
+        sscanf(line, "%s", prefix);  // get first field prefix
+        switch ( router_key_opt )
+        {
+            case 1:  // 1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+                strcpy(&key[n++][0], prefix);
+                break;
+
+            case 2:  // 2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+                sscanf(prefix, "%d.%d.%d.%d/%d", &octet1, &octet2, &octet3, &octet4, &mask);
+                sprintf(&key[n][0], "%03d%03d%03d%03d%02d", octet1, octet2, octet3, octet4, mask);
+                n++;
+                break;
+
+            case 3:  // 3 - (32 bit uint)(4)n(1) binary(5 bytes)
+                unsigned int ip32;
+                unsigned char umask;
+
+                sscanf(prefix, "%d.%d.%d.%d/%d", &octet1, &octet2, &octet3, &octet4, &mask);
+                ip32 = (octet1 * pow(2, 24)) + (octet2 * pow(2, 16)) + (octet3 * pow(2, 8)) + (octet4);
+                umask = mask;
+                memmove(&key[n][0], &ip32, 4);
+                memmove(&key[n][4], &umask, 1);
+                n++;
+                break;
+        }
+    }
 
     // rdx_key[][][] - generate max_rdx_nodes nodes of num_keys keys of
     // max_key_bytes bytes and set all key booleans to 1
-    for ( int n = 0, sum = 0 ; n < max_rdx_nodes ; n++, sum++ )
+    for ( int n = 0 ; n < max_rdx_nodes ; n++ )
     {
         for ( int k = 0 ; k < num_keys ; k++ )
         {
             rdx_key[n][k][0] = 1;  // set key boolean to 1
-            // keys monatonically increase
-            // key is in bytes 1 to max_key_bytes.  sum should be right justified in rdx_key[n][k][<right justified here>].
-            memmove(&rdx_key[n][k][max_key_bytes-sizeof(sum)+1], &sum, sizeof(sum));
+            memmove(&rdx_key[n][k][1], &key[n][0], max_key_bytes);  // put key immediately after key boolean
         }
     }
 
@@ -387,10 +456,13 @@ main
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
     os << tmpstr;
+
     snprintf(tmpstr, sizeof(tmpstr), "trie size = %'db\n\n", rdx->bsize());
     os << tmpstr;
 
     snprintf(tmpstr, sizeof(tmpstr), "-c %d - insert()/remove()(1 default) or search()(2)\n", pmode_opt);
+    os << tmpstr;
+    snprintf(tmpstr, sizeof(tmpstr), "-r %d - key encoding(1-3, 1 default)\n", router_key_opt);
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "-s %f - minimum run time(sec, 30 default)\n", rtime_opt);
     os << tmpstr;

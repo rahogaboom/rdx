@@ -45,16 +45,22 @@ rdx
            4. Testing
            5. Performance
 
+     - ACKNOWLEDGMENT
+         Pavel Odintsov(pavel.odintsov@gmail.com)
+
+         Pavel provided the file of BGP routing prefixes from one of his BGP speakers
+         for the MKRdxPat_perf_bgp performance test program
+
  Do:
+
      1. adjust $CC in ./MKRdxPat.mk to use clang or g++
 
      2. do "./MKRdxPat.mk" to build and run the functional tests
 
      3. do "./MKRdxPat.mk clean" to clean the directory
 
-     4. edit MKRdxPat_perf.cpp and install your application struct app_data{}
+     4. edit MKRdxPat_perf.cpp and install your application data in 'struct app_data{}'
         and set the MKRdxPat.hpp class constructor arguments:
-
 
         //
         // set these application specific data
@@ -78,6 +84,36 @@ rdx
         do "./MKRdxPat.mk" to build
 
         do "./MKRdxPat_perf [options]" to run performance tests with
+        your application specific data
+
+     5. edit MKRdxPat_perf_bgp.cpp and install your application data in 'struct app_data{}':
+
+        //
+        // change only struct app_data {}; if desired and nothing else
+        //
+        // ================================================
+
+        // MKRdxPat.hpp class constructor arguments
+        const int max_rdx_nodes = BGP_SIZE;  // fixed - routing table entries
+        const int num_keys      = 1;  // fixed - one key(prefix) in routing table
+
+        // store keys in trie as:\n"
+        //     1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+        //     2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+        //     3 - (32 bit uint)(4)n(1) binary(5 bytes)
+        const int max_key_bytes = MAX_PREFIX_SIZE;
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int i;
+        };
+
+        // ================================================
+
+        do "./MKRdxPat.mk" to build
+
+        do "./MKRdxPat_perf_bgp [options]" to run bgp performance tests with
         your application specific data
 
 

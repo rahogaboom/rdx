@@ -1,4 +1,10 @@
 
+ rdx-1.1.2.tar.gz - 
+    a. a new executable - MKRdxPat_perf_bgp - has been added to
+       measure performance with real BGP routing prefix data as keys
+    b. minor mods to MKRdxPat_perf to improve outputs
+
+
  rdx-1.1.1.tar.gz - 
     a. add new member function, rdx->keys(key), to retrieve
        keys from a data node that were not used in the search

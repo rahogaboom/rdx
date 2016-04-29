@@ -158,7 +158,7 @@
  *     trie size = 407,000,769b
  *
  *     -c 1 - insert()/remove()(1 default) or search()(2)
- *     -s 30.000000 - minimum run time(sec, 30 default)
+ *     -s 30 - minimum run time(sec, 30 default)
  *     -b 100 - block multiplier(100 default)
  *
  *     insert()/remove() increments: 200,000,000(100*2*max_rdx_nodes)
@@ -279,7 +279,7 @@ main
 
     // cmd line option defaults
     int pmode_opt = 1;  // performance test case option
-    double rtime_opt = 30.;  // run time option
+    int rtime_opt = 30;  // run time option
     int block_multiply_opt = 100;  // block multiply option
 
     opterr = 0;
@@ -298,7 +298,7 @@ main
                 break;
 
             case 's':
-                rtime_opt = atof(optarg);
+                rtime_opt = atoi(optarg);
                 if ( rtime_opt < 1 || rtime_opt > 86400 )
                 {
                     cerr << usage << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
@@ -392,7 +392,7 @@ main
 
     snprintf(tmpstr, sizeof(tmpstr), "-c %d - insert()/remove()(1 default) or search()(2)\n", pmode_opt);
     os << tmpstr;
-    snprintf(tmpstr, sizeof(tmpstr), "-s %f - minimum run time(sec, 30 default)\n", rtime_opt);
+    snprintf(tmpstr, sizeof(tmpstr), "-s %d - minimum run time(sec, 30 default)\n", rtime_opt);
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "-b %d - block multiplier(100 default)\n\n", block_multiply_opt);
     os << tmpstr;

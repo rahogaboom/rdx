@@ -244,12 +244,12 @@ main
     string usage =
         "usage: ./MKRdxPat_perf [-c{1-2}] [-s{1-86400}] [-b{1-100000}]\n"
         "\n"
-        "    -c{1-2}      - option 1: repeatedly insert()(fill)/remove()(empty) trie(1 default) using bgp routing table keys.\n"
-        "                   option 2: fill trie then do max_rdx_nodes random search()'s with bgp routing table keys.\n"
+        "    -c{1-2}      - option 1: repeatedly insert()(fill)/remove()(empty) trie using bgp routing table keys(default)\n"
+        "                   option 2: fill trie then do max_rdx_nodes random search()'s with bgp routing table keys\n"
         "\n"
         "    -r{1-3}      - option to set key encoding scheme\n"
         "                   store keys in trie as:\n"
-        "                       1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)\n"
+        "                       1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)(default)\n"
         "                       2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)\n"
         "                       3 - (32 bit uint)(4)n(1) binary(5 bytes)\n"
         "\n"
@@ -268,7 +268,7 @@ main
 
     // cmd line option defaults
     int pmode_opt = 1;  // performance test case option
-    double rtime_opt = 30.;  // run time option
+    int rtime_opt = 30;  // run time option
     int block_multiply_opt = 100;  // block multiply option
     int router_key_opt = 1;  // router key encoding default
 
@@ -288,7 +288,7 @@ main
                 break;
 
             case 'r':
-                router_key_opt = atof(optarg);
+                router_key_opt = atoi(optarg);
                 if ( router_key_opt < 1 || router_key_opt > 3 )
                 {
                     cerr << usage << "-r option out of range(1 to 3): " << router_key_opt << "\n";
@@ -297,7 +297,7 @@ main
                 break;
 
             case 's':
-                rtime_opt = atof(optarg);
+                rtime_opt = atoi(optarg);
                 if ( rtime_opt < 1 || rtime_opt > 86400 )
                 {
                     cerr << usage << "-s option out of range(1 to 86400): " << rtime_opt << "\n";
@@ -429,8 +429,8 @@ main
                 sscanf(prefix, "%d.%d.%d.%d/%d", &octet1, &octet2, &octet3, &octet4, &mask);
                 ip32 = (octet1 * pow(2, 24)) + (octet2 * pow(2, 16)) + (octet3 * pow(2, 8)) + (octet4);
                 umask = mask;
-                memmove(&key[n][0], &ip32, 4);
-                memmove(&key[n][4], &umask, 1);
+                memmove(&key[n][13], &ip32, 4);
+                memmove(&key[n][14], &umask, 1);
                 n++;
                 break;
         }
@@ -464,7 +464,7 @@ main
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "-r %d - key encoding(1-3, 1 default)\n", router_key_opt);
     os << tmpstr;
-    snprintf(tmpstr, sizeof(tmpstr), "-s %f - minimum run time(sec, 30 default)\n", rtime_opt);
+    snprintf(tmpstr, sizeof(tmpstr), "-s %d - minimum run time(sec, 30 default)\n", rtime_opt);
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "-b %d - block multiplier(100 default)\n\n", block_multiply_opt);
     os << tmpstr;

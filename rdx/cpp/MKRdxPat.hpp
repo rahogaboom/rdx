@@ -580,9 +580,9 @@ namespace MultiKeyRdxPat
             // private functions
             //
 
-            // given a key and bit number (bits numbered 0 from right) will return that bit
-            // used by: insert(), search(), remove(), print()
-                unsigned int
+            // given a key and bit number (bytes numbered 0 from left, bits numbered 0 from right)
+            // will return that bit used by: insert(), search(), remove(), print()
+                inline unsigned int
             gbit
                 (
                     unsigned char *key,
@@ -593,18 +593,20 @@ namespace MultiKeyRdxPat
                 unsigned int bit;
                 unsigned char mask;
 
+                //
                 // the byte index set here assumes one extra prefix byte in the input parameter key(for the
                 // 0xff of the root node impossible key). thus, data nodes with keys of max_key_bytes_ will
-                // have a 0 byte prefix added, and the byte index set here is not 0 to max_key_bytes_ but 1
-                // to max_key_bytes_+1. e.g. if max_key_bytes_=1 and bit_num=0 then byte is set to 1 not 0.
+                // have a 0 byte prefix added, and the byte index set here is not 0 to max_key_bytes_-1 but 1
+                // to max_key_bytes_. e.g. if max_key_bytes_ = 1 and bit_num = 0 then byte is set to 1 not 0.
                 // if max_key_bytes_=16 and bit_num=0 then byte is set to 16 not 15.
-                mask = 1;
-                byte = max_key_bytes_ - bit_num/8;
-                mask <<= bit_num%8;
-                bit = key[byte] & mask;
-                bit >>= bit_num%8;
+                //
+                mask = 1;                              // right most bit set - to be shifted left
+                byte = max_key_bytes_ - (bit_num>>3);  // get byte number(0 from left) that bit is in(from 1 to max_key_bytes_)
+                mask <<= bit_num%8;                    // shift mask bit to position of bit wanted
+                bit = key[byte] & mask;                // keep only bit wanted(0 or 1) - all other bits zero
+                bit >>= bit_num%8;                     // shift wanted bit right to first position in bit variable
 
-                return bit;
+                return bit;  // bit should always be 0 or 1
             }  // gbit()
 
             // recursive routine to descend rdx_ trie

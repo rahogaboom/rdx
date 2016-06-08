@@ -1,5 +1,10 @@
 ```
 
+ rdx-1.1.3.tar.gz - 
+    a. minor code changes to the test routines and documentation
+       updates to MKRdxPat.hpp
+
+
  rdx-1.1.2.tar.gz - 
     a. a new executable - MKRdxPat_perf_bgp - has been added to
        measure performance with real BGP routing prefix data as keys

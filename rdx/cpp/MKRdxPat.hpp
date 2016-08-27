@@ -155,7 +155,7 @@
  *         MKRdxPat<app_data> *
  *     chg_max_rdx_nodes 
  *         (
- *             const int new_max_rdx_nodes
+ *             const unsigned int new_max_rdx_nodes
  *         ) const
  *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
@@ -185,7 +185,7 @@
  *     The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes
  *     of an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA
  *     (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
- *     MKRdxPat is particularly suited to applications the require complex data structures be contiguously
+ *     MKRdxPat is particularly suited to applications that require complex data structures be contiguously
  *     stored and accessed with an algorithm of known fast character with any of several possible keys,
  *     either singly of several simultaneously.
  *
@@ -2074,7 +2074,7 @@ namespace MultiKeyRdxPat
              *     new object can be shrunk to the size of the current number of allocated data nodes or expanded without limit.  
              *
              * Usage:
-             *     int new_max_rdx_nodes;
+             *     unsigned int new_max_rdx_nodes;
              *
              *     MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
              *
@@ -2086,7 +2086,7 @@ namespace MultiKeyRdxPat
              *                                   to the new MKRdxPat<app_data> object fails
              *
              * Parameters:
-             *     const int new_max_rdx_nodes - the new size, max_rdx_nodes_, of the returned object
+             *     const unsigned int new_max_rdx_nodes - the new size, max_rdx_nodes_, of the returned object
              *
              * Comments:
              *     1. the originating object is not affected in any way
@@ -2095,7 +2095,7 @@ namespace MultiKeyRdxPat
                 MKRdxPat<app_data> *
             chg_max_rdx_nodes
                 (
-                    const int new_max_rdx_nodes
+                    const unsigned int new_max_rdx_nodes
                 ) const
             {
                 if ( new_max_rdx_nodes < rdx_.alloc_nodes )

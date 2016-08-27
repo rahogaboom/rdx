@@ -17,8 +17,8 @@ then
 fi
 
 # pick compiler
-CC="clang++"
-#CC="g++"
+#CC="clang++"
+CC="g++"
 
 # pick language dialect
 #LD="c++11"
@@ -37,8 +37,8 @@ $CC -std=$LD -$O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 ./MKRdxPat_test
 
 # compile perf program
-$CC -gline-tables-only -std=$LD -O -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
+$CC -std=$LD -O -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
 
 # compile perf_bgp program
-$CC -gline-tables-only -std=$LD -O -pedantic -Wall -o MKRdxPat_perf_bgp MKRdxPat_perf_bgp.cpp -lstdc++
+$CC -std=$LD -O -pedantic -Wall -o MKRdxPat_perf_bgp MKRdxPat_perf_bgp.cpp -lstdc++
 

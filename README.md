@@ -3,24 +3,31 @@
 rdx
 ===
 
- Multi-key Radix PATRICIA Fast Search C/OO C++
+ Multi-key Radix PATRICIA Fast Search - OO C++
 
-     - C and OO C++ versions
+     - The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes
+       of an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA
+       (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
+       MKRdxPat is particularly suited to applications that require complex data structures be contiguously
+       stored and accessed with an algorithm of known fast character with any of several possible keys,
+       either singly of several simultaneously.  See below for the full documentation.
 
-     - Boost Software License - Version 1.0 - August 17th, 2003
+     - many verification tests that show code usage examples suitable for cut/paste
 
-     - allows the allocation of a fixed sized contiguous data store that holds data nodes of an
-       arbitrary structure that may be accessed with any number of keys of any size with the
-       PATRICIA (Practical Algorithm To Retrieve Information Coded In Alphanumeric) fast search
-       algorithm
+     - no other library dependencies
+
+     - DESIGN GOALS:
+           1. Flexibility
+           2. Originality
+           3. Verifiability
+           4. Testing
+           5. Performance
 
      - see article in Embedded Systems Programming, Mar. 1997, "Highly dynamic Radix fast search
        algorithm with easy sort/deletion"(included)
 
      - see article in Embedded Systems Design, Jun. 2007, "Using multi-key radix PATRICIA fast
        search"(included)
-
-     - many verification tests that show complex code usage examples
 
      - performance measurement executable
            e.g.
@@ -37,14 +44,6 @@ rdx
 
                seconds = 1131.294222  total inserts/removes = 400,000,000
 
-
-     - DESIGN GOALS:
-           1. Flexibility
-           2. Originality
-           3. Verifiability
-           4. Testing
-           5. Performance
-
      - ACKNOWLEDGMENT
          Pavel Odintsov(pavel.odintsov@gmail.com)
 
@@ -53,71 +52,87 @@ rdx
 
  Do:
 
-     1. adjust $CC in ./MKRdxPat.mk to use clang or g++
+ 1. cd rdx/cpp
 
-     2. do "./MKRdxPat.mk" to build and run the functional tests
+ 2. a. vi ./MKRdxPat.hpp for the full documentation with examples in the comments at the
+       beginning of the file.  also, replicated below.
+    b. the library is not dependent on any other libraries.
+    c. the MKRdxPat_test.cpp executable has an extensive set of examples that can easily
+       be cut and paste into your application.
+    d. the MKRdxPat_perf.cpp executable measures performance.  the comments at the
+       beginning of the file gives details.
+    e. the MKRdxPat_perf_bgp.cpp executable measures performance with real BGP data.
+       the comments at the beginning of the file gives details.
 
-     3. do "./MKRdxPat.mk clean" to clean the directory
+ 3. adjust $CC in ./MKRdxPat.mk to use clang or g++
 
-     4. edit MKRdxPat_perf.cpp and install your application data in 'struct app_data{}'
-        and set the MKRdxPat.hpp class constructor arguments:
+ 4. do "./MKRdxPat.mk" to build and run the functional tests and compile the performance
+    executables.
 
-        //
-        // set these application specific data
-        //
-        // ================================================
+ 5. do "./MKRdxPat.mk clean" to clean the directory
 
-        // MKRdxPat.hpp class constructor arguments
-        const int max_rdx_nodes = 200000;
-        const int num_keys      = 2;
-        const int max_key_bytes = 16;
+ 6. vi MKRdxPat_perf.cpp and examine the comments at the beginning of the file to learn
+    how to run the performance test.  to modify the performance tests to better fit your
+    application edit MKRdxPat_perf.cpp and install your application data in
+    'struct app_data{}' and set the MKRdxPat.hpp class constructor arguments:
 
-        // application data of type app_data defined here
-        struct app_data
-        {
-            int i;
-        };
+    //
+    // set these application specific data
+    //
+    // ================================================
 
-        // ================================================
+    // MKRdxPat.hpp class constructor arguments
+    const int max_rdx_nodes = 200000;
+    const int num_keys      = 2;
+    const int max_key_bytes = 16;
 
+    // application data of type app_data defined here
+    struct app_data
+    {
+        int i;
+    };
 
-        do "./MKRdxPat.mk" to build
-
-        do "./MKRdxPat_perf [options]" to run performance tests with
-        your application specific data
-
-     5. edit MKRdxPat_perf_bgp.cpp and install your application data in 'struct app_data{}':
-
-        //
-        // change only struct app_data {}; if desired and nothing else
-        //
-        // ================================================
-
-        // MKRdxPat.hpp class constructor arguments
-        const int max_rdx_nodes = BGP_SIZE;  // fixed - routing table entries
-        const int num_keys      = 1;  // fixed - one key(prefix) in routing table
-
-        // store keys in trie as:\n"
-        //     1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
-        //     2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
-        //     3 - (32 bit uint)(4)n(1) binary(5 bytes)
-        const int max_key_bytes = MAX_PREFIX_SIZE;
-
-        // application data of type app_data defined here
-        struct app_data
-        {
-            int i;
-        };
-
-        // ================================================
-
-        do "./MKRdxPat.mk" to build
-
-        do "./MKRdxPat_perf_bgp [options]" to run bgp performance tests with
-        your application specific data
+    // ================================================
 
 
- OO C++ version:
+    do "./MKRdxPat.mk" to build
+
+    do "./MKRdxPat_perf [options]" to run performance tests with
+    your application specific data
+
+ 7. vi MKRdxPat_perf_bgp.cpp and examine the comments at the beginning of the file to learn
+    how to run the BGP performance test.  to modify the BGP performance test to better fit
+    your application edit MKRdxPat_perf_bgp.cpp and install your application data in
+    'struct app_data{}'.  unpack BGP_routing_table_3peersnap_04102016_as198068.xz:
+
+    //
+    // change only struct app_data {}; if desired and nothing else
+    //
+    // ================================================
+
+    // MKRdxPat.hpp class constructor arguments
+    const int max_rdx_nodes = BGP_SIZE;  // fixed - routing table entries
+    const int num_keys      = 1;  // fixed - one key(prefix) in routing table
+
+    // store keys in trie as:\n"
+    //     1 - d(3).d(3).d(3).d(3)/n(2) ascii(up to 18 bytes)
+    //     2 - d(3)d(3)d(3)d(3)n(2) ascii(up to 14 bytes)
+    //     3 - (32 bit uint)(4)n(1) binary(5 bytes)
+    const int max_key_bytes = MAX_PREFIX_SIZE;
+
+    // application data of type app_data defined here
+    struct app_data
+    {
+        int i;
+    };
+
+    // ================================================
+
+    do "./MKRdxPat.mk" to build
+
+    do "./MKRdxPat_perf_bgp [options]" to run bgp performance tests with
+    your application specific data
+
 
  *======================================================================================================================
  *
@@ -241,7 +256,7 @@ rdx
  *         MKRdxPat<app_data> *
  *     chg_max_rdx_nodes 
  *         (
- *             const int new_max_rdx_nodes
+ *             const unsigned int new_max_rdx_nodes
  *         ) const
  *         e.g. MKRdxPat<app_data> *rdx_new = rdx_old->chg_max_rdx_nodes(new_max_rdx_nodes);
  *
@@ -271,7 +286,7 @@ rdx
  *     The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes
  *     of an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA
  *     (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
- *     MKRdxPat is particularly suited to applications the require complex data structures be contiguously
+ *     MKRdxPat is particularly suited to applications that require complex data structures be contiguously
  *     stored and accessed with an algorithm of known fast character with any of several possible keys,
  *     either singly of several simultaneously.
  *
@@ -461,4 +476,3 @@ rdx
  *======================================================================================================================
 
 ```
-

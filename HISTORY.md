@@ -1,5 +1,21 @@
 ```
 
+ rdx-1.1.4.tar.gz - 
+    a. doc updates
+    b. add #include <cmath> header to BGP performance measurement
+       executable
+    c. changes related to eliminating compiler warnings from
+       updated compiler versions:
+        1. add 'unsigned' to member function arg
+               MKRdxPat<app_data> *
+           chg_max_rdx_nodes(const unsigned int new_max_rdx_nodes) const
+        2. eliminate using ' as a printf flag for comma separation of
+           large integer numbers - not standard
+        3. remove 'unsigned' from 'unsigned int' declaration of args
+           to scanf() function since scanf() wants int* instead of
+           unsigned int*
+
+
  rdx-1.1.3.tar.gz - 
     a. minor code changes to the test routines and documentation
        updates to MKRdxPat.hpp

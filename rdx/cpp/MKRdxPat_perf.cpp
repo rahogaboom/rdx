@@ -271,9 +271,6 @@ main
 
     app_data *app_datap;
 
-    // enable printf("%'d", n); for commas in large numbers
-    setlocale(LC_NUMERIC, "");
-
     ofstream os;
     os.open("MKRdxPat_perf.results", ofstream::app|ofstream::out);
 
@@ -382,12 +379,12 @@ main
     MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(max_rdx_nodes, num_keys, max_key_bytes);
 
     os << "\n";
-    snprintf(tmpstr, sizeof(tmpstr), "\nmax_rdx_nodes = %'d\nnum_keys = %d\nmax_key_bytes = %d\n",
+    snprintf(tmpstr, sizeof(tmpstr), "\nmax_rdx_nodes = %d\nnum_keys = %d\nmax_key_bytes = %d\n",
         max_rdx_nodes, num_keys, max_key_bytes);
     os << tmpstr;
     snprintf(tmpstr, sizeof(tmpstr), "    (Modify MKRdxPat_perf.cpp with new parameters and re-compile.)\n\n");
     os << tmpstr;
-    snprintf(tmpstr, sizeof(tmpstr), "trie size = %'db\n\n", rdx->bsize());
+    snprintf(tmpstr, sizeof(tmpstr), "trie size = %db\n\n", rdx->bsize());
     os << tmpstr;
 
     snprintf(tmpstr, sizeof(tmpstr), "-c %d - insert()/remove()(1 default) or search()(2)\n", pmode_opt);
@@ -406,7 +403,7 @@ main
                 double sec;
                 int return_code;
 
-                snprintf(tmpstr, sizeof(tmpstr), "insert()/remove() increments: %'d(%d*2*max_rdx_nodes)\n\n",
+                snprintf(tmpstr, sizeof(tmpstr), "insert()/remove() increments: %d(%d*2*max_rdx_nodes)\n\n",
                     block_multiply_opt*2*max_rdx_nodes, block_multiply_opt);
                 os << tmpstr;
 
@@ -450,12 +447,12 @@ main
                     }
                 }
 
-                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total inserts/removes = %'ld\n\n", sec, total_inserts_removes);
+                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total inserts/removes = %ld\n\n", sec, total_inserts_removes);
                 os << tmpstr;
 
                 long ops_per_sec;
                 ops_per_sec = total_inserts_removes/sec;
-                snprintf(tmpstr, sizeof(tmpstr), "operations per second = %'ld\n\n", ops_per_sec);
+                snprintf(tmpstr, sizeof(tmpstr), "operations per second = %ld\n\n", ops_per_sec);
                 os << tmpstr;
             }
             break;
@@ -467,7 +464,7 @@ main
                 struct timespec tstart={0,0}, tend={0,0}, tdiff={0,0};
                 double sec;
 
-                snprintf(tmpstr, sizeof(tmpstr), "search() increments: %'d(%d*max_rdx_nodes)\n\n",
+                snprintf(tmpstr, sizeof(tmpstr), "search() increments: %d(%d*max_rdx_nodes)\n\n",
                     block_multiply_opt*max_rdx_nodes, block_multiply_opt);
                 os << tmpstr;
 
@@ -508,12 +505,12 @@ main
                     }
                 }
 
-                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total searches = %'ld\n\n", sec, total_searches);
+                snprintf(tmpstr, sizeof(tmpstr), "seconds = %f  total searches = %ld\n\n", sec, total_searches);
                 os << tmpstr;
 
                 long ops_per_sec;
                 ops_per_sec = total_searches/sec;
-                snprintf(tmpstr, sizeof(tmpstr), "operations per second = %'ld\n\n", ops_per_sec);
+                snprintf(tmpstr, sizeof(tmpstr), "operations per second = %ld\n\n", ops_per_sec);
                 os << tmpstr;
             }
             break;

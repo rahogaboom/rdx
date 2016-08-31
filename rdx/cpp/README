@@ -9,11 +9,13 @@ rdx
        (Practical Algorithm To Retrieve Information Coded In Alphanumeric)(1,2,3) fast search algorithm.
        MKRdxPat is particularly suited to applications that require complex data structures be contiguously
        stored and accessed with an algorithm of known fast character with any of several possible keys,
-       either singly of several simultaneously.  See below for the full documentation.
+       either singly of several simultaneously.  MKRdxPat is unique, as far as I know, in allowing search
+       with multiple keys of any length.  If the application only requires a single key, this is OK; just
+       set num_keys to 1 in the constructor call.  See below for the full documentation.
 
-     - many verification tests that show code usage examples suitable for cut/paste
+     - 15 cut/paste(MKRdxPat_test.cpp) verification tests that show code usage examples
 
-     - no other library dependencies
+     - no library dependencies
 
      - DESIGN GOALS:
            1. Flexibility

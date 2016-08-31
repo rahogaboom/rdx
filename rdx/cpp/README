@@ -2,7 +2,7 @@
 rdx
 ===
 
- Multi-key Radix PATRICIA Fast Search - OO C++ - A header only class
+ Multi-key Radix PATRICIA Fast Search - OO C++ - A header only class(MKRdxPat.hpp)
 
      - The MKRdxPat class allows the allocation of a fixed sized contiguous data store that holds data nodes
        of an arbitrary structure that may be accessed with any number of keys of any size with the PATRICIA

@@ -1,5 +1,14 @@
 ```
 
+ rdx-1.1.5.tar.gz - 
+    a. upgraded g++ to 7.2.1 20170915 and clang++ to 5.0.1.
+    b. fix bug in MKRdxPat_test.cpp.  two memset()s in test 15 zero out
+       twice as much memory as they should.  MKRdxPat.hpp and the test
+       were unaffected.  this bug was detected by the upgraded version
+       of g++(clang++ did not detect the bug).
+    c. fix bug in MKRdxPat_perf_bgp.cpp.  absent input file segfaults.
+       add NULL test on FILE pointer.
+
  rdx-1.1.4.tar.gz - 
     a. doc updates
     b. add #include <cmath> header to BGP performance measurement

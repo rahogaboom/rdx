@@ -396,6 +396,13 @@ main
 
     FILE *bgpfp = fopen("BGP_routing_table_3peersnap_04102016_as198068", "r");
 
+    if ( bgpfp == NULL ) {
+        snprintf(tmpstr, sizeof(tmpstr), "Failed to open BGP_routing_table_3peersnap_04102016_as198068\n");
+        os << tmpstr;
+        printf("Failed to open BGP_routing_table_3peersnap_04102016_as198068\n");
+        exit(1);
+    }
+
     static char key[BGP_SIZE][MAX_PREFIX_SIZE+1];
     memset(key, 0, sizeof(key));
 

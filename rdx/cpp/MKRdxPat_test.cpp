@@ -1955,7 +1955,7 @@ main()
         MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
 
         os << "a. insert one data node in rdx trie with three keys\n";
-        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        memset(rdx_key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));
         rdx_key[0][0] = 1;  // set key boolean to 1
         rdx_key[1][0] = 1;  // set key boolean to 1
         rdx_key[2][0] = 1;  // set key boolean to 1
@@ -1970,7 +1970,7 @@ main()
         os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
 
         os << "b. search for node with only the first key using rdx->keys()\n";
-        memset(rdx_key, 0, (MAX_RDX_NODES+1) * NUM_KEYS * (1+MAX_KEY_BYTES));
+        memset(rdx_key, 0, NUM_KEYS * (1+MAX_KEY_BYTES));
         rdx_key[0][0] = 1;  // set key boolean to 1
         rdx_key[0][MAX_KEY_BYTES] = 1;
         print_key((unsigned char *)rdx_key, os, NUM_KEYS, MAX_KEY_BYTES);

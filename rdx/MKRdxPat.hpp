@@ -1,8 +1,8 @@
-#ifndef RDX_CPP_MKRDXPAT_H_
-#define RDX_CPP_MKRDXPAT_H_
+#ifndef RDX_CPP_MKRDXPAT_HPP_
+#define RDX_CPP_MKRDXPAT_HPP_
 
 //
-//          Copyright Richard Allen Hogaboom 1997 - 2016.
+//          Copyright Richard Allen Hogaboom 1997 - 2019.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -3267,5 +3267,5 @@ namespace MultiKeyRdxPat
 
 }  // namespace MultiKeyRdxPat
 
-#endif  // RDX_CPP_MKRDXPAT_H_
+#endif  // RDX_CPP_MKRDXPAT_HPP_
 

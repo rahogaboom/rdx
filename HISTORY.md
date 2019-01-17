@@ -1,5 +1,8 @@
 ```
 
+ rdx-1.1.6.tar.gz - 
+    a. 
+
  rdx-1.1.5.tar.gz - 
     a. upgraded g++ to 7.2.1 20170915 and clang++ to 5.0.1.
     b. fix bug in MKRdxPat_test.cpp.  two memset()s in test 15 zero out
@@ -162,9 +165,5 @@
      c. the test suite has been improved substantially.  new tests for search/delete/print with a single key
         have been added.  the rdx_pat_test.results file of test output should be much more readable and the
         correspondence of results with example code should be clearer.
-
-
- Why are there no releases beyond the latest three on GitHub?  For now, I only intend to maintain and answer
- questions about the most recent releases.  This may change in future.
 
 ```

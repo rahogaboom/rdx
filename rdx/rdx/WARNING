@@ -1,7 +1,0 @@
-
-This C version of rdx is now no longer maintained.  As of version rdx-1.0.6.tar.gz
-only the C++ and D versions will be updated and maintained.  There are no extant
-known bugs in this C version, however, improvements in performance, documentation,
-functionality, functional test and performance test have been made in the C++ and
-D versions.
-

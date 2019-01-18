@@ -17,8 +17,8 @@ then
 fi
 
 # pick compiler
-#CC="clang++"
-CC="g++"
+CC="clang++"
+#CC="g++"
 
 # pick debug/optimize
 #O=g

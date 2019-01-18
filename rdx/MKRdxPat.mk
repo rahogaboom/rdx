@@ -17,28 +17,22 @@ then
 fi
 
 # pick compiler
-CC="clang++"
-#CC="g++"
-
-# pick language dialect
-#LD="c++11"
-#LD="c++14"
-#LD="gnu++11"
-LD="gnu++14"
+#CC="clang++"
+CC="g++"
 
 # pick debug/optimize
 #O=g
 O=O
 
 # compile test program - using MKRdxPat.hpp
-$CC -std=$LD -$O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
+$CC -$O -pedantic -Wall -o MKRdxPat_test MKRdxPat_test.cpp -lstdc++
 
 # run test program
 ./MKRdxPat_test
 
 # compile perf program
-$CC -std=$LD -O -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
+$CC -O -pedantic -Wall -o MKRdxPat_perf MKRdxPat_perf.cpp -lstdc++
 
 # compile perf_bgp program
-$CC -std=$LD -O -pedantic -Wall -o MKRdxPat_perf_bgp MKRdxPat_perf_bgp.cpp -lstdc++
+$CC -O -pedantic -Wall -o MKRdxPat_perf_bgp MKRdxPat_perf_bgp.cpp -lstdc++
 

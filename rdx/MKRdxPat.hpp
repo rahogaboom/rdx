@@ -1,5 +1,5 @@
-#ifndef RDX_CPP_MKRDXPAT_HPP_
-#define RDX_CPP_MKRDXPAT_HPP_
+#ifndef RDX_CPP_MKRDXPAT_HPP
+#define RDX_CPP_MKRDXPAT_HPP
 
 //
 //          Copyright Richard Allen Hogaboom 1997 - 2019.
@@ -3267,5 +3267,5 @@ namespace MultiKeyRdxPat
 
 }  // namespace MultiKeyRdxPat
 
-#endif  // RDX_CPP_MKRDXPAT_HPP_
+#endif
 

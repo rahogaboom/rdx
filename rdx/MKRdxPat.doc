@@ -14,9 +14,9 @@ Multi-key Radix PATRICIA Fast Search - OO C++ - A header only class
       with multiple keys of any length.  If the application only requires a single key, this is OK; just
       set num_keys to 1 in the constructor call.  See below for the full documentation.
 
-    - 15 cut/paste(MKRdxPat_test.cpp) verification tests that show code usage examples
+    - 16 cut/paste(MKRdxPat_test.cpp) verification tests that show code usage examples
 
-    - no library dependencies
+    - no library dependencies(except standard header files)
 
     - DESIGN GOALS:
           1. Flexibility
@@ -46,6 +46,14 @@ Multi-key Radix PATRICIA Fast Search - OO C++ - A header only class
 
               seconds = 1131.294222  total inserts/removes = 400,000,000
 
+    - see cut/paste Examples and API sections below
+
+    - a rdx-compile.tar file is provided with a non-header compiled(clang, clang++, gcc, g++) version
+
+    - this file is the entire documentation needed to use the library
+
+    - Author: Richard Hogaboom, richard.hogaboom@gmail.com
+
     - ACKNOWLEDGMENT
         Pavel Odintsov(pavel.odintsov@gmail.com)
 
@@ -56,17 +64,15 @@ Usage:
 
     1. cd rdx/cpp
 
-    2. a. vi ./MKRdxPat.hpp for the full documentation with examples in the comments at the
-          beginning of the file.  also, replicated below.
-       b. the library is not dependent on any other libraries.
-       c. the MKRdxPat_test.cpp executable has an extensive set of examples that can easily
+    2. a. the library is not dependent on any other libraries.
+       b. the MKRdxPat_test.cpp executable has an extensive set of examples that can easily
           be cut and paste into your application.
-       d. the MKRdxPat_perf.cpp executable measures performance.  the comments at the
+       c. the MKRdxPat_perf.cpp executable measures performance.  the comments at the
           beginning of the file gives details.
-       e. the MKRdxPat_perf_bgp.cpp executable measures performance with real BGP data.
+       d. the MKRdxPat_perf_bgp.cpp executable measures performance with real BGP data.
           the comments at the beginning of the file gives details.
 
-    3. adjust $CC in ./MKRdxPat.mk to use clang or g++
+    3. adjust $CC in ./MKRdxPat.mk to use clang++ or g++
 
     4. do "./MKRdxPat.mk" to build and run the functional tests and compile the performance
        executables.
@@ -137,14 +143,202 @@ Usage:
 
 Files:
 
-    BGP_routing_table_3peersnap_04102016_as198068.xz
-    MKRdxPat.hpp
-    MKRdxPat.mk
-    MKRdxPat_perf_bgp.cpp
-    MKRdxPat_perf.cpp
-    MKRdxPat_test.cpp
-    rdx-compile.tar
-    rdx.doc
+    BGP_routing_table_3peersnap_04102016_as198068.xz - compressed BGP data
+    MKRdxPat.hpp                                     - header only C++ implementation
+    MKRdxPat.mk                                      - build script, compiles/executes test code
+    MKRdxPat_perf_bgp.cpp                            - BGP test code
+    MKRdxPat_perf.cpp                                - performance test code
+    MKRdxPat_test.cpp                                - test code
+    rdx-compile.tar                                  - non-header compiled(clang, clang++, gcc, g++) version
+    rdx.doc                                          - documentation for library
+
+Examples:
+
+    All examples are from the test code in MKRdxPat_test.cpp.
+
+    NOTES:
+        1. all tests are independent.  any test may be deleted; it will affect no other test
+        2. try the tests with different values for MAX_RDX_NODES, NUM_KEYS and MAX_KEY_BYTES
+        3. each test outputs to it's own file of filename format: MKRdxPat.TESTn.results
+        4. use the './MKRdxPat.mk' script to compile and execute the tests
+        5. use './MKRdxPat.mk clean' to clean the directory
+
+    From TEST 1
+        int return_code;
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int id;
+        };
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_RDX_NODES = 4;
+
+        // number of rdx search keys
+        const int NUM_KEYS = 3;
+
+        // number of bytes in each key(s)
+        const int MAX_KEY_BYTES = 4;
+
+        ofstream os;
+        os.open("MKRdxPat.TEST0.results");
+
+        os << "\n"
+              "TEST 0: Print rdx trie before inserting any data nodes\n"
+              "        Expected Results:\n"
+              "           a. Only the impossible pre-allocated root node should be printed since\n"
+              "              no other nodes have been inserted\n\n";
+
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
+
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
+
+
+        os << "a. Only the impossible pre-allocated root node should be printed since\n";
+        os << "   no other nodes have been inserted\n\n";
+        return_code = rdx->print(NULL, os);
+
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
+
+        delete rdx;
+
+        os.close();
+
+    From TEST 2
+        int return_code;
+
+        // application data of type app_data defined here
+        struct app_data
+        {
+            int id;
+            double d;
+        };
+
+        app_data *app_datap;
+
+        // maximum number of data nodes stored in rdx trie
+        const int MAX_RDX_NODES = 1;
+
+        // number of rdx search keys
+        const int NUM_KEYS = 3;
+
+        // number of bytes in each key(s)
+        const int MAX_KEY_BYTES = 4;
+
+        // MAX_RDX_NODES nodes of NUM_KEYS keys of MAX_KEY_BYTES bytes - set all key booleans to 1
+        unsigned char rdx_key[MAX_RDX_NODES][NUM_KEYS][1+MAX_KEY_BYTES];
+
+        memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
+        for ( int n = 0, sum = 0 ; n < MAX_RDX_NODES ; n++ )
+        {
+            for ( int k = 0 ; k < NUM_KEYS ; k++ )
+            {
+                rdx_key[n][k][0] = 1;  // set key boolean to 1
+                rdx_key[n][k][MAX_KEY_BYTES] = sum++;
+            }
+        }
+
+        ofstream os;
+        os.open("MKRdxPat.TEST1.results");
+
+        os << "\n"
+              "TEST 1: Insert one data node in rdx trie, then insert node with same keys again\n"
+              "        Expected Results:\n"
+              "           a. One node insertion with return code 0\n"
+              "           b. Total nodes allocated(not including root node) 1\n"
+              "           c. No verification error\n"
+              "           d. Print entire trie - allocated node and root node\n"
+              "           e. Same keys node insertion should return code 1\n"
+              "           f. Different keys node insertion into full rdx should return code 2\n"
+              "           g. Same keys node insertion with a key boolean set to 0 should return code 3\n\n";
+
+        os << "MAX_RDX_NODES = " << MAX_RDX_NODES << "\n"
+              "NUM_KEYS = " << NUM_KEYS << "\n"
+              "MAX_KEY_BYTES = " << MAX_KEY_BYTES << "\n\n";
+
+        MKRdxPat<app_data> *rdx = new MKRdxPat<app_data>(MAX_RDX_NODES, NUM_KEYS, MAX_KEY_BYTES);
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n";
+        os << "rdx - Bytes allocated = " << rdx->bsize() << "\n\n";
+
+
+        os << "a. One node insertion with return code 0\n";
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
+
+        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n\n";
+
+
+        os << "b. Total nodes allocated(not including root node) 1\n";
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
+
+        app_datap->id = 20;
+        os << "set app_datap->id = 20\n";
+        os << "get app_datap->id = " << app_datap->id << "\n";
+        app_datap->d = 2.0;
+        os << "set app_datap->d = 2.0\n";
+        os << "get app_datap->d = " << app_datap->d << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
+
+
+        os << "c. No verification error\n";
+        return_code = rdx->verify(ERR_CODE_PRINT, os);
+
+        os << "return_code = rdx->verify(ERR_CODE_PRINT, os); verify success(0) or fail(!0) -> return_code = " << return_code << "\n\n\n";
+
+
+        os << "d. Print entire trie - allocated node and root node\n";
+        return_code = rdx->print(NULL, os);
+
+        os << "return_code = rdx->print(NULL, os); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
+
+
+        os << "e. Same keys node insertion should return code 1\n";
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
+
+        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
+
+
+        os << "f. Different keys node insertion into full rdx should return code 2\n";
+        // set each key to a unique value not used before - this will try to insert into a full rdx and set return_code = 2
+        // - if any key is the same as a previously inserted node then return_code = 1 will be returned
+        rdx_key[0][0][1] = 1;  // set first key(key index 0) first key byte to different from 0
+        rdx_key[0][1][1] = 1;  // set second key(key index 1) first key byte to different from 0
+        rdx_key[0][2][1] = 1;  // set third key(key index 2) first key byte to different from 0
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
+
+        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n\n";
+
+
+        os << "g. Same keys node insertion with a key boolean set to 0 should return code 3\n";
+        rdx_key[0][1][0] = 0;  // set second key(key index 1) boolean to 0
+        print_key((unsigned char *)rdx_key[0], os, NUM_KEYS, MAX_KEY_BYTES);
+        return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap);
+
+        os << "return_code = rdx->insert((unsigned char *)rdx_key[0], &app_datap); return_code = " << return_code << "\n\n";
+
+        os << "rdx - Nodes allocated = " << rdx->alloc_nodes() << "\n\n";
+
+        delete rdx;
+
+        os.close();
 
 API:
 
@@ -491,7 +685,7 @@ API:
  *======================================================================================================================
  */
 
-Member Functions:
+Constructor/Destructor:
 
 /*
  *    struct app_data
@@ -510,6 +704,8 @@ Member Functions:
  *    ~MKRdxPat()
  *        e.g. delete rdx;
  */
+
+Member Functions:
 
 /*
  *======================================================================================================================

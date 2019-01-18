@@ -92,7 +92,7 @@ print_key
    int
 main()
 {
-    {  // TEST 0
+    {  // TEST 1
         int return_code;
 
         // application data of type app_data defined here
@@ -111,10 +111,10 @@ main()
         const int MAX_KEY_BYTES = 4;
 
         ofstream os;
-        os.open("MKRdxPat.TEST0.results");
+        os.open("MKRdxPat.TEST1.results");
 
         os << "\n"
-              "TEST 0: Print rdx trie before inserting any data nodes\n"
+              "TEST 1: Print rdx trie before inserting any data nodes\n"
               "        Expected Results:\n"
               "           a. Only the impossible pre-allocated root node should be printed since\n"
               "              no other nodes have been inserted\n\n";
@@ -142,7 +142,7 @@ main()
         os.close();
     }
 
-    {  // TEST 1
+    {  // TEST 2
         int return_code;
 
         // application data of type app_data defined here
@@ -177,10 +177,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST1.results");
+        os.open("MKRdxPat.TEST2.results");
 
         os << "\n"
-              "TEST 1: Insert one data node in rdx trie, then insert node with same keys again\n"
+              "TEST 2: Insert one data node in rdx trie, then insert node with same keys again\n"
               "        Expected Results:\n"
               "           a. One node insertion with return code 0\n"
               "           b. Total nodes allocated(not including root node) 1\n"
@@ -271,7 +271,7 @@ main()
         os.close();
     }
 
-    {  // TEST 2
+    {  // TEST 3
         int return_code;
 
         // application data of type app_data defined here
@@ -307,10 +307,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST2.results");
+        os.open("MKRdxPat.TEST3.results");
 
         os << "\n"
-              "TEST 2: Insert one data node - rdx->print(key, os) for rdx trie\n"
+              "TEST 3: Insert one data node - rdx->print(key, os) for rdx trie\n"
               "        Expected Results:\n"
               "           a. Should print only the data node with the passed in keys and all of the branch\n"
               "              nodes leading to that data node.  If there are N keys in that data node then\n"
@@ -346,7 +346,7 @@ main()
         os.close();
     }
 
-    {  // TEST 3
+    {  // TEST 4
         int return_code;
 
         // application data of type app_data defined here
@@ -385,10 +385,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST3.results");
+        os.open("MKRdxPat.TEST4.results");
 
         os << "\n"
-              "TEST 3: Insert four data nodes each with NUM_KEYS keys in rdx trie\n"
+              "TEST 4: Insert four data nodes each with NUM_KEYS keys in rdx trie\n"
               "        Expected Results:\n"
               "           a. Four data node insertions with return code 0\n"
               "           b. Total nodes allocated(not including root node) 4\n"
@@ -441,7 +441,7 @@ main()
         os.close();
     }
 
-    {  // TEST 4
+    {  // TEST 5
         int return_code;
 
         // application data of type app_data defined here
@@ -481,10 +481,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST4.results");
+        os.open("MKRdxPat.TEST5.results");
 
         os << "\n"
-              "TEST 4: Search for all MAX_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n"
+              "TEST 5: Search for all MAX_RDX_NODES data nodes with NUM_KEYS keys in rdx trie\n"
               "        Expected Results:\n"
               "           a. insert 4 data nodes and search/find them\n"
               "           b. fail to find 4 nodes who's keys were not inserted\n\n";
@@ -535,7 +535,7 @@ main()
         os.close();
     }
 
-    {  // TEST 5
+    {  // TEST 6
         int return_code;
 
         const size_t MSG_BUF_SIZE = 256;
@@ -581,10 +581,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST5.results");
+        os.open("MKRdxPat.TEST6.results");
 
         os << "\n"
-              "TEST 5: Sort data nodes by successive keys in rdx trie\n"
+              "TEST 6: Sort data nodes by successive keys in rdx trie\n"
               "        Expected Results:\n"
               "           a. Sort rdx with no nodes inserted and key index set to 3 - return_code=-1, app_datapp= NULL\n"
               "           b. Sort rdx with no nodes inserted and key index set to 0 - return_code= 0, app_datapp= NULL\n"
@@ -681,7 +681,7 @@ main()
         os.close();
     }
 
-    {  // TEST 6
+    {  // TEST 7
         int return_code;
 
         // application data of type app_data defined here
@@ -723,10 +723,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST6.results");
+        os.open("MKRdxPat.TEST7.results");
 
         os << "\n"
-              "TEST 6: Insert 5 data nodes in rdx trie - remove all nodes in rdx trie\n"
+              "TEST 7: Insert 5 data nodes in rdx trie - remove all nodes in rdx trie\n"
               "        Expected Results:\n"
               "           a. Non-NULL returns of the nodes removed(5), NULL returns(3) for nodes not\n"
               "              allocated and zero allocated nodes upon completion\n\n";
@@ -787,7 +787,7 @@ main()
         os.close();
     }
 
-    {  // TEST 7
+    {  // TEST 8
         int return_code;
 
         // application data of type app_data defined here
@@ -825,10 +825,10 @@ main()
         memset(rdx_key, 0, MAX_RDX_NODES * NUM_KEYS * (1+MAX_KEY_BYTES));
 
         ofstream os;
-        os.open("MKRdxPat.TEST7.results");
+        os.open("MKRdxPat.TEST8.results");
 
         os << "\n"
-              "TEST 7: Insert/Search/Remove MAX_RDX_NODES nodes with random keys repeatedly\n"
+              "TEST 8: Insert/Search/Remove MAX_RDX_NODES nodes with random keys repeatedly\n"
               "        Expected Results:\n"
               "           a. Do not report success - report only errors in insert/search/remove operations\n\n";
 
@@ -921,7 +921,7 @@ main()
         os.close();
     }
 
-    {  // TEST 8
+    {  // TEST 9
         int return_code;
 
         int n = 0;
@@ -959,10 +959,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST8.results");
+        os.open("MKRdxPat.TEST9.results");
 
         os << "\n"
-              "TEST 8: Insert one data node in rdx with specific keys - key 0 = 3, key 1 = 4, key 2 = 5\n"
+              "TEST 9: Insert one data node in rdx with specific keys - key 0 = 3, key 1 = 4, key 2 = 5\n"
               "        Do, using only a single key, searches/removes with correct/incorrect keys\n"
               "        Expected Results:\n"
               "           a. insert one data node - should succeed\n"
@@ -1151,7 +1151,7 @@ main()
         os.close();
     }
 
-    {  // TEST 9
+    {  // TEST 10
         int return_code;
 
         // application data of type app_data defined here
@@ -1187,10 +1187,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST9.results");
+        os.open("MKRdxPat.TEST10.results");
 
         os << "\n"
-              "TEST 9: Insert MAX_RDX_NODES+1 data nodes in a rdx trie of only MAX_RDX_NODES nodes\n"
+              "TEST 10: Insert MAX_RDX_NODES+1 data nodes in a rdx trie of only MAX_RDX_NODES nodes\n"
               "        Expected Results:\n"
               "           a. MAX_RDX_NODES node insertions with return code 0\n"
               "           b. 1 node insertion with return code 2(no free nodes)\n"
@@ -1232,7 +1232,7 @@ main()
         os.close();
     }
 
-    {  // TEST 10
+    {  // TEST 11
         int return_code;
         int tot_errs = 0;
 
@@ -1271,10 +1271,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST10.results");
+        os.open("MKRdxPat.TEST11.results");
 
         os << "\n"
-              "TEST 10: Create rdx trie with 1 key of 1 byte and 256 data nodes\n"
+              "TEST 11: Create rdx trie with 1 key of 1 byte and 256 data nodes\n"
               "         Expected Results:\n"
               "            a. MAX_RDX_NODES node insertions with return code 0\n"
               "            b. Total nodes allocated(not including root node) MAX_RDX_NODES\n"
@@ -1380,7 +1380,7 @@ main()
         os.close();
     }
 
-    {  // TEST 11
+    {  // TEST 12
         int return_code;
         int tot_errs = 0;
 
@@ -1418,10 +1418,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST11.results");
+        os.open("MKRdxPat.TEST12.results");
 
         os << "\n"
-              "TEST 11: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n"
+              "TEST 12: Create rdx trie with 8 keys of 16 bytes and 2 data nodes\n"
               "         Expected Results:\n"
               "            a. MAX_RDX_NODES node insertions with return code 0\n"
               "            b. Total nodes allocated(not including root node) MAX_RDX_NODES\n"
@@ -1500,7 +1500,7 @@ main()
         os.close();
     }
 
-    {  // TEST 12
+    {  // TEST 13
         int return_code;
 
         // application data of type app_data defined here
@@ -1537,10 +1537,10 @@ main()
         }
 
         ofstream os;
-        os.open("MKRdxPat.TEST12.results");
+        os.open("MKRdxPat.TEST13.results");
 
         os << "\n"
-              "TEST 12: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n"
+              "TEST 13: Create rdx trie with 4 keys of 2 bytes and 4 data nodes with\n"
               "         key values the same for each key but unique within a key\n"
               "         Expected Results:\n"
               "            a. MAX_RDX_NODES node insertions with return code 0\n"
@@ -1584,16 +1584,16 @@ main()
         os.close();
     }
 
-    {  // TEST 13
+    {  // TEST 14
         int return_code;
         int sum = 0;
 
 
         ofstream os;
-        os.open("MKRdxPat.TEST13.results");
+        os.open("MKRdxPat.TEST14.results");
 
         os << "\n"
-              "TEST 13: Demonstrate that MKRdxPat.hpp class works with multiple different structs allocated in the same code block\n"
+              "TEST 14: Demonstrate that MKRdxPat.hpp class works with multiple different structs allocated in the same code block\n"
               "         Expected Results:\n"
               "            a. First trie filled with data\n"
               "            b. No verification error in first trie\n"
@@ -1752,16 +1752,16 @@ main()
         os.close();
     }
 
-    {  // TEST 14
+    {  // TEST 15
         int return_code;
         int sum = 0;
 
 
         ofstream os;
-        os.open("MKRdxPat.TEST14.results");
+        os.open("MKRdxPat.TEST15.results");
 
         os << "\n"
-              "TEST 14: Create rdx trie with max 25 data nodes, insert 20 data nodes, use chg_max_rdx_nodes() member\n"
+              "TEST 15: Create rdx trie with max 25 data nodes, insert 20 data nodes, use chg_max_rdx_nodes() member\n"
               "         to create new trie with max 100 data nodes and the same data, insert 50 new data nodes\n"
               "         Expected Results:\n"
               "            a. Insert 20 data nodes in rdx1 trie - trie has 25 data nodes max\n"
@@ -1909,7 +1909,7 @@ main()
         os.close();
     }
 
-    {  // TEST 15
+    {  // TEST 16
         int return_code;
 
 
@@ -1936,10 +1936,10 @@ main()
         unsigned char rdx_key[NUM_KEYS][1+MAX_KEY_BYTES];
 
         ofstream os;
-        os.open("MKRdxPat.TEST15.results");
+        os.open("MKRdxPat.TEST16.results");
 
         os << "\n"
-              "TEST 15: Create rdx trie with one node, three keys a four bytes per key\n"
+              "TEST 16: Create rdx trie with one node, three keys a four bytes per key\n"
               "         Expected Results:\n"
               "            a. insert one data node in rdx trie with three keys\n"
               "            b. search for node with only the first key using rdx->keys()\n"
